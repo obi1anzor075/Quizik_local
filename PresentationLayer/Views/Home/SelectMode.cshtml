@@ -1,0 +1,394 @@
+﻿@using PresentationLayer.Controllers;
+@{
+    ViewData["Title"] = "Выбор режима";
+}
+
+<head>
+    <link href="~/css/chat.css" rel="stylesheet" />
+    <link href="~/css/SelelctMode.css" rel="stylesheet" />
+</head>
+    <div class="container">
+        <header>
+            <div class="head__mode_part">
+                <div class="head__mode_left">
+                </div>
+                <div class="logo__img">
+                <img src="~/img/logo.svg" class="main__logo_landing" alt="Логотип Brand-battles" />
+                </div>
+                <div class="head__mode_right">
+                    <div class="google__logout">
+                        <a class="google__logout_btn" asp-controller="Home" asp-action="Logout"></a>
+                    </div>
+                    <div id="body">
+
+                        <div id="chat-circle" class="btn btn-raised">
+                            <div id="chat-overlay"></div>
+                            <i class="material-icons">
+                                <svg width="42px" height="42px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22 5C22 6.65685 20.6569 8 19 8C17.3431 8 16 6.65685 16 5C16 3.34315 17.3431 2 19 2C20.6569 2 22 3.34315 22 5Z" fill="#1C274C" />
+                                    <path opacity="0.5" d="M15.2347 2.53476C14.2201 2.1881 13.132 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39938 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88836 21.6244 10.4003 22 12 22C17.5228 22 22 17.5228 22 12C22 10.868 21.8119 9.77987 21.4652 8.76526C20.7572 9.22981 19.9101 9.5 19 9.5C16.5147 9.5 14.5 7.48528 14.5 5C14.5 4.08987 14.7702 3.24284 15.2347 2.53476Z" fill="#1C274C" />
+                                </svg>
+                            </i>
+                        </div>
+                        
+                        <div class="chat-box">
+                            <div class="chat-box-header ">
+                                Чат
+                                <span class="chat-box-toggle">
+                                    <i class="material-icons">
+                                        <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM8.96963 8.96965C9.26252 8.67676 9.73739 8.67676 10.0303 8.96965L12 10.9393L13.9696 8.96967C14.2625 8.67678 14.7374 8.67678 15.0303 8.96967C15.3232 9.26256 15.3232 9.73744 15.0303 10.0303L13.0606 12L15.0303 13.9696C15.3232 14.2625 15.3232 14.7374 15.0303 15.0303C14.7374 15.3232 14.2625 15.3232 13.9696 15.0303L12 13.0607L10.0303 15.0303C9.73742 15.3232 9.26254 15.3232 8.96965 15.0303C8.67676 14.7374 8.67676 14.2625 8.96965 13.9697L10.9393 12L8.96963 10.0303C8.67673 9.73742 8.67673 9.26254 8.96963 8.96965Z" fill="#1C274C" />
+                                        </svg>
+                                    </i>
+                                </span>
+                            </div>
+                            <div class="chat-box-body ">
+                                
+                                <div class="chat-box-overlay ">
+                                </div>
+                                <div class="chat-logs" id="chat-logs">
+                                    
+
+
+                                       
+                                </div>
+                            </div><!--chat-log -->
+                            <div id="chat" class="chat-input">
+                                <form>
+                                    <input type="text" id="chat-input" placeholder="Send a message..." />
+                                    <button type="submit" class="chat-submit" id="chat-submit"><i class="material-icons"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#5A5EB9"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z" stroke="#5A5EB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></i></button>
+                                </form>
+                            </div>
+                        </div>
+                            
+                    </div>
+                </div>
+            </div>
+        </header>
+        </div>
+        <main>
+            <div class="container__mode">
+                <div class="easy__mode_container">
+                    <a type="button" class="easy__mode_link button" data-toggle="modal" data-target="#simpleModeModal">ПРОСТОЙ РЕЖИМ</a>
+                </div>
+                <div class="wrapper">
+                    <div class="hard__mode_container">
+                        <a type="button" class="hard__mode_link button" data-toggle="modal" data-target="#hardModeModal">СЛОЖНЫЙ РЕЖИМ</a>
+                    </div>
+                    <div class="duel__mode_container">
+                        <a type="button" class="duel__mode_link button" data-toggle="modal" data-target="#duelModeModal">ДУЭЛЬ</a>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    <!-- Подключение jQuery и Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="
+https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js
+"></script>
+
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js" ></script>
+    <script>
+        $(document).ready(function () {
+            // Установка соединения с хабом SignalR
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/gameHub") // Укажите URL вашего хаба SignalR
+                .build();
+
+            connection.start().then(async function () {
+                console.log("SignalR connection established.");
+
+                let userName = '';
+
+                try {
+                    // Получение имени пользователя
+                    const response = await fetch('/Home/GetUserName');
+                    const data = await response.json();
+                    userName = data.userName;
+
+                    if (userName) {
+                        console.log("Retrieved user name: " + userName);
+                        await localStorage.setItem('userName', userName);
+                        await joinChat(userName);
+                    } else {
+                        console.log("User name not found in cookies.");
+                    }
+                } catch (error) {
+                    console.error('Error fetching user name:', error);
+                }
+
+            }).catch(function (err) {
+                console.error(err.toString());
+            });
+
+
+            // Функция для присоединения к чату
+            function joinChat(userName) {
+                var connectionInfo = {
+                    userName: userName,
+                    chatRoom: "Global" // Укажите нужную чат-комнату
+                };
+
+                connection.invoke("JoinChat", connectionInfo).then(function () {
+                    $(".chat-box").show('scale');
+                    $(".chat-log").hide('scale');
+                    $("#chat-circle").hide(); // Скрыть chat circle при показе chat box
+
+                    // Отправка сообщения "добро пожаловать"
+                }).catch(function (err) {
+                    console.error(err.toString());
+                });
+            }
+
+
+
+            // Функция для отправки сообщения
+            function sendMessage(userName, message) {
+                connection.invoke("SendMessage", userName, message).then(function () {
+                    @*
+                    console.log("Message sent.");
+                *@
+                }).catch(function (err) {
+                    console.error(err.toString());
+                });
+            }
+
+            // Список случайных аватаров
+            const randomAvatars = [
+                '/img/chat-logo/logo1.svg',
+                '/img/chat-logo/logo2.svg',
+                '/img/chat-logo/logo3.svg',
+                '/img/chat-logo/logo4.svg'
+            ];
+
+            // Функция для генерации или получения сохраненного аватара
+            function getAvatar(userName) {
+                let avatar = localStorage.getItem(`avatar_${userName}`);
+                if (!avatar) {
+                    avatar = generateAvatar(userName);
+                    localStorage.setItem(`avatar_${userName}`, avatar);
+                }
+                return avatar;
+            }
+
+            // Функция для генерации аватара
+            function generateAvatar(userName) {
+                if (userName === 'Brand-Battle') {
+                    return '/img/chat-logo/Admin-logo.jpg'; // Специальный аватар для BrandBattle
+                } else {
+                    const randomIndex = Math.floor(Math.random() * randomAvatars.length);
+                    return randomAvatars[randomIndex];
+                }
+            }
+
+            // Функция для генерации HTML кода сообщения
+            function generateMessageHTML(userName, message) {
+                const avatarSrc = getAvatar(userName);
+
+                return '<div class="chat-msg">' +
+                    '<span class="msg-avatar">' +
+                    '<img class="avatar-img" src="' + avatarSrc + '" alt="avatar">' +
+                    '</span>' +
+                    '<div class="cm-msg-text"><strong>' + userName + ':</strong> ' + message + '</div>' +
+                    '</div>';
+            }
+
+
+
+            // Переменные для отслеживания состояния chat box и chat log
+            var chatCircle = $("#chat-circle");
+            var chatLog = $(".chat-log");
+            var chatBox = $(".chat-box");
+            var chatBoxToggle = $(".chat-box-toggle");
+            var chatLogToggle = $(".chat-log-toggle");
+
+            // Показать chat log при клике на chat circle
+            chatCircle.click(function () {
+                chatLog.toggle('scale');
+            });
+
+            // Закрытие chat log при клике на toggle
+            chatLogToggle.click(function () {
+                chatLog.toggle('scale');
+            });
+
+            // Закрытие chat box при клике на toggle
+            chatBoxToggle.click(function () {
+                chatBox.toggle('scale', function () {
+                    chatCircle.show('scale'); // Показать chat circle после скрытия chat box
+                });
+            });
+            // Отправка сообщения из chat box
+            $("#chat-submit").click(async function (e) {
+                e.preventDefault();
+                var message = $("#chat-input").val();
+                var userName = localStorage.getItem('userName');
+
+                if (message.trim() !== '') {
+                    await sendMessage(userName, message);
+                    $("#chat-input").val('');
+
+                    // Перемещение вниз чата с использованием requestAnimationFrame
+                    requestAnimationFrame(function () {
+                        const chat = document.getElementById("chat-logs");
+                        chat.scrollTop = chat.scrollHeight;
+                    });
+                }
+            });
+
+            // Обработка получения сообщения от сервера
+            connection.on("ReceiveMessage", function (userName, message) {
+                $(".chat-logs").append(generateMessageHTML(userName, message));
+
+                // Перемещение вниз чата при получении нового сообщения
+                requestAnimationFrame(function() {
+                    const chat = document.getElementById("chat-logs");
+                    chat.scrollTop = chat.scrollHeight;
+                });
+            });
+            // Обработчик событий для chat circle и chat box toggle
+            $("#chat-circle").click(function () {
+                chatCircle.hide('scale');
+                chatBox.show('scale');
+            });
+
+            $(".chat-box-toggle").click(function () {
+                chatBox.hide('scale', function () {
+                    chatCircle.show('scale'); // Показать chat circle после скрытия chat box
+                });
+            });
+        });
+
+        $(function () {
+            $("#chat-submit").click(function (e) {
+                e.preventDefault();
+                var msg = $("#chat-input").val();
+                if (msg.trim() == '') {
+
+                    return false;
+                }
+            });
+
+            $(document).delegate(".chat-btn", "click", function () {
+                var value = $(this).attr("chat-value");
+                var name = $(this).html();
+                $("#chat-input").attr("disabled", false);
+                generate_message(name, 'self');
+            });
+        });
+
+        function setUserNameCookie(userName) {
+            // Set the userName cookie
+            Cookies.set('userName', userName, { expires: 7 }); // Expires in 7 days
+        }
+
+    </script>
+
+
+
+
+
+
+    <script src="~/js/site.js"></script>
+
+
+    <!-- Модальное окно для простого режима -->
+    <div class="modal fade" id="simpleModeModal" tabindex="-1" role="dialog" aria-labelledby="simpleModeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content game-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title center" id="simpleModeModalLabel">
+                        Добро пожаловать! Вы выбрали простой уровень сложности
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Здесь можно разместить содержимое модального окна, например, инструкции для простого режима -->
+                    <p>
+                        Этот режим создан для тех, кто только начинает свой путь в мире викторин и готов пройти захватывающее путешествие по миру известных брендов сумок. Здесь вы встретите вопросы на самые разные темы, связанные с мировой модой, трендами и легендарными марками.
+                    </p>
+                    <p>
+                        Предстоит выбрать из четырех вариантов ответа тот, который считаете верным. Но будьте осторожны, время для каждого вопроса ограничено 15 секундами! Это будет настоящий вызов для вашей реакции и знаний.
+                    </p>
+                    <p>
+                        В этом режиме нет места для ошибок – только один правильный ответ. Готовы ли вы попробовать свои силы? Если да, то давайте начнем этот увлекательный путь к победе! Нажмите 'Играть' и дайте себе шанс стать настоящим знатоком мировой моды!
+                    </p>
+                </div>
+                <div class="modal-footer align-center">
+                    <a class="button-confirm" asp-controller="SelectMode" asp-action="Easy">Играть</a>
+                    <!-- Здесь можно добавить дополнительные кнопки или функциональность для простого режима -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для сложного режима -->
+    <div class="modal fade" id="hardModeModal" tabindex="-1" role="dialog" aria-labelledby="hardModeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content game-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title center" id="hardModeModalLabel">
+                        Добро пожаловать! Вы выбрали сложный уровень
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Здесь можно разместить содержимое модального окна, например, инструкции для простого режима -->
+                    <p>
+                        Этот уровень предназначен для настоящих знатоков моды и истинных ценителей изысканности. Здесь вас ждут вопросы на самые разные темы, связанные с мировой индустрией моды, включая бренды сумок, историю моды, дизайнерские коллекции и многое другое.
+                    </p>
+                    <p>
+                        В этом режиме вы не найдете вариантов ответов – вам придется проявить свои знания в полной мере и написать правильный ответ самостоятельно. Но не забывайте, что на каждый вопрос у вас будет всего 30 секунд. Подумайте быстро, но внимательно – каждая деталь может быть решающей!
+                    </p>
+                    <p>
+                        Готовы ли вы к этому вызову? Если ваш ответ 'да', то жмите 'Играть' и докажите всем свою экспертность в мире моды! Не отступайте перед сложностями – впереди вас ждут настоящие испытания!
+                    </p>
+                </div>
+                <div class="modal-footer align-center">
+                    <a class="button-confirm" asp-controller="SelectMode" asp-action="Hard">Играть</a>
+                    <!-- Здесь можно добавить дополнительные кнопки или функциональность для простого режима -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для дуэльного режима -->
+    <div class="modal fade" id="duelModeModal" tabindex="-1" role="dialog" aria-labelledby="duelModeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content game-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title center" id="duelModeModalLabel">
+                        Добро пожаловать в Дуэль!
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Здесь можно разместить содержимое модального окна, например, инструкции для простого режима -->
+                    <p>
+                        Этот режим представляет собой настоящее соревнование между вами и другим игроком. Вас ожидают увлекательные вопросы из мира моды, где вы будете сражаться за звание лучшего знатока в этой области.
+                    </p>
+                    <p>
+                        Игра пройдет в формате дуэли, где вы будете отвечать на вопросы по очереди. На некоторые вопросы у вас будет выбор из вариантов ответа, на другие – вам нужно будет написать ответ самостоятельно. Не забывайте, что на вопросы с вариантами ответа у вас будет всего 15 секунд, а на вопросы без вариантов  – 30 секунд. Поэтому действуйте быстро и точно!
+                    </p>
+                    <p>
+                        Покажите свою сообразительность, смекалку и знания в мире моды! Готовы ли вы помериться силами с оппонентом? Если ваш ответ 'да', то жмите 'Играть' и отправляйтесь на поле битвы модных гуру! Победа ждет того, кто окажется самым искусным и внимательным!
+                    </p>
+                </div>
+                <div class="modal-footer align-center">
+                    <a class="button-confirm" asp-controller="SelectMode" asp-action="Duel">Играть</a>
+                    <!-- Здесь можно добавить дополнительные кнопки или функциональность для простого режима -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+

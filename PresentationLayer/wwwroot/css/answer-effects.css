@@ -1,0 +1,50 @@
+﻿.eventListener {
+    cursor: pointer;
+}
+
+.answer.eventListener {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.answer.eventListener:hover {
+    transform: scale(1.03) translate(0px, 0px);
+    opacity: 1;
+}
+
+.answer.eventListener.dimmed {
+    opacity: 0.4;
+}
+
+/* Отключение hover для выбранного ответа */
+.answer.hover-disabled:hover {
+    transform: none;
+}
+
+/* Стили для выделения при нажатии */
+.answer.selected {
+    transform: scale(1.1) translate(0px, 0px);
+    transition: 0.2s;
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Стили для правильного ответа */
+.answer.correct {
+    background-color: #32CD32;
+}
+
+/* Стили для неправильного ответа */
+.answer.incorrect {
+    background-color: #FF6347;
+}
+
+.input-answer.correct {
+    color: #32CD32;
+}
+
+.input-answer.incorrect {
+    color: #FF6347;
+}

@@ -1,0 +1,253 @@
+﻿.none{
+    display:none;
+}
+
+a:hover{
+    color:white;
+}
+
+.container{
+    width:100vw;
+    margin:0;
+}
+
+.head__mode_part{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    height:100px;
+    width:99vw;
+}
+
+.head__mode_left{
+    display:flex;
+    justify-content:flex-start;
+}
+.logo__img{
+    display:flex;
+    justify-content:center;
+}
+
+.google__logout {
+    border: none;
+    padding: 8px 16px;
+    background-color: #41CAC2;
+    border-radius: 15px;
+    height:fit-content;
+    margin:32px 32px 10px;
+}
+
+.google__logout_btn {
+    font-size: 18px;
+    font-weight: 700;
+    color:white;
+    /*color: #CFCFCF;*/
+    /*padding: 32px 32px 10px;*/
+}
+
+.google__logout_btn:before{
+    content:"Выйти";
+}
+
+
+.head__mode_right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/*Logo*/
+.main__logo_landing{
+    width: 400px;
+    padding-top:40px;
+}
+
+.chat-msg {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.msg-avatar {
+    margin-right: 10px;
+}
+
+.avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.cm-msg-text {
+    background: #f1f1f1;
+    border-radius: 10px;
+    padding: 10px;
+    position: relative;
+    max-width: 60%;
+}
+
+
+
+
+.logo__profile {
+    width: 32px;
+    height: 32px
+}
+
+.settings {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.button__settings {
+    display: flex;
+    height: 42px;
+    width: 42px;
+    align-items: center;
+    border-radius: 100%;
+    border: none;
+    background-color: #3f99ff;
+    padding: 5px
+}
+
+
+/*Main*/
+.container__mode {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100vw;
+    height: calc(50vh + 20px);
+}
+.easy__mode_container {
+    border-radius: 18px;
+    outline: 4px;
+    border: 10px solid #00000061;
+    background: #41CAC2;
+    width: 260px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.hard__mode_container {
+    border-radius: 18px;
+    outline: 4px;
+    border: 10px solid #00000061;
+    background: #A52F2F;
+    width: 260px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.duel__mode_container {
+    border-radius: 18px;
+    outline: 4px;
+    border: 10px solid #00000061;
+    background: #C021C3;
+    width: 260px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wrapper{
+    display:flex;
+    flex-direction:row;
+    gap:20px;
+}
+
+.easy__mode_link,
+.hard__mode_link,
+.duel__mode_link {
+    cursor: pointer;
+    color: #FFF;
+    text-align: center;
+    font-family: Montserrat;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    padding:5px;
+}
+
+/*Game-modal*/
+.game-modal {
+    width: 1100px;
+    background-color: #355873;
+    color: white;
+}
+
+.close {
+    filter: brightness(0) invert(1);
+}
+
+.center{
+    width:100%;
+    text-align:center;
+}
+
+.align-center {
+    justify-content: center;
+}
+
+.button-confirm {
+    background-color: #41CAC2;
+    padding:12px 20px;
+    border-radius:15px;
+    color:white;
+    font-weight:700;
+}
+
+/*Media requests*/
+
+@media(max-width:1150px){
+    .main__logo_landing {
+        width: clamp(250px, 45vw, 300px);
+        padding-top: 80px
+    }
+    
+    .wrapper{
+        flex-direction: column;
+    }
+
+    .modal-dialog-centered.modal-dialog-scrollable .modal-content {
+        width: 90vw !important;
+    }
+
+    .head__mode_part {
+        padding: 16px 16px 16px;
+    }
+
+    .head__back {
+        font-size: 18px;
+    }
+
+    .container{
+        padding:0 !important;
+    }
+
+}
+
+@media(max-width:680px){
+    .google__logout{
+        margin:8px 8px;
+        position:absolute;
+    }
+
+    .head__mode_part {
+        padding: 8px 8px;
+    }
+
+}
+
+@media(max-height:1000px){
+    .container__mode {
+        height: clamp(520px, 63vh, 600px);
+    }
+}

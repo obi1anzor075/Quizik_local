@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /*/Easy
+Disallow: /*/Hard
+Disallow: /*/Duel
+Disallow: /*/Finish
+Sitemap: https://brand-battles.ru/sitemap.xml
