@@ -67,8 +67,8 @@
                                 <span class="validator_error text-danger" asp-validation-for="RememberMe"></span>
                             </div>
 
-                            <input type="submit" value="Играть" id="send" class="button button__play" />
-                            <div class="redirect-to-login">Нет аккаунта? <a class="login-text" asp-controller="Home" asp-action="Register">Зарегистрироваться</a></div>
+                            <input type="submit" value="ИГРАТЬ" id="send" class="button button__play" />
+                        <div class="redirect-to-login">Нет аккаунта? <a class="aqua-text" asp-controller="Home" asp-action="Register">Зарегистрироваться</a></div>
                         </div>
                     </form>
                 </div>
@@ -78,23 +78,26 @@
                 <hr />
             </div>
 
-            <div class="field_wrapper">
-                <div class="google__login">
-                    <div id="g_id_onload"
-                         data-client_id="451296040503-18sveltvp6o2lfhlnr4490a6kb8o9sae.apps.googleusercontent.com"
-                         data-login_uri="@Url.Action("LoginGoogle", "Home")"
-                         data-auto_prompt="false">
-                    </div>
-                    <div class="g_id_signin"
-                         data-type="icon"
-                         data-shape="circle"
-                         data-theme="outline"
-                         data-text="signin_with"
-                         data-size="large"
-                         data-logo_alignment="left">
-                    </div>
+        <div class="field_wrapper">
+            <div class="google__login">
+                <div id="g_id_onload"
+                     data-client_id="451296040503-18sveltvp6o2lfhlnr4490a6kb8o9sae.apps.googleusercontent.com"
+                     data-login_uri="@Url.Action("LoginGoogle", "Home")"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
                 </div>
             </div>
+        </div>
+
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+
         </div>
     </main>
 

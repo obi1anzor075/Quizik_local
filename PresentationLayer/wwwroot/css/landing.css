@@ -34,30 +34,34 @@ margin-top:50px;
 .log__in_text:before {
     content: "ВОЙТИ ИЛИ ЗАРЕГИСТРИРОВАТЬСЯ"
 }
-
-.button{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    border:none;
-    padding: 8px 16px;
-    background-color:#41CAC2;
-    border-radius:15px;
-    gap:5px;
-
-    height:50px !important;
+.aqua-text {
+    color: #43c3bc !important;
 }
 
-    .button > span {
-        font-weight: 600;
-        font-size: 14px
-    }
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    background-color: #41CAC2;
+    border-radius: 15px;
+    gap: 5px;
+    height: 50px;
+}
+
+.button > span {
+    font-weight: 600;
+    font-size: 14px
+}
 
 
-    .button:hover {
-        filter: brightness(0.80)
-    }
+.button:hover {
+    transform: translateY(4px);
+    box-shadow: 0px 0px 0px #2c8f89;
+}
+
 
 
 
@@ -74,6 +78,27 @@ margin-top:50px;
 color:white;
 
 }
+
+.button__play {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 32px;
+    width: 50%;
+    border-radius: 8px;
+    background-color: #41CAC2;
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0px 4px 0px #2c8f89;
+    transition: .1s all ease-in-out;
+}
+
+.button:active {
+    transform: scale(0.95);
+}
+
 
 .ctr {
     display: flex;
@@ -159,11 +184,20 @@ color:white;
 
 .google__login {
     margin-block: 20px;
+    width: 11% !important;
 }
+
+/*.google__login > * > * > * > *  {
+    background-color: transparent;
+    border-color: transparent !important;
+}*/
 
 .nsm7Bb-HzV7m-LgbsSe{
 
     border-radius:7px !important;
+}
+.nsm7Bb-HzV7m-LgbsSe-BPrWId{
+    color: white;
 }
 
 
@@ -233,6 +267,7 @@ font-size:clamp(0.85rem,2.1vw,1.1rem);
     display: flex;
     align-items: center;
     margin-right: 10px; /* Adjust spacing as needed */
+    filter: invert(61%) sepia(95%) saturate(288%) hue-rotate(127deg) brightness(96%) contrast(87%) !important;
 }
 
     .checkbox-wrapper-12 > svg {

@@ -16,7 +16,9 @@ a:hover{
     grid-template-columns:repeat(3,1fr);
     height:100px;
     width:99vw;
+    padding:25px;
 }
+
 
 .head__mode_left{
     display:flex;
@@ -197,11 +199,32 @@ a:hover{
 }
 
 .button-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: none;
+    padding: 8px 16px;
     background-color: #41CAC2;
-    padding:12px 20px;
-    border-radius:15px;
-    color:white;
-    font-weight:700;
+    gap: 5px;
+    height: 50px;
+    font-weight: 700;
+    font-size: 20px;
+    width: 150px;
+    border-radius: 8px;
+    box-sizing: border-box;    
+    cursor: pointer;
+    box-shadow: 0px 4px 0px #2c8f89;
+    transition: .1s all ease-in-out;
+}
+
+.button-confirm:hover {
+    transform: translateY(4px);
+    box-shadow: 0px 0px 0px #2c8f89;
+}
+
+.button-confirm:active {
+    transform: scale(0.95);
 }
 
 /*Media requests*/
