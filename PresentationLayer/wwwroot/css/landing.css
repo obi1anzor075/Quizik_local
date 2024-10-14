@@ -2,6 +2,8 @@
 
 /*Main page*/
 
+
+
 .main__part{
     height:100%;
 margin-top:50px;
@@ -184,7 +186,6 @@ color:white;
 
 .google__login {
     margin-block: 20px;
-    width: 11% !important;
 }
 
 /*.google__login > * > * > * > *  {

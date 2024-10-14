@@ -6,6 +6,10 @@ a:hover{
     color:white;
 }
 
+.main {
+    height: 100vh;
+}
+
 .container{
     width:100vw;
     margin:0;
@@ -32,10 +36,15 @@ a:hover{
 .google__logout {
     border: none;
     padding: 8px 16px;
-    background-color: #41CAC2;
+    background-color: #5A5EB9;
     border-radius: 15px;
-    height:fit-content;
-    margin:32px 32px 10px;
+    height: fit-content;
+    margin: 32px 32px 10px;
+}
+
+.google__logout:hover{
+    transform:scale(1.1);
+    transition:0.2s ease;
 }
 
 .google__logout_btn {
@@ -116,11 +125,72 @@ a:hover{
 .container__mode {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     width: 100vw;
-    height: calc(50vh + 20px);
+    height: calc(100% - 100px);
 }
+
+.carousel_container{
+    width:max(40vw,480px);
+}
+
+.card-list .card-item {
+    list-style: none;
+}
+
+.card-list .card-item .card-link {
+    width: 350px;
+    display: block;
+    background: #808080;
+    padding: 22px;
+    border-radius: 12px;
+    text-decoration: none;
+    border:2px solid transparent;
+    box-shadow: 0 10px 10px rgba(0,0,0,0.05);
+    transition:0.2s ease;
+}
+
+.card-list .card-item .card-link:hover{
+    transform:scale(1.1);
+}
+
+
+
+.card-list .card-link .card-image{
+    width:128px;
+}
+
+.card-list .card-link .card-title{
+    font-size:1.19rem;
+    color:white;
+    font-weight:700;
+    letter-spacing:1px;
+    margin:0;
+}
+
+.card-list .card-item .card-link{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.card-list .card-item {
+    display: flex;
+    justify-content: center;
+    padding-right:60px;
+}
+
+.card-wrapper .swiper-pagination {
+    top: 90% !important;
+}
+
+.card-wrapper{
+    padding:15px;
+}
+
+
+
 .easy__mode_container {
     border-radius: 18px;
     outline: 4px;
@@ -228,6 +298,13 @@ a:hover{
 }
 
 /*Media requests*/
+
+@media (min-width: 836px) and (min-height: 650px) {
+    .category_selector {
+        padding-top: unset;
+        padding-bottom: unset;
+    }
+}
 
 @media(max-width:1150px){
     .main__logo_landing {

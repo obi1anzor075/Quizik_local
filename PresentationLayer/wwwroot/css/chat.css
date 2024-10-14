@@ -33,6 +33,11 @@
     align-items: center;
 }
 
+#chat-circle:hover{
+    transform:scale(1.2);
+    transition:0.2s ease-in-out;
+}
+
 .btn#my-btn {
     background: white;
     padding-top: 13px;
