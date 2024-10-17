@@ -4,10 +4,10 @@
     ViewData["Title"] = "Вход";
 }
 
-
 <head>
     <link href="~/css/landing.css" rel="stylesheet" />
 </head>
+
     <header class="head__part">
         <div class="settings">
             <!-- Настройки (может быть добавлено позже) -->
@@ -85,14 +85,14 @@
                      data-login_uri="@Url.Action("LoginGoogle", "Home")"
                      data-auto_prompt="false">
                 </div>
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-shape="rectangular"
-                     data-theme="outline"
-                     data-text="signin_with"
-                     data-size="large"
-                     data-logo_alignment="left">
-                </div>
+                    <div class="g_id_signin"
+                         data-type="icon"
+                         data-shape="circle"
+                         data-theme="outline"
+                         data-text="signin_with"
+                         data-size="large"
+                         data-logo_alignment="left">
+                    </div>
             </div>
         </div>
 
@@ -103,6 +103,7 @@
 
     <footer class="footer__part"></footer>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+
 
     @section Scripts {
         @{

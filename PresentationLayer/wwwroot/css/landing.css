@@ -451,7 +451,7 @@ font-size:clamp(0.85rem,2.1vw,1.1rem);
     }
 
     .input__name, .input__name:active{
-        width:230px;
+        width:100%;
     }
 }
 
