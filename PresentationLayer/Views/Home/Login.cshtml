@@ -32,8 +32,8 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="register-wrapper">
                             <div class="input__name_wrapper">
-                                <input asp-for="UserName" class="input__name" required type="email" id="username" name="username" placeholder="Введите почту" />
-                                <span class="validator_error text-danger" asp-validation-for="UserName"></span>
+                                <input asp-for="Email" class="input__name" required type="email" id="username" name="email" placeholder="Введите почту" />
+                                <span class="validator_error text-danger" asp-validation-for="Email"></span>
                             </div>
 
                             <div class="input__password_wrapper">
@@ -85,14 +85,14 @@
                      data-login_uri="@Url.Action("LoginGoogle", "Home")"
                      data-auto_prompt="false">
                 </div>
-                    <div class="g_id_signin"
-                         data-type="icon"
-                         data-shape="circle"
-                         data-theme="outline"
-                         data-text="signin_with"
-                         data-size="large"
-                         data-logo_alignment="left">
-                    </div>
+                <div class="g_id_signin"
+                     data-type="icon"
+                     data-shape="circle"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
+                </div>
             </div>
         </div>
 

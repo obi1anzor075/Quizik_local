@@ -5,8 +5,9 @@ namespace PresentationLayer.ViewModels
 {
     public class LoginVM
     {
-        [Required(ErrorMessage = "Введите почту")]
-        public string? UserName { get; set; }
+        [Required(ErrorMessage = "Введите корректный адрес электронной почты")]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Введите корректный адрес электронной почты")]
+        public string? Email { get; set; }
 
         [Required(ErrorMessage ="Введите пароль")]
         [DataType(DataType.Password)]

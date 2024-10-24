@@ -16,7 +16,7 @@
                 <div class="head__mode_left">
                 </div>
                 <div class="logo__img">
-                <img src="~/img/logo.svg" class="main__logo_landing" alt="Логотип Brand-battles" />
+                <img src="~/img/logo.svg" class="main__logo_landing" alt="Логотип Quizik" />
                 </div>
                 <div class="head__mode_right">
                     <div class="google__logout">
@@ -86,7 +86,7 @@
                     <div class="card-wrapper">
                         <ul class="card-list swiper-wrapper">
                             <li class="card-item swiper-slide" data-swiper-autoplay="2000">
-                                <a type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
+                                <a type="button" data-toggle="modal" data-target="#pddModal" class="card-link">
                                     <h2 class="card-title">ПДД</h2>
                                     <img src="~/img/game-modes/PDD.svg" alt="Alternate Text" class="card-image" >
                                 </a>
@@ -213,8 +213,8 @@
 
             // Функция для генерации аватара
             function generateAvatar(userName) {
-                if (userName === 'Brand-Battle') {
-                    return '/img/chat-logo/Admin-logo.jpg'; // Специальный аватар для BrandBattle
+                if (userName === 'Quizik') {
+                return '/img/chat-logo/Admin-logo.webp'; // Специальный аватар для Quizik
                 } else {
                     const randomIndex = Math.floor(Math.random() * randomAvatars.length);
                     return randomAvatars[randomIndex];
@@ -358,12 +358,12 @@
 
 
     <!-- Модальное окно для простого режима -->
-    <div class="modal fade" id="simpleModeModal" tabindex="-1" role="dialog" aria-labelledby="simpleModeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="pddModal" tabindex="-1" role="dialog" aria-labelledby="pddLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content game-modal">
                 <div class="modal-header">
-                    <h5 class="modal-title center" id="simpleModeModalLabel">
-                        Добро пожаловать! Вы выбрали простой уровень сложности
+                    <h5 class="modal-title center" id="pddModalLabel">
+                        Добро пожаловать! Вы выбрали викторину на тему:"ПДД"
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -372,18 +372,20 @@
                 <div class="modal-body">
                     <!-- Здесь можно разместить содержимое модального окна, например, инструкции для простого режима -->
                     <p>
-                        Этот режим создан для тех, кто только начинает свой путь в мире викторин и готов пройти захватывающее путешествие по миру известных брендов сумок. Здесь вы встретите вопросы на самые разные темы, связанные с мировой модой, трендами и легендарными марками.
+                    Тест на знание ПДД поможет вам проверить и укрепить свои знания о правилах безопасного движения на дорогах. В каждом вопросе вам будет предложен один или несколько вариантов ответов, из которых нужно выбрать правильный.
                     </p>
                     <p>
-                        Предстоит выбрать из четырех вариантов ответа тот, который считаете верным. Но будьте осторожны, время для каждого вопроса ограничено 15 секундами! Это будет настоящий вызов для вашей реакции и знаний.
+                    Викторина охватывает основные положения правил дорожного движения, включая знаки, разметку, приоритеты на дороге и обязанности водителей и пешеходов.
                     </p>
                     <p>
-                        В этом режиме нет места для ошибок – только один правильный ответ. Готовы ли вы попробовать свои силы? Если да, то давайте начнем этот увлекательный путь к победе! Нажмите 'Играть' и дайте себе шанс стать настоящим знатоком мировой моды!
+                    Готовы проверить свои знания и подготовиться к безопасному передвижению на дорогах?
                     </p>
                 </div>
                 <div class="modal-footer align-center">
-                    <a class="button-confirm button button__play" asp-controller="SelectMode" asp-action="Easy">Играть</a>
-                    <!-- Здесь можно добавить дополнительные кнопки или функциональность для простого режима -->
+                    <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyPDD">Просто</a>
+                    <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardPDD">Сложно</a>
+                    <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelPDD">Дуэль</a>
+                    <!-- Здесь можно добавить дополнительные кнопки или функциональность -->
                 </div>
             </div>
         </div>

@@ -123,8 +123,8 @@
 
     // Функция для генерации аватара
     function generateAvatar(userName) {
-        if (userName === 'Brand-Battle') {
-            return '/img/chat-logo/Admin-logo.jpg'; // Специальный аватар для BrandBattle
+        if (userName === 'Quizik') {
+            return '/img/chat-logo/Admin-logo.webp'; // Специальный аватар для Quizik
         } else {
             const randomIndex = Math.floor(Math.random() * randomAvatars.length);
             return randomAvatars[randomIndex];

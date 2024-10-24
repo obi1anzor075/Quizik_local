@@ -23,14 +23,22 @@ namespace PresentationLayer.Controllers
             _gameHubContext = gameHubContext;
         }
 
-        public IActionResult Easy(int index = 0)
+        public IActionResult Easy(string gameMode, int index = 0)
         {
+            // Проверяем сессию для сохранения текущего вопроса
             if (!HttpContext.Session.TryGetValue("CurrentQuestionId", out byte[] questionIdBytes))
             {
                 HttpContext.Session.SetInt32("CurrentQuestionId", 0);
             }
 
-            Question nextQuestion = _dbContext.Questions.Skip(index).FirstOrDefault();
+            // Динамическое формирование SQL-запроса
+            string tableName = gameMode; // Название таблицы зависит от режима игры (например: "EasyQuestions", "HardQuestions")
+
+            // Пример необработанного SQL-запроса для получения вопроса из нужной таблицы
+            string sqlQuery = $"SELECT TOP 1 * FROM {tableName} ORDER BY QuestionId OFFSET {index} ROWS";
+
+            // Выполняем запрос
+            var nextQuestion = _dbContext.Questions.FromSqlRaw(sqlQuery).FirstOrDefault();
 
             if (nextQuestion != null)
             {
@@ -40,6 +48,7 @@ namespace PresentationLayer.Controllers
 
                 var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
 
+                // Перемешиваем варианты ответов
                 var random = new Random();
                 for (int i = answers.Count - 1; i > 0; i--)
                 {
@@ -59,6 +68,7 @@ namespace PresentationLayer.Controllers
             string difficultyLevel = "Легкий";
             return RedirectToAction("Finish", new { difficultyLevel });
         }
+
 
         public IActionResult Hard(int index = 0)
         {
