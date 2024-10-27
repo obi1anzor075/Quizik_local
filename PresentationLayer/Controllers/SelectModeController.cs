@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using PresentationLayer.Hubs;
+using Microsoft.Data.SqlClient;
 
 namespace PresentationLayer.Controllers
 {
@@ -23,21 +24,22 @@ namespace PresentationLayer.Controllers
             _gameHubContext = gameHubContext;
         }
 
-        public IActionResult Easy(string gameMode, int index = 0)
+        public IActionResult EasyPDD()
         {
-            // Проверяем сессию для сохранения текущего вопроса
-            if (!HttpContext.Session.TryGetValue("CurrentQuestionId", out byte[] questionIdBytes))
-            {
-                HttpContext.Session.SetInt32("CurrentQuestionId", 0);
-            }
+            return Easy("EasyPDD");
+        }
+
+        public IActionResult Easy(string gameMode)
+        {
+            // Извлекаем текущее значение индекса вопроса из сессии
+            int currentQuestionIndex = HttpContext.Session.GetInt32("CurrentQuestionId") ?? 0;
+
+            // Увеличиваем индекс для следующего вопроса
+            HttpContext.Session.SetInt32("CurrentQuestionId", currentQuestionIndex);
 
             // Динамическое формирование SQL-запроса
-            string tableName = gameMode; // Название таблицы зависит от режима игры (например: "EasyQuestions", "HardQuestions")
+            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
 
-            // Пример необработанного SQL-запроса для получения вопроса из нужной таблицы
-            string sqlQuery = $"SELECT TOP 1 * FROM {tableName} ORDER BY QuestionId OFFSET {index} ROWS";
-
-            // Выполняем запрос
             var nextQuestion = _dbContext.Questions.FromSqlRaw(sqlQuery).FirstOrDefault();
 
             if (nextQuestion != null)
@@ -59,9 +61,6 @@ namespace PresentationLayer.Controllers
                 }
 
                 ViewBag.Answers = answers;
-                int nextIndex = index + 1;
-                ViewBag.NextIndex = nextIndex;
-
                 return View();
             }
 
@@ -69,24 +68,32 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Finish", new { difficultyLevel });
         }
 
+        public IActionResult HardPDD()
+        {
+            return Hard("HardPDD");
+        }
 
-        public IActionResult Hard(int index = 0)
+        public IActionResult Hard(string gameMode)
         {
             if (!HttpContext.Session.TryGetValue("CurrentQuestionId", out byte[] questionIdBytes))
             {
                 HttpContext.Session.SetInt32("CurrentQuestionId", 0);
             }
 
-            HardQuestion nextQuestion = _dbContext.HardQuestions.Skip(index).FirstOrDefault();
+            int currentQuestionIndex = HttpContext.Session.GetInt32("CurrentQuestionId") ?? 0;
+
+            HttpContext.Session.SetInt32("CurrentQuestionId", currentQuestionIndex + 1);
+
+            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
+
+
+            var nextQuestion = _dbContext.HardQuestions.FromSqlRaw(sqlQuery).FirstOrDefault();
 
             if (nextQuestion != null)
             {
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
                 ViewBag.ImageUrl = nextQuestion.ImageUrl;
-
-                int nextIndex = index + 1;
-                ViewBag.NextIndex = nextIndex;
 
                 return View();
             }
@@ -141,7 +148,7 @@ namespace PresentationLayer.Controllers
             ViewBag.CorrectAnswersCount = correctAnswersCount;
 
             int totalQuestionsCount = _dbContext.Questions.Count();
-            ViewBag.TotalQuestionsCount = totalQuestionsCount;
+            ViewBag.TotalQuestionsCount = totalQuestionsCount -1;
 
             return View();
         }

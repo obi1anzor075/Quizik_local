@@ -7,42 +7,49 @@
 
     function handleAnswerClick(event) {
         const answer = event.currentTarget;
+        const url = window.location.href;
+        const gameMode = url.substring(url.lastIndexOf('/') + 1);
 
-        if (!isAnswerSelected) {
-            isAnswerSelected = true;
-            answer.classList.add('selected');
-            nextQuestionBtn.removeAttribute('disabled'); // Enable the "Continue" button
-            const selectedAnswer = answer.textContent.trim(); // Get the selected answer and trim whitespace
+        if (answer.innerHTML && gameMode) {
+            if (!isAnswerSelected) {
+                isAnswerSelected = true;
+                answer.classList.add('selected');
+                const selectedAnswer = answer.textContent.trim(); // Get the selected answer and trim whitespace
 
-            fetch(`/Game/CheckAnswer/${selectedAnswer}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.isCorrect) {
-                        answer.classList.add('correct');
-                    } else {
-                        answer.classList.add('incorrect');
-                    }
-                    // Disable all interactions after selection and dim other answers
-                    answers.forEach(ans => {
-                        ans.classList.add('disabled');
-                        if (ans !== answer) {
-                            ans.classList.add('dimmed');
+                fetch(`/Game/CheckAnswer/${gameMode}/${selectedAnswer}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.isCorrect) {
+                            answer.classList.add('correct');
                         } else {
-                            ans.classList.remove('dimmed'); // Ensure selected answer is not dimmed
-                            ans.classList.remove('disabled'); // Ensure selected answer is not dimmed
-                            ans.classList.remove('eventListener');
+                            answer.classList.add('incorrect');
                         }
-                        ans.removeEventListener('click', handleAnswerClick);
+                        // Disable all interactions after selection and dim other answers
+                        answers.forEach(ans => {
+                            ans.classList.add('disabled');
+                            if (ans !== answer) {
+                                ans.classList.add('dimmed');
+                            } else {
+                                ans.classList.remove('dimmed'); // Ensure selected answer is not dimmed
+                                ans.classList.remove('disabled'); // Ensure selected answer is not dimmed
+                                ans.classList.remove('eventListener');
+                            }
+                            ans.removeEventListener('click', handleAnswerClick);
+                        });
+                        // Remove hover and dimming functionality
+                        document.querySelectorAll('.answer').forEach(item => {
+                            item.removeEventListener('mouseover', handleMouseOver);
+                            item.removeEventListener('mouseout', handleMouseOut);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
                     });
-                    // Remove hover and dimming functionality
-                    document.querySelectorAll('.answer').forEach(item => {
-                        item.removeEventListener('mouseover', handleMouseOver);
-                        item.removeEventListener('mouseout', handleMouseOut);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+
+                nextQuestionBtn.removeAttribute('disabled'); // Enable the "Continue" button
+        }
+
+        
         }
     }
 

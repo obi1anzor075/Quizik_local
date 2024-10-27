@@ -24,7 +24,7 @@
         <div class="question">
             <img class="question-style" src="~/img/game/question-style.svg" alt="Alternate Text" />
             <div class="question-text">
-                <div translate="no">Вопрос @ViewBag.QuestionId<br />Что за бренд на фото?</div>
+                <div translate="no">Вопрос @ViewBag.QuestionId<br />Что за знак на фото?</div>
             </div>
         </div>
     </header>
@@ -37,17 +37,18 @@
                 <div class="wrapper-answer">
                     @foreach (var answer in firstColumn)
                     {
-                        <div class="answer eventListener">@answer</div>
+                        <div class="answer eventListener" data-answer="@answer">@answer</div>
                     }
                 </div>
                 <div class="wrapper-answer">
                     @foreach (var answer in secondColumn)
                     {
-                        <div class="answer eventListener">@answer</div>
+                        <div class="answer eventListener" data-answer="@answer">@answer</div>
                     }
                 </div>
             </div>
-            <a class="next__question" id="next-question-btn" href="@Url.Action("Easy", "SelectMode", new { index = ViewBag.NextIndex })">Продолжить</a>
+
+            <a class="next__question" id="next-question-btn" href="@Url.Action("EasyPDD", "SelectMode")">Продолжить</a>
         </div>
     </main>
     <footer class="footer__part"></footer>
@@ -59,23 +60,5 @@
     <!-- Подключение обработчик ответа -->
     <script src="~/js/easy-handler.js"></script>
     <script src="~/js/site.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const backButton = document.getElementById('backButton');
-
-            if (backButton) {
-                backButton.addEventListener('click', () => {
-                    // Отправляем запрос на сброс счетчика верных ответов и CurrentQuestionId
-                    fetch('/Game/ResetCounters')
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                });
-            }
-
-
-
-        });
-    </script>
 </body>
 </html>
