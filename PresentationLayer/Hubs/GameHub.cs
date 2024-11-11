@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using DataAccessLayer.DataContext;
 using BusinessLogicLayer.Services.Contracts;
 using DataAccessLayer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace PresentationLayer.Hubs
 {
@@ -177,7 +178,7 @@ namespace PresentationLayer.Hubs
             await Clients.All.ReceiveMessage(userName, message);
         }
 
-        public async Task AnswerQuestion(string userName, string chatRoom, int questionId, string answer)
+        public async Task AnswerQuestion(string userName, string chatRoom, int questionId, string answer, string gameMode)
         {
             try
             {
@@ -189,13 +190,27 @@ namespace PresentationLayer.Hubs
                     throw new KeyNotFoundException($"User '{userName}' not found in player states.");
                 }
 
-                var question = _dbContext.Questions.FirstOrDefault(q => q.QuestionId == questionId);
+                string sqlQuery = $"SELECT * FROM {gameMode} WHERE question_id = {questionId}";
+                var question = _dbContext
+                    .Questions
+                    .FromSqlRaw(sqlQuery);
+
                 if (question == null)
                 {
                     throw new Exception($"Question with ID {questionId} not found.");
                 }
 
-                var isCorrect = string.Equals(answer.Trim(), question.CorrectAnswer.Trim(), StringComparison.OrdinalIgnoreCase);
+                // SQL-запрос для получения всей строки (включая correct_answer)
+                string sqlQueryCorrectAns = $"SELECT * FROM {gameMode} WHERE question_id = {questionId}";
+
+                // Выполнение запроса и получение всех данных
+                var result = _dbContext.Questions
+                    .FromSqlRaw(sqlQueryCorrectAns)
+                    .FirstOrDefault();
+
+                string correctAnswer = result.CorrectAnswer;
+
+                var isCorrect = string.Equals(answer.Trim(), correctAnswer?.Trim(), StringComparison.OrdinalIgnoreCase);
 
                 if (isCorrect)
                 {
@@ -206,15 +221,22 @@ namespace PresentationLayer.Hubs
 
                 await Clients.Caller.AnswerResult(isCorrect);
 
+                string sqlQueryCount = $"SELECT * FROM {gameMode}";
+
+                int questionCount = await _dbContext.Questions.FromSqlRaw(sqlQueryCount).CountAsync();
+
                 // Проверяем, остались ли еще вопросы
-                var questionsCount = _dbContext.Questions.Count();
-                if (playerState.CurrentQuestionIndex >= questionsCount)
+                Console.WriteLine("####################");
+                Console.WriteLine(questionCount);
+                Console.WriteLine(playerState.CurrentQuestionIndex);
+                Console.WriteLine("####################");
+                if (playerState.CurrentQuestionIndex >= questionCount)
                 {
                     await EndGame(chatRoom);
                 }
                 else
                 {
-                    await GetNextQuestion(userName, chatRoom, playerState.CurrentQuestionIndex);
+                    await GetNextQuestion(userName, chatRoom, playerState.CurrentQuestionIndex,"EasyPDD");
                 }
             }
             catch (Exception ex)
@@ -225,11 +247,11 @@ namespace PresentationLayer.Hubs
             }
         }
 
-        public async Task GetNextQuestion(string userName, string chatRoom, int questionIndex)
+        public async Task GetNextQuestion(string userName, string chatRoom, int questionIndex, string gameMode)
         {
             try
             {
-                Console.WriteLine($"GetNextQuestion called with UserName={userName}, ChatRoom={chatRoom}, QuestionIndex={questionIndex}");
+                Console.WriteLine($"GetNextQuestion called with UserName={userName}, ChatRoom={chatRoom}, QuestionIndex={questionIndex}, GameMode={gameMode}");
 
                 var playerState = await GetPlayerState(userName) ?? new PlayerState();
                 await SavePlayerState(userName, playerState);
@@ -241,9 +263,10 @@ namespace PresentationLayer.Hubs
                     return;
                 }
 
+                string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {questionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
+
                 var nextQuestion = _dbContext.Questions
-                    .OrderBy(q => q.QuestionId)
-                    .Skip(questionIndex)
+                    .FromSqlRaw(sqlQuery)
                     .FirstOrDefault();
 
                 if (nextQuestion != null)

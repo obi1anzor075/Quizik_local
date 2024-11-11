@@ -86,7 +86,7 @@
                     <div class="card-wrapper">
                         <ul class="card-list swiper-wrapper">
                             <li class="card-item swiper-slide" data-swiper-autoplay="2000">
-                                <a type="button" data-toggle="modal" data-target="#pddModal" class="card-link">
+                                <a id="cardSlider" type="button" data-toggle="modal" data-target="#pddModal" class="card-link">
                                     <h2 class="card-title">ПДД</h2>
                                     <img src="~/img/game-modes/PDD.svg" alt="Alternate Text" class="card-image" >
                                 </a>
@@ -347,6 +347,14 @@
             Cookies.set('userName', userName, { expires: 7 }); // Expires in 7 days
         }
 
+    // Reset counters when the back button is clicked
+    document.getElementById("cardSlider").addEventListener("click", function () {
+        fetch('/Game/ResetCounters')
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+
     </script>
 
 
@@ -382,9 +390,9 @@
                     </p>
                 </div>
                 <div class="modal-footer align-center">
-                    <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyPDD">Просто</a>
-                    <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardPDD">Сложно</a>
-                    <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelPDD">Дуэль</a>
+                    <a class="button-confirm button button__play easy"  asp-controller="SelectMode" asp-action="EasyPDD">Просто</a>
+                    <a class="button-confirm button button__play hard"  asp-controller="SelectMode" asp-action="HardPDD">Сложно</a>
+                    <a class="button-confirm button button__play duel"  asp-controller="SelectMode" asp-action="DuelPDD">Дуэль</a>
                     <!-- Здесь можно добавить дополнительные кнопки или функциональность -->
                 </div>
             </div>

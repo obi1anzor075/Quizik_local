@@ -24,18 +24,24 @@ namespace PresentationLayer.Controllers
             _gameHubContext = gameHubContext;
         }
 
+        private void ResetQuestionIndex()
+        {
+            Response.Cookies.Append("CurrentQuestionIndex", "0");
+            Response.Cookies.Append("CurrentQuestionIndexHard", "0");
+        }
+
         public IActionResult EasyPDD()
         {
+            
             return Easy("EasyPDD");
         }
 
         public IActionResult Easy(string gameMode)
         {
-            // Извлекаем текущее значение индекса вопроса из сессии
-            int currentQuestionIndex = HttpContext.Session.GetInt32("CurrentQuestionId") ?? 0;
 
-            // Увеличиваем индекс для следующего вопроса
-            HttpContext.Session.SetInt32("CurrentQuestionId", currentQuestionIndex);
+            // Извлекаем текущее значение индекса вопроса из сессии
+            int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
+
 
             // Динамическое формирование SQL-запроса
             string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
@@ -75,17 +81,10 @@ namespace PresentationLayer.Controllers
 
         public IActionResult Hard(string gameMode)
         {
-            if (!HttpContext.Session.TryGetValue("CurrentQuestionId", out byte[] questionIdBytes))
-            {
-                HttpContext.Session.SetInt32("CurrentQuestionId", 0);
-            }
 
-            int currentQuestionIndex = HttpContext.Session.GetInt32("CurrentQuestionId") ?? 0;
-
-            HttpContext.Session.SetInt32("CurrentQuestionId", currentQuestionIndex + 1);
+            int.TryParse(Request.Cookies["CurrentQuestionIndexHard"], out int currentQuestionIndex);
 
             string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
-
 
             var nextQuestion = _dbContext.HardQuestions.FromSqlRaw(sqlQuery).FirstOrDefault();
 
@@ -102,14 +101,18 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Finish", new { difficultyLevel });
         }
 
-        public async Task<IActionResult> Duel(int index = 0, string chatRoom = "DuelRoom")
+        public Task<IActionResult> DuelPDD()
         {
-            if (!HttpContext.Session.TryGetValue("CurrentQuestionId", out byte[] questionIdBytes))
-            {
-                HttpContext.Session.SetInt32("CurrentQuestionId", 0);
-            }
+            return Duel("EasyPDD");
+        }
 
-            Question nextQuestion = _dbContext.Questions.Skip(index).FirstOrDefault();
+        public async Task<IActionResult> Duel(string gameMode)
+        {
+            int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
+
+            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
+
+            var nextQuestion = _dbContext.Questions.FromSqlRaw(sqlQuery).FirstOrDefault();
 
             if (nextQuestion != null)
             {
@@ -129,10 +132,8 @@ namespace PresentationLayer.Controllers
                 }
 
                 ViewBag.Answers = answers;
-                int nextIndex = index + 1;
-                ViewBag.NextIndex = nextIndex;
 
-                await _gameHubContext.Clients.Group(chatRoom).ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, answers);
+                await _gameHubContext.Clients.Group("DuelRoom").ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, answers);
 
                 return View();
             }
@@ -144,14 +145,20 @@ namespace PresentationLayer.Controllers
         {
             ViewBag.DifficultyLevel = difficultyLevel;
 
-            int correctAnswersCount = HttpContext.Session.GetInt32("CorrectAnswersCount") ?? 0;
+            // Attempt to retrieve the correct answers count from cookies, defaulting to 0 if it doesn't exist
+            if (!int.TryParse(Request.Cookies["CorrectAnswersCount"], out int correctAnswersCount))
+            {
+                correctAnswersCount = 0;
+            }
+
             ViewBag.CorrectAnswersCount = correctAnswersCount;
 
             int totalQuestionsCount = _dbContext.Questions.Count();
-            ViewBag.TotalQuestionsCount = totalQuestionsCount -1;
+            ViewBag.TotalQuestionsCount = totalQuestionsCount - 1;
 
             return View();
         }
+
 
         public IActionResult ResetCounters()
         {

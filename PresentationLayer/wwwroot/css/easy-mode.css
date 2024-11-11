@@ -61,7 +61,7 @@
 
 .question-img > img {
     border-radius: 10px;
-    width:300px;
+    width:420px;
     padding:20px;
 }
 
@@ -95,6 +95,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align:center;
 }
 
 .next__question {

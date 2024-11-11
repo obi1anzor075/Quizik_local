@@ -335,10 +335,11 @@
     }
 
     async function getNextQuestion() {
+        let gameMode = "EasyPDD";
         try {
             const questionId = parseInt(document.getElementById('questionText').getAttribute('data-question-id')) || 0;
             console.log(`Requesting next question: index=${questionId}`);
-            await connection.invoke("GetNextQuestion", userName, chatRoom, questionId);
+            await connection.invoke("GetNextQuestion", userName, chatRoom, questionId,gameMode);
         } catch (err) {
             console.error(err);
         }
@@ -346,8 +347,9 @@
 
     async function submitAnswer(questionId, answer) {
         try {
+            let gameMode = "EasyPDD"
             console.log(`Submitting answer: UserName=${userName}, ChatRoom=${chatRoom}, QuestionId=${questionId}, Answer=${answer}`);
-            await connection.invoke("AnswerQuestion", userName, chatRoom, questionId, answer);
+            await connection.invoke("AnswerQuestion", userName, chatRoom, questionId, answer, gameMode);
         } catch (err) {
             console.error("Error invoking AnswerQuestion:", err);
         }
