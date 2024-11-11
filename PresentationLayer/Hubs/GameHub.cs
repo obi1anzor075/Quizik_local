@@ -225,6 +225,7 @@ namespace PresentationLayer.Hubs
 
                 int questionCount = await _dbContext.Questions.FromSqlRaw(sqlQueryCount).CountAsync();
 
+                if (playerState.CurrentQuestionIndex >= questionCount)
                 {
                     await EndGame(chatRoom);
                 }

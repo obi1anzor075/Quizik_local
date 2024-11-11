@@ -103,7 +103,7 @@ namespace PresentationLayer.Controllers
 
         public Task<IActionResult> DuelPDD()
         {
-            return Duel("EasyPDD");
+            return Duel("DuelPDD");
         }
 
         public async Task<IActionResult> Duel(string gameMode)
