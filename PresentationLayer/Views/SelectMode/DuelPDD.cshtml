@@ -335,7 +335,7 @@
     }
 
     async function getNextQuestion() {
-        let gameMode = "EasyPDD";
+        let gameMode = "DuelPDD";
         try {
             const questionId = parseInt(document.getElementById('questionText').getAttribute('data-question-id')) || 0;
             console.log(`Requesting next question: index=${questionId}`);
@@ -347,7 +347,7 @@
 
     async function submitAnswer(questionId, answer) {
         try {
-            let gameMode = "EasyPDD"
+            let gameMode = "DuelPDD"
             console.log(`Submitting answer: UserName=${userName}, ChatRoom=${chatRoom}, QuestionId=${questionId}, Answer=${answer}`);
             await connection.invoke("AnswerQuestion", userName, chatRoom, questionId, answer, gameMode);
         } catch (err) {

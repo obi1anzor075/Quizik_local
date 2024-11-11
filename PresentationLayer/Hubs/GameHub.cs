@@ -225,18 +225,12 @@ namespace PresentationLayer.Hubs
 
                 int questionCount = await _dbContext.Questions.FromSqlRaw(sqlQueryCount).CountAsync();
 
-                // Проверяем, остались ли еще вопросы
-                Console.WriteLine("####################");
-                Console.WriteLine(questionCount);
-                Console.WriteLine(playerState.CurrentQuestionIndex);
-                Console.WriteLine("####################");
-                if (playerState.CurrentQuestionIndex >= questionCount)
                 {
                     await EndGame(chatRoom);
                 }
                 else
                 {
-                    await GetNextQuestion(userName, chatRoom, playerState.CurrentQuestionIndex,"EasyPDD");
+                    await GetNextQuestion(userName, chatRoom, playerState.CurrentQuestionIndex,"DuelPDD");
                 }
             }
             catch (Exception ex)
