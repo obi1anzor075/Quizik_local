@@ -251,13 +251,23 @@ namespace PresentationLayer.Hubs
                 var playerState = await GetPlayerState(userName) ?? new PlayerState();
                 await SavePlayerState(userName, playerState);
 
-                var questionsCount = _dbContext.Questions.Count();
+                Console.WriteLine("######################");
+                Console.WriteLine(gameMode);
+                Console.WriteLine(userName);
+                Console.WriteLine(questionIndex);
+                Console.WriteLine("######################");
+
+                string sqlQueryCount = $"SELECT * FROM {gameMode}";
+
+                int questionsCount = await _dbContext.Questions.FromSqlRaw(sqlQueryCount).CountAsync();
                 if (questionIndex >= questionsCount)
                 {
                     await EndGame(chatRoom);
                     return;
                 }
-
+                Console.WriteLine("######################");
+                Console.WriteLine(questionsCount);
+                Console.WriteLine("######################");
                 string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {questionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
 
                 var nextQuestion = _dbContext.Questions

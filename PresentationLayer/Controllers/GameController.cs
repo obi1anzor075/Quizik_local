@@ -43,7 +43,7 @@ namespace PresentationLayer.Controllers
                 return Json(new { isCorrect = false, error = "Question not found." });
             }
 
-            bool isCorrect = (selectedAnswer == question.CorrectAnswer);
+            bool isCorrect = (selectedAnswer.Trim().Normalize() == question.CorrectAnswer.Trim().Normalize());
             CurrentQuestionIndex++;
 
             if (isCorrect)
@@ -65,7 +65,7 @@ namespace PresentationLayer.Controllers
         public async Task<IActionResult> CheckHardAnswer(string gameMode, string selectedAnswer)
         {
             // Получаем текущий индекс вопроса из куки            
-            int.TryParse(Request.Cookies["CurrentQuestionIndexHard"], out int currentQuestionIndex);
+            int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
 
             string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
 
@@ -78,7 +78,7 @@ namespace PresentationLayer.Controllers
 
             // Увеличиваем индекс текущего вопроса и обновляем в куки
             currentQuestionIndex++;
-            Response.Cookies.Append("CurrentQuestionIndexHard", currentQuestionIndex.ToString(), new CookieOptions { Expires = DateTimeOffset.UtcNow.AddDays(1) });
+            Response.Cookies.Append("CurrentQuestionIndex", currentQuestionIndex.ToString(), new CookieOptions { Expires = DateTimeOffset.UtcNow.AddDays(1) });
 
             // Проверяем правильность ответа и увеличиваем счетчик, если ответ правильный
             if (isCorrect)
@@ -109,7 +109,6 @@ namespace PresentationLayer.Controllers
         {
             Response.Cookies.Delete("CorrectAnswersCount");
             Response.Cookies.Delete("CurrentQuestionIndex");
-            Response.Cookies.Delete("CurrentQuestionIndexHard");
             return Ok();
         }
 

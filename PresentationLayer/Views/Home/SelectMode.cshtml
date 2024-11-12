@@ -92,19 +92,19 @@
                                 </a>
                             </li>
                             <li class="card-item swiper-slide" data-swiper-autoplay="2000">
-                                <a type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
+                                <a id="cardSlider" type="button" data-toggle="modal" data-target="#geographyModal" class="card-link">
+                                    <h2 class="card-title">География</h2>
+                                    <img src="~/img/game-modes/Geography.png" alt="Alternate Text" class="card-image" >
+                                </a>
+                            </li>
+                            <li class="card-item swiper-slide" data-swiper-autoplay="2000">
+                                <a id="cardSlider" type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
                                     <h2 class="card-title">ПДД</h2>
                                     <img src="~/img/game-modes/PDD.svg" alt="Alternate Text" class="card-image" >
                                 </a>
                             </li>
                             <li class="card-item swiper-slide" data-swiper-autoplay="2000">
-                                <a type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
-                                    <h2 class="card-title">ПДД</h2>
-                                    <img src="~/img/game-modes/PDD.svg" alt="Alternate Text" class="card-image" >
-                                </a>
-                            </li>
-                            <li class="card-item swiper-slide" data-swiper-autoplay="2000">
-                                <a type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
+                                <a id="cardSlider" type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
                                     <h2 class="card-title">ПДД</h2>
                                     <img src="~/img/game-modes/PDD.svg" alt="Alternate Text" class="card-image" >
                                 </a>
@@ -299,30 +299,6 @@
             });
         });
 
-        // Генератор текста модальных окон
-        $('.modal').on('show.bs.modal', function (e) {
-            var modalId = $(this).attr('id');  // Получаем id открываемого модального окна
-            var modalBody = $(this).find('.modal-body');  // Находим элемент, в который будем вставлять текст
-
-            // Проверяем id модального окна и вставляем текст в зависимости от него
-            if (modalId === 'simpleModeModal') {
-                modalBody.html(`
-                        <p>
-                            Этот режим создан для тех, кто только начинает свой путь в мире викторин и готов пройти захватывающее путешествие по миру известных брендов сумок. Здесь вы встретите вопросы на самые разные темы, связанные с мировой модой, трендами и легендарными марками.
-                        </p>
-                        <p>
-                            Предстоит выбрать из четырех вариантов ответа тот, который считаете верным. Но будьте осторожны, время для каждого вопроса ограничено 15 секундами! Это будет настоящий вызов для вашей реакции и знаний.
-                        </p>
-                        <p>
-                            В этом режиме нет места для ошибок – только один правильный ответ. Готовы ли вы попробовать свои силы? Если да, то давайте начнем этот увлекательный путь к победе! Нажмите 'Играть' и дайте себе шанс стать настоящим знатоком мировой моды!
-                        </p>
-                    `);
-            }
-            // Можно добавить дополнительные условия для других модальных окон
-            else if (modalId === 'anotherModalId') {
-                modalBody.html('<p>Это другой текст для другого модального окна.</p>');
-            }
-        });
 
         $(function () {
             $("#chat-submit").click(function (e) {
@@ -357,15 +333,9 @@
 
     </script>
 
-
-
-
-
-
     <script src="~/js/site.js"></script>
 
-
-    <!-- Модальное окно для простого режима -->
+    <!-- Модальное окно для ПДД -->
     <div class="modal fade" id="pddModal" tabindex="-1" role="dialog" aria-labelledby="pddLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content game-modal">
@@ -399,13 +369,13 @@
         </div>
     </div>
 
-    <!-- Модальное окно для сложного режима -->
-    <div class="modal fade" id="hardModeModal" tabindex="-1" role="dialog" aria-labelledby="hardModeModalLabel" aria-hidden="true">
+     <!-- Модальное окно для Географии -->
+    <div class="modal fade" id="geographyModal" tabindex="-1" role="dialog" aria-labelledby="geographyLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content game-modal">
                 <div class="modal-header">
-                    <h5 class="modal-title center" id="hardModeModalLabel">
-                        Добро пожаловать! Вы выбрали сложный уровень
+                    <h5 class="modal-title center" id="pddModalLabel">
+                        Добро пожаловать! Вы выбрали викторину на тему:"География"
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -414,50 +384,20 @@
                 <div class="modal-body">
                     <!-- Здесь можно разместить содержимое модального окна, например, инструкции для простого режима -->
                     <p>
-                        Этот уровень предназначен для настоящих знатоков моды и истинных ценителей изысканности. Здесь вас ждут вопросы на самые разные темы, связанные с мировой индустрией моды, включая бренды сумок, историю моды, дизайнерские коллекции и многое другое.
+                        Тест по географии поможет вам проверить и расширить знания о нашей планете, её странах, столицах, природных чудесах и культурных особенностях. Каждый вопрос предлагает несколько вариантов ответов, из которых необходимо выбрать правильный.
                     </p>
                     <p>
-                        В этом режиме вы не найдете вариантов ответов – вам придется проявить свои знания в полной мере и написать правильный ответ самостоятельно. Но не забывайте, что на каждый вопрос у вас будет всего 30 секунд. Подумайте быстро, но внимательно – каждая деталь может быть решающей!
+                        Викторина охватывает такие темы, как столицы стран, уникальные географические объекты, природные чудеса и интересные факты о городах и странах мира.
                     </p>
                     <p>
-                        Готовы ли вы к этому вызову? Если ваш ответ 'да', то жмите 'Играть' и докажите всем свою экспертность в мире моды! Не отступайте перед сложностями – впереди вас ждут настоящие испытания!
+                        Готовы отправиться в путешествие по миру и проверить свои знания о географии?
                     </p>
                 </div>
                 <div class="modal-footer align-center">
-                    <a class="button-confirm" asp-controller="SelectMode" asp-action="Hard">Играть</a>
-                    <!-- Здесь можно добавить дополнительные кнопки или функциональность для простого режима -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для дуэльного режима -->
-    <div class="modal fade" id="duelModeModal" tabindex="-1" role="dialog" aria-labelledby="duelModeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
-            <div class="modal-content game-modal">
-                <div class="modal-header">
-                    <h5 class="modal-title center" id="duelModeModalLabel">
-                        Добро пожаловать в Дуэль!
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Здесь можно разместить содержимое модального окна, например, инструкции для простого режима -->
-                    <p>
-                        Этот режим представляет собой настоящее соревнование между вами и другим игроком. Вас ожидают увлекательные вопросы из мира моды, где вы будете сражаться за звание лучшего знатока в этой области.
-                    </p>
-                    <p>
-                        Игра пройдет в формате дуэли, где вы будете отвечать на вопросы по очереди. На некоторые вопросы у вас будет выбор из вариантов ответа, на другие – вам нужно будет написать ответ самостоятельно. Не забывайте, что на вопросы с вариантами ответа у вас будет всего 15 секунд, а на вопросы без вариантов  – 30 секунд. Поэтому действуйте быстро и точно!
-                    </p>
-                    <p>
-                        Покажите свою сообразительность, смекалку и знания в мире моды! Готовы ли вы помериться силами с оппонентом? Если ваш ответ 'да', то жмите 'Играть' и отправляйтесь на поле битвы модных гуру! Победа ждет того, кто окажется самым искусным и внимательным!
-                    </p>
-                </div>
-                <div class="modal-footer align-center">
-                    <a class="button-confirm" asp-controller="SelectMode" asp-action="Duel">Играть</a>
-                    <!-- Здесь можно добавить дополнительные кнопки или функциональность для простого режима -->
+                    <a class="button-confirm button button__play easy"  asp-controller="SelectMode" asp-action="EasyGeography">Просто</a>
+                    <a class="button-confirm button button__play hard"  asp-controller="SelectMode" asp-action="HardGeography">Сложно</a>
+                    <a class="button-confirm button button__play duel"  asp-controller="SelectMode" asp-action="DuelGeography">Дуэль</a>
+                    <!-- Здесь можно добавить дополнительные кнопки или функциональность -->
                 </div>
             </div>
         </div>

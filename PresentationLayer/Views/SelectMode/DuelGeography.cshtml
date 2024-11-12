@@ -46,7 +46,7 @@
                     Комната заполнена
                 </p>
                 <div class="input__room_wrapper">
-                    <input id="input__room" placeholder="Название комнаты" type="text" class="input__room"/>
+                    <input id="input__room" placeholder="Название комнаты" type="text" class="input__room" />
                 </div>
                 <button id="joinDuelBtn" class="button join-duel-btn">Присоединиться</button>
             </div>
@@ -60,7 +60,7 @@
             </div>
         </div>
     </div>
-        <div class="finish__level_card_wrapper" id="finish__level_card_wrapper" style="display: none">
+    <div class="finish__level_card_wrapper" id="finish__level_card_wrapper" style="display: none">
         <div class="finish__level_card">
             <!-- Здесь будет вставлен результат игры -->
         </div>
@@ -304,7 +304,7 @@
             position: 'bottomLeftRight',
         });
     });
-    
+
 
     // Helper function to get random integer between min and max (inclusive)
     function getRandomInt(min, max) {
@@ -329,17 +329,17 @@
             console.error("Error in joinDuel:", err);
         } finally {
             isJoining = false; // Reset flag after joining attempt
-        } 
+        }
         document.getElementById('duel-log').style.display = 'none';
         document.getElementById('waiting-card').style.display = 'flex';
     }
 
     async function getNextQuestion() {
-        let gameMode = "DuelPDD";
+        let gameMode = "DuelGeography";
         try {
             const questionId = parseInt(document.getElementById('questionText').getAttribute('data-question-id')) || 0;
             console.log(`Requesting next question: index=${questionId}`);
-            await connection.invoke("GetNextQuestion", userName, chatRoom, questionId,gameMode);
+            await connection.invoke("GetNextQuestion", userName, chatRoom, questionId, gameMode);
         } catch (err) {
             console.error(err);
         }
@@ -347,7 +347,7 @@
 
     async function submitAnswer(questionId, answer) {
         try {
-            let gameMode = "DuelPDD"
+            let gameMode = "DuelGeography"
             console.log(`Submitting answer: UserName=${userName}, ChatRoom=${chatRoom}, QuestionId=${questionId}, Answer=${answer}`);
             await connection.invoke("AnswerQuestion", userName, chatRoom, questionId, answer, gameMode);
         } catch (err) {
@@ -390,10 +390,10 @@
         timerInterval = setInterval(() => {
             currentTime -= 1;
             const newWidth = (currentTime / durationInSeconds) * totalWidth;
-            @*
-            console.log("Timer update: currentTime =", currentTime, "newWidth =", newWidth);
-            *@
-            timerBar.style.width = newWidth + 'px';
+    @*
+                console.log("Timer update: currentTime =", currentTime, "newWidth =", newWidth);
+                *@
+                timerBar.style.width = newWidth + 'px';
 
             if (currentTime <= 0) {
                 clearInterval(timerInterval);

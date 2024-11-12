@@ -258,6 +258,11 @@ h2{
     font-weight: 700;
     color: red;
 }
+
+.question-text {
+    width: 28vw;
+}
+
 /*Question img*/
 .question-img {
     border-radius: 18px;
@@ -272,7 +277,6 @@ h2{
 
 .question-img > img {
     border-radius: 10px;
-    padding:20px;
     width:420px;
 }
 

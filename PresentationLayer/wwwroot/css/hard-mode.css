@@ -39,7 +39,12 @@
 }
 
 .question-text {
-    width: 28vw;
+    font-size:14px !important;
+    width:85%;
+}
+
+.question-label{
+    font-size:14px;
 }
 
 .answer-helper{
@@ -80,7 +85,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 20px; /* Отступ между изображением и ответами */
+}
 
+.question-img > img {
+    border-radius: 10px;
+    width:420px
 }
 
 .question-answer{
@@ -228,7 +238,7 @@
 
 }
 
-@media(max-width:450px) {
+@media(max-width:400px) {
     .question-style{
         width:280px;
     }

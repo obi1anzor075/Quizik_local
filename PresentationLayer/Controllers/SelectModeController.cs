@@ -27,13 +27,17 @@ namespace PresentationLayer.Controllers
         private void ResetQuestionIndex()
         {
             Response.Cookies.Append("CurrentQuestionIndex", "0");
-            Response.Cookies.Append("CurrentQuestionIndexHard", "0");
         }
 
         public IActionResult EasyPDD()
         {
             
             return Easy("EasyPDD");
+        }
+
+        public IActionResult EasyGeography()
+        {
+            return Easy("EasyGeography");
         }
 
         public IActionResult Easy(string gameMode)
@@ -79,10 +83,15 @@ namespace PresentationLayer.Controllers
             return Hard("HardPDD");
         }
 
+        public IActionResult HardGeography()
+        {
+            return Hard("HardGeography");
+        }
+
         public IActionResult Hard(string gameMode)
         {
 
-            int.TryParse(Request.Cookies["CurrentQuestionIndexHard"], out int currentQuestionIndex);
+            int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
 
             string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
 
@@ -104,6 +113,11 @@ namespace PresentationLayer.Controllers
         public Task<IActionResult> DuelPDD()
         {
             return Duel("DuelPDD");
+        }
+
+        public Task<IActionResult> DuelGeography()
+        {
+            return Duel("DuelGeography");
         }
 
         public async Task<IActionResult> Duel(string gameMode)
@@ -153,7 +167,10 @@ namespace PresentationLayer.Controllers
 
             ViewBag.CorrectAnswersCount = correctAnswersCount;
 
-            int totalQuestionsCount = _dbContext.Questions.Count();
+            if (!int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int totalQuestionsCount))
+            {
+                totalQuestionsCount = 0;
+            }
             ViewBag.TotalQuestionsCount = totalQuestionsCount - 1;
 
             return View();
