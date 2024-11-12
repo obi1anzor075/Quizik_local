@@ -171,7 +171,7 @@ namespace PresentationLayer.Controllers
             {
                 totalQuestionsCount = 0;
             }
-            ViewBag.TotalQuestionsCount = totalQuestionsCount - 1;
+            ViewBag.TotalQuestionsCount = totalQuestionsCount;
 
             return View();
         }

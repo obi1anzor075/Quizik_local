@@ -20,7 +20,7 @@
         <div class="relative-container">
             <img class="question-style" src="~/img/game/question-style.svg" alt="Alternate Text" />
             <div class="question-wrapper" translate="no">
-                <div id="questionText" class="question-label">Вопрос @ViewBag.QuestionId</div><div class="question-text">@ViewBag.QuestionText</div>
+                <div id="questionId" class="question-label">Вопрос @ViewBag.QuestionId</div><div id="questionText" class="question-text">@ViewBag.QuestionText</div>
             </div>
             <div id="timeBarContainer">
                 <div id="timerBar"></div>
@@ -94,7 +94,8 @@
     connection.on("ReceiveQuestion", function (questionId, questionText, imageUrl, answers) {
         document.getElementById('card-login').style.display = 'none';
         console.log("Received question:", questionId, questionText, imageUrl, answers);
-        document.getElementById('questionText').innerText = questionText;
+        document.getElementById('questionId').innerText = questionId;
+        document.getElementById('questionText').innerText = "Вопрос " + String(questionText);
         document.getElementById('questionText').setAttribute('data-question-id', questionId);
         if (imageUrl) {
             document.getElementById('questionImage').src = "/img/questions/" + imageUrl;
@@ -153,7 +154,7 @@
 
         // Запуск таймера только при получении первого вопроса
         if (!timerInterval) {
-            startTimer(45); // Specify the duration in seconds
+            startTimer(45) // Specify the duration in seconds
         }
     });
 

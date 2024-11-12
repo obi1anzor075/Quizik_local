@@ -4,6 +4,7 @@
 
 .answer.eventListener {
     transition: opacity 0.2s ease-in-out;
+    text-align:center;
 }
 
 .answer.eventListener:hover {
