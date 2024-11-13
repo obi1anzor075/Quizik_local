@@ -40,6 +40,7 @@ namespace PresentationLayer.Controllers
             return Easy("EasyGeography");
         }
 
+        [HttpGet("/SelectMode/Easy/{gameMode}")]
         public IActionResult Easy(string gameMode)
         {
 
