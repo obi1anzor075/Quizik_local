@@ -31,7 +31,6 @@ namespace PresentationLayer.Controllers
 
         public IActionResult EasyPDD()
         {
-            
             return Easy("EasyPDD");
         }
 
@@ -40,7 +39,11 @@ namespace PresentationLayer.Controllers
             return Easy("EasyGeography");
         }
 
-        [HttpGet("/SelectMode/Easy/{gameMode}")]
+        public IActionResult EasyWWII()
+        {
+            return Easy("EasyWWII");
+        }
+
         public IActionResult Easy(string gameMode)
         {
 
@@ -89,6 +92,11 @@ namespace PresentationLayer.Controllers
             return Hard("HardGeography");
         }
 
+        public IActionResult HardWWII()
+        {
+            return Hard("HardWWII");
+        }
+
         public IActionResult Hard(string gameMode)
         {
 
@@ -119,6 +127,11 @@ namespace PresentationLayer.Controllers
         public Task<IActionResult> DuelGeography()
         {
             return Duel("DuelGeography");
+        }
+        
+        public Task<IActionResult>DuelWWII()
+        {
+            return Duel("DuelWWII");
         }
 
         public async Task<IActionResult> Duel(string gameMode)

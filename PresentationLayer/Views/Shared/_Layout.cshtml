@@ -35,7 +35,7 @@
 
 </head>
 <body>
-	<div class="loading">
+	<div id="loading" class="loading">
 		<p class="loading-label">Loading. Please wait...</p>
 		<div class="pl1">
 			<div class="pl1__a"></div>
@@ -253,9 +253,18 @@
 
 	<script type="text/javascript">
 		window.onload = function () {
-			setTimeout(function () {
-				loading.style.display = "none";
-			});
+		    var loading = document.getElementById('loading');
+		    
+		    setTimeout(function () {
+		        if (loading) {
+		            loading.classList.add('hidden');  
+		        }
+		    }, 200); 
+		
+		    // Ждём окончания анимации и устанавливаем display: none
+		    loading.addEventListener('transitionend', function () {
+		        loading.style.display = 'none';  // Скрываем элемент после завершения анимации
+		    });
 		};
 	</script>
 

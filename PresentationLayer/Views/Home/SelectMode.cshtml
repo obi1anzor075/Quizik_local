@@ -97,12 +97,13 @@
                                     <img src="~/img/game-modes/Geography.png" alt="Alternate Text" class="card-image" >
                                 </a>
                             </li>
-                           @*  <li class="card-item swiper-slide" data-swiper-autoplay="2000">
-                                <a id="cardSlider" type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
-                                    <h2 class="card-title">ПДД</h2>
-                                    <img src="~/img/game-modes/PDD.svg" alt="Alternate Text" class="card-image" >
+                             <li class="card-item swiper-slide" data-swiper-autoplay="2000">
+                                <a id="cardSlider" type="button" data-toggle="modal" data-target="#WWIImodal" class="card-link">
+                                    <h2 class="card-title">WWII</h2>
+                                    <img src="~/img/game-modes/WWII.png" alt="Alternate Text" class="card-image" >
                                 </a>
                             </li>
+                    @*
                             <li class="card-item swiper-slide" data-swiper-autoplay="2000">
                                 <a id="cardSlider" type="button" data-toggle="modal" data-target="#simpleModeModal" class="card-link">
                                     <h2 class="card-title">ПДД</h2>
@@ -341,7 +342,7 @@
             <div class="modal-content game-modal">
                 <div class="modal-header">
                     <h5 class="modal-title center" id="pddModalLabel">
-                        Добро пожаловать! Вы выбрали викторину на тему:"ПДД"
+                        Добро пожаловать! Вы выбрали викторину на тему: "ПДД"
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -375,7 +376,7 @@
             <div class="modal-content game-modal">
                 <div class="modal-header">
                     <h5 class="modal-title center" id="pddModalLabel">
-                        Добро пожаловать! Вы выбрали викторину на тему:"География"
+                        Добро пожаловать! Вы выбрали викторину на тему: "География"
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -397,6 +398,40 @@
                     <a class="button-confirm button button__play easy"  asp-controller="SelectMode" asp-action="EasyGeography">Просто</a>
                     <a class="button-confirm button button__play hard"  asp-controller="SelectMode" asp-action="HardGeography">Сложно</a>
                     <a class="button-confirm button button__play duel"  asp-controller="SelectMode" asp-action="DuelGeography">Дуэль</a>
+                    <!-- Здесь можно добавить дополнительные кнопки или функциональность -->
+                </div>
+            </div>
+        </div>
+    </div>     
+    
+    <!-- Модальное окно для WWII -->
+    <div class="modal fade" id="WWIImodal" tabindex="-1" role="dialog" aria-labelledby="WWIILabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content game-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title center" id="pddModalLabel">
+                        Добро пожаловать! Вы выбрали викторину на тему: "WWII"
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Здесь можно разместить содержимое модального окна, например, инструкции для простого режима -->
+                    <p>
+                        Тест по истории Второй мировой войны позволит вам проверить свои знания о событиях, сражениях, лидерах и ключевых моментах этого важного периода в истории человечества. Каждый вопрос содержит несколько вариантов ответа, из которых необходимо выбрать правильный.
+                    </p>
+                    <p>
+                        Викторина охватывает такие темы, как даты и факты, крупнейшие битвы, знаковые операции, а также лидеры и страны, сыгравшие ключевую роль в конфликте. Вы узнаете интересные подробности о стратегии, тактике и влиянии войны на дальнейшую историю.
+                    </p>
+                    <p>
+                        Готовы окунуться в историю Второй мировой войны и проверить, насколько хорошо вы разбираетесь в этом сложном и значимом периоде?
+                    </p>
+                </div>
+                <div class="modal-footer align-center">
+                    <a class="button-confirm button button__play easy"  asp-controller="SelectMode" asp-action="EasyWWII">Просто</a>
+                    <a class="button-confirm button button__play hard"  asp-controller="SelectMode" asp-action="HardWWII">Сложно</a>
+                    <a class="button-confirm button button__play duel"  asp-controller="SelectMode" asp-action="DuelWWII">Дуэль</a>
                     <!-- Здесь можно добавить дополнительные кнопки или функциональность -->
                 </div>
             </div>
