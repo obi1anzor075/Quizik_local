@@ -1,4 +1,10 @@
-﻿.none{
+﻿main {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.none{
     display:none;
 }
 
@@ -18,7 +24,7 @@ a:hover{
 .head__mode_part{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    height:100px;
+    height:auto;
     width:99vw;
     padding:25px;
 }
@@ -357,10 +363,4 @@ a:hover{
         padding: 8px 8px;
     }
 
-}
-
-@media(max-height:1000px){
-    .container__mode {
-        height: clamp(520px, 63vh, 600px);
-    }
 }

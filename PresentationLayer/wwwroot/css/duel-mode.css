@@ -30,20 +30,22 @@
 
 .question-style {
     width: 450px;
-    position: relative;
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
 }
 
 .question-text {
     font-size: 14px;
-    width: 85%;
+    width: 100%;
 }
 
 .question-wrapper {
     position: absolute;
     top: 3rem;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    /*background-color: rgba(255, 255, 255, 0.5);*/
+    /* left: 50%; */
+    transform: translateY(-50%);
+    /* background-color: rgba(255, 255, 255, 0.5); */
     text-align: center;
     font-size: 14px;
     font-weight: bold;
@@ -53,7 +55,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-top:25px
 }
 /*TimeBar*/
 .relative-container {
@@ -265,7 +266,7 @@ h2{
 }
 
 .question-text {
-    width: 20vw;
+    width: 100%;
 }
 
 /*Question img*/
@@ -412,6 +413,13 @@ body{
     list-style-type: none;
 }
 
+.question-style {
+    width: 400px;
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+}
+
 /*#questionText{
     width: 100%;
 }*/
@@ -428,9 +436,11 @@ body{
 }
 
 @media(max-width:1150px){
-    .question-style{
-        width:300px;
-        position:relative;
+    .question-style {
+        width: 300px;
+        position: absolute;
+        left: 50%;
+        transform: translatex(-50%);
     }
 
     .question-img > img{
@@ -460,7 +470,7 @@ body{
     .question-text{
         font-size:12px;
         top:1.6rem;
-        width:40vw;
+        width:100%;
     }
 
     .head__part{
@@ -515,7 +525,7 @@ body{
     }
 
     .question-text {
-        width: 50vw;
+        width: 100%;
     }
 }
 @media(max-width:400px) {
@@ -528,7 +538,7 @@ body{
     }
 
     .question-text {
-        width: 60vw;
+        width: 100%;
     }
 
     .answer {
@@ -560,7 +570,9 @@ body{
 
     .question-style {
         width: 240px;
-        position: relative;
+        position: absolute;
+        left: 50%;
+        transform: translatex(-50%);
     }
 
     #timeBarContainer {

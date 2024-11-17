@@ -17,15 +17,17 @@
 
 .question-style {
     width: 450px;
-    position: relative;
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
 }
 
 .question-wrapper {
     position: absolute;
     top: 3rem;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    /*background-color: rgba(255, 255, 255, 0.5);*/
+    /* left: 50%; */
+    transform: translateY(-50%);
+    /* background-color: rgba(255, 255, 255, 0.5); */
     text-align: center;
     font-size: 14px;
     font-weight: bold;
@@ -187,6 +189,8 @@
     .question-style {
         width: 350px;
         position: absolute;
+        left: 50%;
+        transform: translatex(-50%);
     }
 
     .question-wrapper {
@@ -242,5 +246,8 @@
 
     .question-style {
         width: 280px;
+        position: absolute;
+        left: 50%;
+        transform: translatex(-50%);
     }
 }
