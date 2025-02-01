@@ -1,14 +1,24 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
+
 namespace PresentationLayer.ErrorDescriber
 {
     public class LocalizedIdentityErrorDescriber : IdentityErrorDescriber
     {
+        private readonly IStringLocalizer<LocalizedIdentityErrorDescriber> _localizer;
+
+        // Конструктор с инжекцией локализатора
+        public LocalizedIdentityErrorDescriber(IStringLocalizer<LocalizedIdentityErrorDescriber> localizer)
+        {
+            _localizer = localizer;
+        }
+
         public override IdentityError DuplicateUserName(string userName)
         {
             return new IdentityError
             {
                 Code = nameof(DuplicateUserName),
-                Description = string.Format("Имя пользователя '{0}' уже занято.", userName)
+                Description = string.Format(_localizer["DuplicateUserName"], userName)
             };
         }
 
@@ -17,7 +27,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(DuplicateEmail),
-                Description = $"Электронная почта '{email}' уже занята."
+                Description = string.Format(_localizer["DuplicateEmail"], email)
             };
         }
 
@@ -26,7 +36,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(InvalidUserName),
-                Description = $"Недопустимое имя пользователя '{userName}'."
+                Description = string.Format(_localizer["InvalidUserName"], userName)
             };
         }
 
@@ -35,7 +45,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(InvalidEmail),
-                Description = $"Недопустимая электронная почта '{email}'."
+                Description = string.Format(_localizer["InvalidEmail"], email)
             };
         }
 
@@ -44,7 +54,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(PasswordTooShort),
-                Description = $"Пароль должен быть не короче {length} символов."
+                Description = string.Format(_localizer["PasswordTooShort"], length)
             };
         }
 
@@ -53,7 +63,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresNonAlphanumeric),
-                Description = "Пароль должен содержать хотя бы один неалфавитный символ."
+                Description = _localizer["PasswordRequiresNonAlphanumeric"]
             };
         }
 
@@ -62,7 +72,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresDigit),
-                Description = "Пароль должен содержать хотя бы одну цифру ('0'-'9')."
+                Description = _localizer["PasswordRequiresDigit"]
             };
         }
 
@@ -71,7 +81,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresLower),
-                Description = "Пароль должен содержать хотя бы одну строчную букву ('a'-'z')."
+                Description = _localizer["PasswordRequiresLower"]
             };
         }
 
@@ -80,7 +90,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(PasswordRequiresUpper),
-                Description = "Пароль должен содержать хотя бы одну прописную букву ('A'-'Z')."
+                Description = _localizer["PasswordRequiresUpper"]
             };
         }
 
@@ -89,7 +99,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(UserAlreadyHasPassword),
-                Description = "Пользователь уже имеет пароль."
+                Description = _localizer["UserAlreadyHasPassword"]
             };
         }
 
@@ -98,7 +108,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(UserLockoutNotEnabled),
-                Description = "Блокировка пользователя не включена."
+                Description = _localizer["UserLockoutNotEnabled"]
             };
         }
 
@@ -107,7 +117,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(UserNotInRole),
-                Description = $"Пользователь не состоит в роли '{role}'."
+                Description = string.Format(_localizer["UserNotInRole"], role)
             };
         }
 
@@ -116,17 +126,16 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(UserAlreadyInRole),
-                Description = $"Пользователь уже состоит в роли '{role}'."
+                Description = string.Format(_localizer["UserAlreadyInRole"], role)
             };
         }
-
 
         public override IdentityError DefaultError()
         {
             return new IdentityError
             {
                 Code = nameof(DefaultError),
-                Description = "Произошла ошибка."
+                Description = _localizer["DefaultError"]
             };
         }
 
@@ -135,7 +144,7 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(ConcurrencyFailure),
-                Description = "Ошибка параллелизма."
+                Description = _localizer["ConcurrencyFailure"]
             };
         }
 
@@ -144,17 +153,17 @@ namespace PresentationLayer.ErrorDescriber
             return new IdentityError
             {
                 Code = nameof(PasswordMismatch),
-                Description = "Неверный пароль."
+                Description = _localizer["PasswordMismatch"]
             };
         }
 
-        //For Login
+        // Для входа
         public IdentityError InvalidLogin()
         {
             return new IdentityError
             {
                 Code = nameof(InvalidLogin),
-                Description = "Неправильный логин или пароль."
+                Description = _localizer["InvalidLogin"]
             };
         }
     }

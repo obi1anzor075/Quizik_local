@@ -30,10 +30,56 @@ a:hover{
 }
 
 
-.head__mode_left{
-    display:flex;
-    justify-content:flex-start;
+.head__mode_left {
+    display: flex;
+    justify-content: flex-start;
 }
+
+/*Language selector*/
+.language-selector {
+    position: relative;
+    width: 68px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    margin: 32px 32px 10px;
+}
+
+.selected-flag {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+}
+
+.flag-dropdown {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    display: none;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+}
+
+    .flag-dropdown img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    .flag-dropdown.show {
+        display: flex;
+        flex-direction: column;
+    }
+/*End*/
+
+
 .logo__img{
     display:flex;
     justify-content:center;
@@ -59,10 +105,6 @@ a:hover{
     color:white;
     /*color: #CFCFCF;*/
     /*padding: 32px 32px 10px;*/
-}
-
-.google__logout_btn:before{
-    content:"Выйти";
 }
 
 
@@ -138,7 +180,7 @@ a:hover{
 }
 
 .carousel_container{
-    width:max(40vw,480px);
+    width:max(40vw,400px);
 }
 
 .card-list .card-item {
@@ -357,6 +399,11 @@ a:hover{
     .google__logout{
         margin:8px 8px;
         position:absolute;
+    }
+
+    .language-selector {
+        position: absolute;
+        margin:8px 8px;
     }
 
     .head__mode_part {

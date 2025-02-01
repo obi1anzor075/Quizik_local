@@ -23,6 +23,7 @@ namespace PresentationLayer.Utilities
             var localizer = GetLocalizer(resourceName);
             return localizer.GetAllStrings().ToDictionary(ls => ls.Name, ls => ls.Value);
         }
+
     }
 
 

@@ -42,7 +42,13 @@ namespace PresentationLayer.Controllers
         }
 
         public IActionResult Login()
-        {
+        {            
+            
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
             if (User.Identity.IsAuthenticated)
             {
                 var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
@@ -53,11 +59,7 @@ namespace PresentationLayer.Controllers
                 }
             }
 
-            // Локализация
-            var localizedStrings = _localizer.GetAllLocalizedStrings("LoginVM");
 
-            // Передача строк в ViewData
-            ViewData["LocalizedStrings"] = localizedStrings;
 
             return View();
         }
@@ -65,6 +67,12 @@ namespace PresentationLayer.Controllers
         [HttpPost]
         public async Task<IActionResult> LoginAsync(LoginVM model)
         {
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email!, model.Password!, model.RememberMe, lockoutOnFailure: false);
@@ -76,17 +84,31 @@ namespace PresentationLayer.Controllers
                 ModelState.AddModelError(string.Empty, _localizedIdentityErrorDescriber.InvalidLogin().Description);
                 return View(model);
             }
+
             return View(model);
         }
 
         public IActionResult Register()
         {
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM model)
-        {
+        {            
+            
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
             if (ModelState.IsValid)
             {
                 User user = new()
@@ -108,6 +130,7 @@ namespace PresentationLayer.Controllers
                     ModelState.AddModelError("", error.Description);
                 }
             }
+
             return View(model);
         }
 
@@ -121,6 +144,12 @@ namespace PresentationLayer.Controllers
         [Authorize]
         public IActionResult SelectMode()
         {
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("SelectMode");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
             return View();
         }
 
@@ -147,6 +176,12 @@ namespace PresentationLayer.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GoogleResponse()
         {
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("SelectMode");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
