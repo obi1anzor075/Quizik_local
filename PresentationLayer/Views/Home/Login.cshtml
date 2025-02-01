@@ -1,82 +1,105 @@
-﻿@using PresentationLayer.ViewModels;
+﻿@using Microsoft.AspNetCore.Localization;
+@using PresentationLayer.ExtensionMethods;
+@using PresentationLayer.ViewModels;
 @model LoginVM;
+@inject PresentationLayer.Utilities.SharedViewLocalizer SharedLocalizer
+
 @{
-    ViewData["Title"] = "Вход";
+    var Localizer = ViewData["LocalizedStrings"] as Dictionary<string, string>;
+
+}
+
+@{
+    ViewData["Title"] = Localizer["LoginTitle"];
 }
 
 <head>
     <link href="~/css/landing.css" rel="stylesheet" />
 </head>
 
-    <header class="head__part">
-        <div class="settings">
-            <!-- Настройки (может быть добавлено позже) -->
-        </div>
-        <div class="logo__img">
-            <img src="~/img/logo.svg" class="main__logo_landing" alt="Логотип Quizik" />
-        </div>
-        <div class="log__in" style="display: none">
-            <button type="button" class="button">
-                <img src="~/img/add-user.png" alt="Add user" />
-                <span class="log__in_text"></span>
-            </button>
-        </div>
-    </header>
+<header class="head__part">
+    <div class="settings">
+        <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector">
+            <input type="hidden" name="culture" id="selectedLanguage" value="ru-RU">
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
 
-    <main class="main__part">
-        <div class="ctr">
-            <div class="field_wrapper">
-                <div class="play__field">
-                    <form id="playForm" asp-action="Login" method="post">
-                        <!-- Место для вывода всех ошибок формы -->
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <div class="register-wrapper">
-                            <div class="input__name_wrapper">
-                                <input asp-for="Email" class="input__name" required type="email" id="username" name="email" placeholder="Введите почту" />
-                                <span class="validator_error text-danger" asp-validation-for="Email"></span>
-                            </div>
+            <!-- Кнопка с текущим флагом -->
+            <div class="selected-flag" id="currentFlag" onclick="toggleDropdown()"
+                 style="background-image: url(https://hatscripts.github.io/circle-flags/flags/ru.svg);">
+            </div>
 
-                            <div class="input__password_wrapper">
-                                <input asp-for="Password" class="input__password" required type="password" id="password" name="password" placeholder="Введите пароль" />
-                                <span class="validator_error text-danger" asp-validation-for="Password"></span>
-                            </div>
+            <!-- Выпадающее меню -->
+            <div class="flag-dropdown" id="flagDropdown">
+                <img src="https://hatscripts.github.io/circle-flags/flags/ru.svg" alt="Русский" onclick="selectLanguage('ru-RU', this)">
+                <img src="https://hatscripts.github.io/circle-flags/flags/us.svg" alt="English" onclick="selectLanguage('en-US', this)">
+                <img src="https://hatscripts.github.io/circle-flags/flags/cn.svg" alt="中文" onclick="selectLanguage('zh-CN', this)">
+            </div>
+        </form>
+    </div>
+    <div class="logo__img">
+        <img src="~/img/logo.svg" class="main__logo_landing" alt="Quizik Logo" />
+    </div>
+    <div class="log__in" style="display: none">
+        <button type="button" class="button">
+            <img src="~/img/add-user.png" alt="Add user" />
+            <span class="log__in_text"></span>
+        </button>
+    </div>
+</header>
 
-                            <div class="checkbox__wrapper">
-                                <div class="checkbox">
-                                    <div class="checkbox-wrapper-12">
-                                        <div class="cbx">
-                                            <input asp-for="RememberMe" id="cbx-12" type="checkbox" />
-                                            <label for="cbx-12"></label>
-                                            <svg width="15" height="14" viewbox="0 0 15 14" fill="none">
-                                                <path d="M2 8.36364L6.23077 12L13 2"></path>
-                                            </svg>
-                                        </div>
-                                        <!-- SVG-->
-                                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
-                                            <defs>
-                                                <filter id="goo-12">
-                                                    <fegaussianblur in="SourceGraphic" stddeviation="4" result="blur"></fegaussianblur>
-                                                    <fecolormatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -7" result="goo-12"></fecolormatrix>
-                                                    <feblend in="SourceGraphic" in2="goo-12"></feblend>
-                                                </filter>
-                                            </defs>
+<main class="main__part">
+    <div class="ctr">
+        <div class="field_wrapper">
+            <div class="play__field">
+                <form id="playForm" asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="register-wrapper">
+                        <div class="input__name_wrapper">
+                            <input asp-for="Email" class="input__name" required type="email" id="username" name="email" placeholder="@Localizer["EnterEmail"]" />
+                            <span class="validator_error text-danger" asp-validation-for="Email"></span>
+                        </div>
+
+                        <div class="input__password_wrapper">
+                            <input asp-for="Password" class="input__password" required type="password" id="password" name="password" placeholder="@Localizer["EnterPassword"]" />
+                            <span class="validator_error text-danger" asp-validation-for="Password"></span>
+                        </div>
+
+                        <div class="checkbox__wrapper">
+                            <div class="checkbox">
+                                <div class="checkbox-wrapper-12">
+                                    <div class="cbx">
+                                        <input asp-for="RememberMe" id="cbx-12" type="checkbox" />
+                                        <label for="cbx-12"></label>
+                                        <svg width="15" height="14" viewbox="0 0 15 14" fill="none">
+                                            <path d="M2 8.36364L6.23077 12L13 2"></path>
                                         </svg>
                                     </div>
-                                    <span class="checkbox-label">Запомнить меня</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                                        <defs>
+                                            <filter id="goo-12">
+                                                <fegaussianblur in="SourceGraphic" stddeviation="4" result="blur"></fegaussianblur>
+                                                <fecolormatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -7" result="goo-12"></fecolormatrix>
+                                                <feblend in="SourceGraphic" in2="goo-12"></feblend>
+                                            </filter>
+                                        </defs>
+                                    </svg>
                                 </div>
-                                <span class="validator_error text-danger" asp-validation-for="RememberMe"></span>
+                                <span class="checkbox-label">@Localizer["RememberMe"]</span>
                             </div>
-
-                            <input type="submit" value="ИГРАТЬ" id="send" class="button button__play" />
-                        <div class="redirect-to-login">Нет аккаунта? <a class="aqua-text" asp-controller="Home" asp-action="Register">Зарегистрироваться</a></div>
+                            <span class="validator_error text-danger" asp-validation-for="RememberMe"></span>
                         </div>
-                    </form>
-                </div>
+
+                        <input type="submit" value="@Localizer["Play"]" id="send" class="button button__play" />
+                        <div class="redirect-to-login">@Localizer["NoAccount"] <a class="aqua-text" asp-controller="Home" asp-action="Register">@Localizer["Register"]</a></div>
+                    </div>
+                </form>
             </div>
-            <div class="other_wrapper">
-                <span>ИЛИ</span>
-                <hr />
-            </div>
+        </div>
+
+        <div class="other_wrapper">
+            <span>@Localizer["Or"]</span>
+            <hr />
+        </div>
 
         <div class="field_wrapper">
             <div class="google__login">
@@ -97,16 +120,77 @@
         </div>
 
         <script src="https://accounts.google.com/gsi/client" async defer></script>
+    </div>
+</main>
 
-        </div>
-    </main>
+<footer class="footer__part"></footer>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <footer class="footer__part"></footer>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+    // Получение выбранного языка из Cookie
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM загружен!");
 
+        // Получаем .AspNetCore.Culture из cookie
+        const cookies = document.cookie.split('; ').find(row => row.startsWith('.AspNetCore.Culture'));
 
-    @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        if (cookies) {
+            const cookieValue = cookies.split('=')[1];
+            const selectedCookie = decodeURIComponent(cookieValue);
+            console.log("Cookie найдено:", selectedCookie);
+
+            // Разбираем строку cookie (c=en-US|uic=en-US)
+            const parts = selectedCookie.split('|');
+            const culturePart = parts.find(part => part.startsWith('c='));
+
+            if (culturePart) {
+                const cultureValue = culturePart.split('=')[1];
+                console.log("Выбранный язык:", cultureValue);
+
+                // Устанавливаем текущий флаг
+                const currentFlag = document.getElementById("currentFlag");
+                const flagMap = {
+                    "ru-RU": "https://hatscripts.github.io/circle-flags/flags/ru.svg",
+                    "en-US": "https://hatscripts.github.io/circle-flags/flags/us.svg",
+                    "zh-CN": "https://hatscripts.github.io/circle-flags/flags/cn.svg"
+                };
+
+                if (flagMap[cultureValue]) {
+                    currentFlag.style.backgroundImage = `url(${flagMap[cultureValue]})`;
+                    document.getElementById("selectedLanguage").value = cultureValue;
+                    console.log("Установлен флаг:", flagMap[cultureValue]);
+                } else {
+                    console.warn("Неизвестный язык в cookie:", cultureValue);
+                }
+            } else {
+                console.warn("Не удалось найти 'c=' в cookie:", cookieValue);
+            }
+        } else {
+            console.warn("Cookie .AspNetCore.Culture не найдено!");
         }
+    });
+</script>
+<script>
+     function toggleDropdown() {
+        document.getElementById('flagDropdown').classList.toggle('show');
     }
+
+    function selectLanguage(lang, element) {
+        document.getElementById('selectedLanguage').value = lang;
+        document.getElementById('currentFlag').style.backgroundImage = element.style.backgroundImage;
+        document.querySelector(".language-selector").submit();
+    }
+
+    // Закрыть выпадающий список при клике вне его
+    document.addEventListener("click", function (event) {
+        if (!event.target.closest(".language-selector")) {
+            document.getElementById('flagDropdown').classList.remove('show');
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

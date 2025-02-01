@@ -61,6 +61,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
                 ViewBag.ImageUrl = nextQuestion.ImageUrl;
+                ViewBag.QuestionExplanation = nextQuestion.QuestionExplanataion;
 
                 var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
 

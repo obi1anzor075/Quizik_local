@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using PresentationLayer.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,14 +54,16 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new List<CultureInfo>
     {
-        new CultureInfo("en"),
-        new CultureInfo("ru")
+        new CultureInfo("en-US"),
+        new CultureInfo("ru-RU"),
+        new CultureInfo("zh-CN")
     };
 
     options.DefaultRequestCulture = new RequestCulture("ru");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
 });
+builder.Services.AddSingleton<SharedViewLocalizer>();
 
 builder.Services.AddControllersWithViews()
     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
@@ -148,6 +151,14 @@ builder.Services.AddDataProtection()
 var app = builder.Build();
 
 app.UseCors();
+
+// Настройка локализатора
+var locOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+
+if (locOptions != null)
+{
+    app.UseRequestLocalization(locOptions.Value);
+}
 
 // Настройка конвейера обработки HTTP-запросов
 if (!app.Environment.IsDevelopment())
