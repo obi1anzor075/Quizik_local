@@ -117,37 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="RegistrationTitle" xml:space="preserve">
-    <value>RegistrationTitle</value>
+  <data name="Continue" xml:space="preserve">
+    <value>繼續</value>
   </data>
-  <data name="UserNamePlaceholder" xml:space="preserve">
-    <value>UserNamePlaceholder</value>
+  <data name="Question" xml:space="preserve">
+    <value>問題</value>
   </data>
-  <data name="EmailPlaceholder" xml:space="preserve">
-    <value>EmailPlaceholder</value>
-  </data>
-  <data name="PasswordPlaceholder" xml:space="preserve">
-    <value>PasswordPlaceholder</value>
-  </data>
-  <data name="ConfirmPasswordPlaceholder" xml:space="preserve">
-    <value>ConfirmPasswordPlaceholder</value>
-  </data>
-  <data name="TermsOfServiceText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="SubmitButton" xml:space="preserve">
-    <value>SubmitButton</value>
-  </data>
-  <data name="AlreadyHaveAccount" xml:space="preserve">
-    <value>AlreadyHaveAccount</value>
-  </data>
-  <data name="OrText" xml:space="preserve">
-    <value>OrText</value>
-  </data>
-  <data name="TermsOfServiceTextLink" xml:space="preserve">
-    <value>TermsOfServiceTextLink</value>
-  </data>
-  <data name="Login" xml:space="preserve">
-    <value>Login</value>
+  <data name="Return" xml:space="preserve">
+    <value>返回</value>
   </data>
 </root>

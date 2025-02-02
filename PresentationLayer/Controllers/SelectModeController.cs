@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using PresentationLayer.Hubs;
 using Microsoft.Data.SqlClient;
+using PresentationLayer.Utilities;
 
 namespace PresentationLayer.Controllers
 {
@@ -18,10 +19,15 @@ namespace PresentationLayer.Controllers
         private readonly DataStoreDbContext _dbContext;
         private readonly IHubContext<GameHub, IChatClient> _gameHubContext;
 
-        public SelectModeController(DataStoreDbContext dbContext, IHubContext<GameHub, IChatClient> gameHubContext)
+        private readonly CultureHelper _cultureHelper;
+        public readonly SharedViewLocalizer _localizer;
+
+        public SelectModeController(DataStoreDbContext dbContext, IHubContext<GameHub, IChatClient> gameHubContext, CultureHelper cultureHelper, SharedViewLocalizer localizer)
         {
             _dbContext = dbContext;
             _gameHubContext = gameHubContext;
+            _cultureHelper = cultureHelper;
+            _localizer = localizer;
         }
 
         private void ResetQuestionIndex()
@@ -31,17 +37,56 @@ namespace PresentationLayer.Controllers
 
         public IActionResult EasyPDD()
         {
-            return Easy("EasyPDD");
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("Shared");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
+            string currentCulture = _cultureHelper.GetCurrentCulture();
+            return currentCulture switch
+            {
+                "ru-RU" => Easy("EasyPDD"),
+                "en-US" => Easy("EasyPDD_us"),
+                "zh-CN" => Easy("EasyPDD_cn"),
+                _ => Easy("EasyPDD")
+            };
         }
 
         public IActionResult EasyGeography()
         {
-            return Easy("EasyGeography");
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("Shared");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
+            string currentCulture = _cultureHelper.GetCurrentCulture();
+            return currentCulture switch
+            {
+                "ru-RU" => Easy("EasyGeography"),
+                "en-US" => Easy("EasyGeography_us"),
+                "zh-CN" => Easy("EasyGeography_cn"),
+                _ => Easy("EasyGeography")
+            };
         }
 
         public IActionResult EasyWWII()
         {
-            return Easy("EasyWWII");
+            // Локализация
+            var localizedStrings = _localizer.GetAllLocalizedStrings("Shared");
+
+            // Передача строк в ViewData
+            ViewData["LocalizedStrings"] = localizedStrings;
+
+            string currentCulture = _cultureHelper.GetCurrentCulture();
+            return currentCulture switch
+            {
+                "ru-RU" => Easy("EasyWWII"),
+                "en-US" => Easy("EasyWWII_us"),
+                "zh-CN" => Easy("EasyWWII_cn"),
+                _ => Easy("EasyWWII")
+            };
         }
 
         public IActionResult Easy(string gameMode)
@@ -199,5 +244,6 @@ namespace PresentationLayer.Controllers
 
             return Ok();
         }
+
     }
 }

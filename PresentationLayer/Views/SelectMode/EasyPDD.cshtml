@@ -1,5 +1,10 @@
 ﻿@using PresentationLayer.Controllers;
+@using PresentationLayer.ExtensionMethods;
+@using Microsoft.AspNetCore.Localization;
+@inject PresentationLayer.Utilities.SharedViewLocalizer SharedLocalizer
+
 @{
+    var Localizer = ViewData["LocalizedStrings"] as Dictionary<string, string>;
     ViewData["Title"] = "Легкий уровень";
     var answers = ViewBag.Answers as List<string>;
     var halfCount = answers.Count / 2;
@@ -18,13 +23,13 @@
 <body translate="no">
     <header class="head__part">
         <div class="back-button">
-            <a asp-controller="Home" asp-action="SelectMode" id="backButton" class="head__back">Назад</a>
+            <a asp-controller="Home" asp-action="SelectMode" id="backButton" class="head__back">@Localizer["Return"]</a>
         </div>
 
         <div class="question">
             <img class="question-style" src="~/img/game/question-style.svg" alt="Alternate Text" />
             <div class="question-wrapper" translate="no">
-                <div class="question-label">Вопрос @ViewBag.QuestionId</div><div class="question-text">@ViewBag.QuestionText</div>
+                <div class="question-label">@Localizer["Question"] @ViewBag.QuestionId</div> <div class="question-text">@ViewBag.QuestionText</div>
             </div>
         </div>
     </header>
@@ -48,7 +53,7 @@
                 </div>
             </div>
 
-            <a class="next__question" id="next-question-btn" href="@Url.Action("EasyPDD", "SelectMode")">Продолжить</a>
+            <a class="next__question" id="next-question-btn" href="@Url.Action("EasyPDD", "SelectMode")">@Localizer["Continue"]</a>
         </div>
         <div class="explanation-question" translate="no">
 

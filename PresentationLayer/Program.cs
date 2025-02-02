@@ -17,6 +17,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using PresentationLayer.Utilities;
 using Microsoft.AspNetCore.Components.Forms;
+using PresentationLayer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,6 +118,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IQuestionsService, QuestionsService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<CultureHelper>();
 
 builder.Services.AddSignalR();
 
