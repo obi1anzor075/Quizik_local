@@ -126,4 +126,7 @@
   <data name="Return" xml:space="preserve">
     <value>返回</value>
   </data>
+  <data name="EasyPDD" xml:space="preserve">
+    <value>EasyPDD_cn</value>
+  </data>
 </root>

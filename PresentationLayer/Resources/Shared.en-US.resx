@@ -126,4 +126,7 @@
   <data name="Return" xml:space="preserve">
     <value>Return</value>
   </data>
+  <data name="EasyPDD" xml:space="preserve">
+    <value>EasyPDD_us</value>
+  </data>
 </root>

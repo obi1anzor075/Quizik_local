@@ -13,10 +13,12 @@ namespace PresentationLayer.Controllers
     public class GameController : Controller
     {
         private readonly DataStoreDbContext _dbContext;
+        private readonly CultureHelper _cultureHelper;
 
-        public GameController(DataStoreDbContext dbContext)
+        public GameController(DataStoreDbContext dbContext, CultureHelper cultureHelper)
         {
             _dbContext = dbContext;
+            _cultureHelper = cultureHelper;
         }
 
         private int CurrentQuestionIndex
@@ -32,9 +34,23 @@ namespace PresentationLayer.Controllers
             }
         }
 
+        private string GetCurrentLanguage()
+        {
+            string currentCulture = _cultureHelper.GetCurrentCulture();
+            return currentCulture switch
+            {
+                "ru-RU" => string.Empty,
+                "en-US" => "_us",
+                "zh-CN" => "_cn",
+                _ => string.Empty
+            };
+        }
+
         [HttpGet("/Game/CheckAnswer/{gameMode}/{selectedAnswer}")]
         public async Task<IActionResult> CheckAnswer(string gameMode, string selectedAnswer)
         {
+            gameMode += GetCurrentLanguage();
+
             string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {CurrentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
             var question = _dbContext.Questions.FromSqlRaw(sqlQuery).FirstOrDefault();
 

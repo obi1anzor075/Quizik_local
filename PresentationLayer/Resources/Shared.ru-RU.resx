@@ -126,4 +126,7 @@
   <data name="Return" xml:space="preserve">
     <value>Назад</value>
   </data>
+  <data name="EasyPDD" xml:space="preserve">
+    <value>EasyPDD</value>
+  </data>
 </root>
