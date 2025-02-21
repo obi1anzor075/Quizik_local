@@ -19,7 +19,7 @@ namespace PresentationLayer.Hubs
         Task StartGame();
         Task EndGame(Dictionary<string, int> results);
         Task GameReady();
-        Task ReceiveQuestion(int questionId, string questionText, string imageUrl, List<string> answers);
+        Task ReceiveQuestion(int questionId, string questionText, string imageUrl,string? questionExplanation ,List<string> answers);
         Task AnswerResult(bool isCorrect);
         Task RoomFull();
     }
@@ -281,7 +281,7 @@ namespace PresentationLayer.Hubs
                     playerState.CurrentQuestionIndex = questionIndex + 1; // Обновляем индекс следующего вопроса
                     await SavePlayerState(userName, playerState);
 
-                    await Clients.Client(Context.ConnectionId).ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, answers);
+                    await Clients.Client(Context.ConnectionId).ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, nextQuestion.QuestionExplanation,answers);
                     Console.WriteLine($"Question sent: {nextQuestion.QuestionId} - {nextQuestion.QuestionText}");
                 }
             }

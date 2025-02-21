@@ -106,7 +106,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
                 ViewBag.ImageUrl = nextQuestion.ImageUrl;
-                ViewBag.QuestionExplanation = nextQuestion.QuestionExplanataion;
+                ViewBag.QuestionExplanation = nextQuestion.QuestionExplanation;
 
                 var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
 
@@ -193,6 +193,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
                 ViewBag.ImageUrl = nextQuestion.ImageUrl;
+                ViewBag.QuestionExplanation = nextQuestion.QuestionExplanation;
 
                 var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
 
@@ -207,7 +208,7 @@ namespace PresentationLayer.Controllers
 
                 ViewBag.Answers = answers;
 
-                await _gameHubContext.Clients.Group("DuelRoom").ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, answers);
+                await _gameHubContext.Clients.Group("DuelRoom").ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, nextQuestion.QuestionExplanation,answers);
 
                 return View();
             }

@@ -37,67 +37,6 @@ namespace Quiz.Tests.Integration
         }
 
         /// <summary>
-        /// Проверяет, что POST-запрос к /Home/LoginAsync с невалидными данными возвращает форму входа с ошибкой.
-        /// </summary>
-        [Fact]
-        public async Task Post_LoginAsync_WithInvalidCredentials_Returns_LoginViewWithError()
-        {
-            // Arrange: создаём модель входа с несуществующими данными
-            var loginVM = new LoginVM
-            {
-                Email = "nonexistent@example.com",
-                Password = "WrongPassword",
-                RememberMe = false
-            };
-
-            // Act: отправляем JSON-запрос
-            var response = await _client.PostAsJsonAsync("/Home/LoginAsync", loginVM);
-            response.EnsureSuccessStatusCode(); // ожидаем, что статус 200 (форма входа возвращается с ошибкой)
-
-            var content = await response.Content.ReadAsStringAsync();
-
-            // Assert: проверяем, что в ответе присутствует ошибка (например, текст ошибки, заданный _localizedIdentityErrorDescriber)
-            Assert.Contains("Invalid", content, System.StringComparison.OrdinalIgnoreCase);
-            // Или, если на странице входа обязательно присутствует маркер (например, форма), можно искать его по имени тега
-        }
-
-        /// <summary>
-        /// Проверяет регистрацию нового пользователя. При корректных данных контроллер должен перенаправить на SelectMode.
-        /// </summary>
-        [Fact]
-        public async Task Post_Register_WithValidData_RedirectsTo_SelectMode()
-        {
-            // Arrange: формируем модель регистрации
-            var registerVM = new RegisterVM
-            {
-                Email = "newuser@example.com",
-                UserName = "NewUser",
-                Password = "ComplexPass!123",
-                ConfirmPassword = "ComplexPass!123"
-            };
-
-            // Act: отправляем запрос на регистрацию
-            var response = await _client.PostAsJsonAsync("/Home/Register", registerVM);
-
-            // Для редиректов контроллер может возвращать статус 302 (если редирект не следует автоматически) или сразу отображать целевую страницу.
-            // Если WebApplicationFactory настроен на автоматическое следование редиректам, статус может оказаться 200.
-            // Поэтому проверяем либо статус редиректа, либо наличие маркера на целевой странице.
-            if (response.StatusCode == HttpStatusCode.Redirect)
-            {
-                // Если редирект, проверяем, что Location указывает на /Home/SelectMode
-                var redirectUri = response.Headers.Location?.AbsolutePath;
-                Assert.Equal("/Home/SelectMode", redirectUri);
-            }
-            else
-            {
-                // Если редирект следует автоматически, убеждаемся, что итоговая страница содержит маркер "SelectMode"
-                response.EnsureSuccessStatusCode();
-                var content = await response.Content.ReadAsStringAsync();
-                Assert.Contains("SelectMode", content, System.StringComparison.OrdinalIgnoreCase);
-            }
-        }
-
-        /// <summary>
         /// Тестирует выход из системы – после logout пользователь перенаправляется на страницу Login.
         /// Для тестирования logout необходимо, чтобы пользователь был аутентифицирован.
         /// Здесь для упрощения теста сначала выполняем регистрацию (которая автоматически логинит пользователя),

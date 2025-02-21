@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccessLayer.Models;
 
@@ -20,5 +21,6 @@ public partial class Question
     public string? Answer3 { get; set; }
 
     public string? Answer4 { get; set; }
-    public string? QuestionExplanataion { get; set; }
+    [Column("question_explanation")]
+    public string? QuestionExplanation { get; set; }
 }

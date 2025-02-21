@@ -59,7 +59,7 @@ namespace DataAccessLayer.DataContext
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("question_text");
-                entity.Property(e => e.QuestionExplanataion)
+                entity.Property(e => e.QuestionExplanation)
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("question_explanation");

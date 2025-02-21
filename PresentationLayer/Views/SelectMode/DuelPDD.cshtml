@@ -91,7 +91,7 @@
 
 
 
-    connection.on("ReceiveQuestion", function (questionId, questionText, imageUrl, answers) {
+    connection.on("ReceiveQuestion", function (questionId, questionText, imageUrl,questionExplanation ,answers) {
         document.getElementById('card-login').style.display = 'none';
         console.log("Received question:", questionId, questionText, imageUrl, answers);
         document.getElementById('questionId').innerText = `Вопрос ${questionId}`;
