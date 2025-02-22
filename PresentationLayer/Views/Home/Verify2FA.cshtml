@@ -1,0 +1,61 @@
+﻿@model Verify2FAModel
+
+@{
+    ViewData["Title"] = "Подтвердите код";
+}
+<head>
+    <link href="~/css/landing.css" rel="stylesheet" />
+</head>
+<header class="head__part">
+    <div class="settings">
+        <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector">
+            <input type="hidden" name="culture" id="selectedLanguage" value="ru-RU">
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+
+            <!-- Кнопка с текущим флагом -->
+            <div class="selected-flag" id="currentFlag" onclick="toggleDropdown()"
+                 style="background-image: url(https://hatscripts.github.io/circle-flags/flags/ru.svg);display:none;">
+            </div>
+
+            <!-- Выпадающее меню -->
+            <div class="flag-dropdown" id="flagDropdown">
+                <img src="https://hatscripts.github.io/circle-flags/flags/ru.svg" alt="Русский" onclick="selectLanguage('ru-RU', this)">
+                <img src="https://hatscripts.github.io/circle-flags/flags/us.svg" alt="English" onclick="selectLanguage('en-US', this)">
+                <img src="https://hatscripts.github.io/circle-flags/flags/cn.svg" alt="中文" onclick="selectLanguage('zh-CN', this)">
+            </div>
+        </form>
+    </div>
+    <div class="logo__img">
+        <img src="~/img/logo.svg" class="main__logo_landing" alt="Quizik Logo" />
+    </div>
+    <div class="log__in" style="display: flex">
+        <div class="google__logout">
+            <a class="google__logout_btn" asp-controller="Home" asp-action="Logout">Выйти</a>
+            </div>
+    </div>
+</header>
+<div class="ctr profile-ctr">
+    <!-- Блок с формой ввода кода -->
+    <div class="play__field" style="flex-direction: column;gap: 15px; display: flex; flex-direction: column;">
+        <h2 style="color: #fff; margin-top: 0;text-align:center;">Введите код 2FA</h2>
+
+        <form asp-action="Verify2FA" method="post" style="gap:15px;">
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="RememberMe" />
+
+            <div class="form-group" style="gap">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <span asp-validation-for="Code" class="text-danger">Неверный код. Попробуйте снова.</span>
+                }
+                <input asp-for="Code" class="input__name" placeholder="Введите код 2FA" required />
+            </div>
+
+            <button type="submit" class="button button__play">Подтвердить</button>
+        </form>
+    </div>
+</div>
+
+
+
+

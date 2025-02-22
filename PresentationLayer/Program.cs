@@ -136,10 +136,14 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequiredLength = 8;
     options.Password.RequireLowercase = false;
     options.Password.RequireNonAlphanumeric = false;
+
+    // Добавляем провайдер токенов для 2FA (Google Authenticator)
+    options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
     .AddDefaultTokenProviders();
+
 
 // Регистрация LocalizedIdentityErrorDescriber
 builder.Services.AddScoped<LocalizedIdentityErrorDescriber>();

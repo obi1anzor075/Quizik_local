@@ -16,5 +16,7 @@ namespace DataAccessLayer.Models
         public DateTime? CreatedAt { get; set; }
         public byte[]? ProfilePicture { get; set; }
         public string? ProfilePictureFileName { get; set; }
+        public string? TwoFactorSecretKey { get; set; }
+
     }
 }

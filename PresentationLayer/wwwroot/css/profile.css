@@ -1,5 +1,130 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿.play__field {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    padding: 16px;
+    background: #00000061;
+    border-radius: 15px;
+    flex-direction: column;
+    gap: 20px;
+    height: 770px;
+    width: clamp(320px, 50vw, 420px);
+}
+
+.ctr {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    gap: 50px;
+}
+
+
+.avatar-upload {
+    position: relative;
+    max-width: 205px;
+    margin: 20px auto;
+}
+
+.avatar-upload .avatar-edit {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    z-index: 1;
+}
+
+.avatar-upload .avatar-edit input {
+    display: none;
+}
+
+.avatar-upload .avatar-edit input + label {
+    display: flex;
+    align-items: center;
+    justify-content: center;    width: 34px;
+    height: 34px;
+    margin-bottom: 0;
+    border-radius: 100%;
+    background: #FFFFFF;
+    border: 1px solid transparent;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.avatar-upload .avatar-edit input + label:hover {
+    background: #f1f1f1;
+    border-color: #d6d6d6;
+}
+
+.avatar-upload .avatar-edit input + label:after {
+    color: #757575;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    margin: auto;
+}
+
+.avatar-upload .avatar-preview {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 100%;
+    border: 4px solid #F8F8F8;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.avatar-upload .avatar-preview > div {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.img-edit{
+    width:60%;
+}
+
+
+/*2FA*/
+.twofa-section {
+    background-color: #1C1A1B;
+    color:white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 700px;
+}
+
+    .twofa-section h5 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .twofa-section p {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+.modal-content {
+    background-color: #1C1A1B;
+    color: #fff;
+}
+/* Закрывающая кнопка в тёмном модальном окне */
+.btn-close.btn-close-white {
+    filter: invert(1);
+}
+
+@media(max-width:900px) {
+    .profile-ctr{
+        flex-direction:column;
+    }
 }

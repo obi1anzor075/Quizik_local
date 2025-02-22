@@ -177,6 +177,7 @@ color:white;
 
 .play__field > form{
     width:100%;
+    gap:20px;
 
     display:flex;
     flex-direction: column;
@@ -202,7 +203,7 @@ color:white;
     color:red;
 }
 
-.input__name, .input__name:active, .input__email, .input__email:active, .input__password, .input__password:active {
+.input__name, .input__name:active, .input__email, .input__email:active, .input__password, .inpuit__code .input__password:active {
     text-transform: uppercase;
     background: #00000061;
     padding: 12px 12px 8px;

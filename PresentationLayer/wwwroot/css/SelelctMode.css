@@ -34,6 +34,48 @@ a:hover{
     display: flex;
     justify-content: flex-start;
 }
+/*Profile*/
+/* Круглый аватар */
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    object-fit: cover;
+    cursor:pointer;
+}
+
+/* Выпадающее меню */
+.profile-menu {
+    position: absolute;
+    top: 122px;
+    background: #595db7;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+    padding: 5px;
+}
+
+/* Ссылки меню */
+.profile-menu a {
+    color: #fff;
+    padding: 8px 12px;
+    text-decoration: none;
+    font-size: 14px;
+    display: block;
+}
+
+/* Эффект при наведении */
+.profile-menu a:hover {
+    /*background-color: #2c2a2b;*/
+}
+
+.profile-menu > *:hover {
+    transform: scale(1.05);
+    transition: 0.2s ease-in-out;
+}
 
 #music-circle {
     position: fixed;
@@ -108,16 +150,19 @@ a:hover{
 
 .google__logout {
     border: none;
-    padding: 8px 16px;
     background-color: #5A5EB9;
-    border-radius: 15px;
+    border-radius: 50%;
     height: fit-content;
     margin: 32px 32px 10px;
-}
+    overflow: hidden;
 
-.google__logout:hover{
-    transform:scale(1.1);
-    transition:0.2s ease;
+    width:64px;
+    height:64px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    object-fit: cover;
 }
 
 .google__logout_btn {

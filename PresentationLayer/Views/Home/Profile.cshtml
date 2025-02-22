@@ -8,6 +8,7 @@
 
 <head>
     <link rel="stylesheet" href="~/css/landing.css">
+    <link rel="stylesheet" href="~/css/profile.css">
 </head>
 <body>
 
@@ -22,84 +23,230 @@
         <!-- Правая колонка (пример - селектор языка) -->
         <div class="settings">
             <div class="language-selector">
-                <div class="selected-flag" style="background-image: url('/img/flag-en.png');"></div>
+@*                 <div class="selected-flag" style="background-image: url('/img/flag-en.png');"></div>
                 <div class="flag-dropdown">
                     <img src="/img/flag-ru.png" alt="Russian" />
                     <img src="/img/flag-en.png" alt="English" />
-                </div>
+                </div> *@
             </div>
         </div>
     </div>
 
     <!-- Основная часть - Страница профиля -->
-    <div class="ctr">
+    <div class="ctr profile-ctr">
         <!-- Блок с формой редактирования профиля -->
         <div class="play__field" style="flex-direction: column; gap: 20px;">
-            <h2 style="color: #fff; margin-top: 0;">User Profile</h2>
-
-            <!-- Аватар -->
-            <div style="text-align: center;">
-                <img src="@ViewBag.ProfilePicture" alt="Фото профиля" style="width:150px;height:150px;object-fit: cover;border-radius: 100%;" />
+            <h2 style="color: #fff; margin-top: 0;text-align:center;">Профиль пользователя</h2>
+            
+            <form asp-controller="Home" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" style="width: 100%;">
+            <!-- блок смены аватара -->
+            <div class="avatar-upload">
+                <div class="avatar-edit">
+                    <input asp-for="ProfilePicture" type="file" accept="image/*" id="avatar" name="avatar" />
+                    <label for="avatar"><img class="img-edit" src="~/img/pencil-solid.svg" alt="Alternate Text" /></label>
+                    <span class="validator_error text-danger" asp-validation-for="ProfilePicture"></span>
+                </div>
+                <div class="avatar-preview">
+                    <div id="imagePreview" style="background-image: url(@ViewBag.ProfilePicture);">
+                    </div>
+                </div>
             </div>
 
-            <!-- Форма редактирования -->
-            <form asp-controller="Home" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" style="width: 100%;">
+            <hr class="hr" style="width: -webkit-fill-available;" />
+
+            <!-- Форма редактирования данных -->
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <!-- Имя -->
                 <div class="input__name_wrapper">
                     <label for="userName" style="color: white;">Name</label>
-                    <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="YOUR NAME" value="@ViewBag.Name" required />
+                    <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="Ваше имя" value="@ViewBag.Name" required />
                     <span class="validator_error text-danger" asp-validation-for="Name"></span>
                 </div>
 
                 <!-- Email -->
                 <div class="input__email_wrapper">
                     <label for="userEmail" style="color: white;">Email</label>
-                    <input asp-for="Email" type="email" id="userEmail" class="input__email" placeholder="YOUR EMAIL" value="@ViewBag.Email" required />
+                    <input asp-for="Email" type="email" id="userEmail" class="input__email" placeholder="EMAIL" value="@ViewBag.Email" required />
                     <span class="validator_error text-danger" asp-validation-for="Email"></span>
-                </div>
-
-                <!-- Загрузка нового аватара -->
-                <div class="input__password_wrapper">
-                    <label for="avatar" style="color: white;">Profile Picture</label>
-                    <input asp-for="ProfilePicture" type="file" accept="image/*" id="avatar" name="avatar" />
-                    <span class="validator_error text-danger" asp-validation-for="ProfilePicture"></span>
                 </div>
 
                 <!-- Кнопка сохранить изменения -->
                 <button type="submit" class="button button__play">
-                    Save Changes
+                    Сохранить
+                </button>
+            </form>
+        </div>        
+        
+        <!-- Блок безопасность  -->
+        <div class="play__field" style="flex-direction: column; gap: 20px;">
+            <h2 style="color: #fff; margin-top: 0;text-align:center;">Безопасность</h2>
+
+            <!-- Форма редактирования данных -->
+            <form asp-controller="Home" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" style="width: 100%;">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <!-- Текущий пароль -->
+                <div class="input__current_password_wrapperr">
+                    <label for="userName" style="color: white;">Текущий пароль</label>
+                    <input asp-for="Name" type="text" id="userName" class="input__password" placeholder="Текущий пароль" required />
+                    <span class="validator_error text-danger" asp-validation-for="Name"></span>
+                </div>
+
+                <!-- Новый пароль -->
+                <div class="input__new_password_wrapper">
+                    <label for="userEmail" style="color: white;">Новый пароль</label>
+                    <input asp-for="Email" type="email" id="userEmail" class="input__password" placeholder="Новый пароль" required />
+                    <span class="validator_error text-danger" asp-validation-for="Email"></span>
+                </div>                
+                
+                <!-- Подтверждение пароля -->
+                <div class="input__confirm_new_password_wrapper">
+                    <label for="userEmail" style="color: white;">Повтор пароля</label>
+                    <input asp-for="Email" type="email" id="userEmail" class="input__password" placeholder="Повтор пароля" required />
+                    <span class="validator_error text-danger" asp-validation-for="Email"></span>
+                </div>
+
+                <hr class="hr" style="width: -webkit-fill-available;" />
+
+                <div class="container">
+                    <!-- Блок настройки двухфакторной аутентификации -->
+                    <div class="twofa-section d-flex align-items-center justify-content-between flex-column">
+                        <div>
+                            <h5 style="text-align:center;">Стороннее приложение-аутентификатор</h5>
+                            <p>
+                                Использовать аутентификатор в качестве меры двухфакторной аутентификации.
+                                При входе вам потребуется ввести код безопасности, предложенный аутентификатором.
+                            </p>
+                        </div>
+                        <div>
+                            @if (Model.TwoFactorEnabled)
+                            {
+                                <!-- Если 2FA включена – кнопка для отключения -->
+                                <button type="button" class="button button__play disable-2fa" onclick="disable2FA()" style="width:fit-content; background-color:red;    box-shadow: 0px 4px 0px #570917;">
+                                    Отключить
+                                </button>
+                            }
+                            else
+                            {
+                                <!-- Если 2FA не включена – кнопка для включения (открывает модальное окно) -->
+                                <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#googleAuthModal" style="width:fit-content;">
+                                    Включить
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопка сохранить изменения -->
+                <button type="submit" class="button button__play">
+                    Сохранить
                 </button>
             </form>
         </div>
     </div>
-
-    <!-- Скрипт для скрытия лоадера и работы селектора языка (пример) -->
-    <script>
-        // Скрытие лоадера после загрузки
-        window.addEventListener('load', () => {
-          const loading = document.getElementById('loading');
-          // Добавляем класс для анимации opacity
-          loading.classList.add('hidden');
-          // Полностью убираем из потока через 1с (после анимации)
-          setTimeout(() => {
-            loading.style.display = 'none';
-          }, 1000);
-        });
-
-        // Открытие/закрытие флагов (селектор языка)
-        const selectedFlag = document.querySelector('.selected-flag');
-        const dropdown = document.querySelector('.flag-dropdown');
-        if (selectedFlag && dropdown) {
-          selectedFlag.addEventListener('click', () => {
-            dropdown.classList.toggle('show');
-          });
-          // Закрыть при клике вне области
-          document.addEventListener('click', (e) => {
-            if (!dropdown.contains(e.target) && e.target !== selectedFlag) {
-              dropdown.classList.remove('show');
-            }
-          });
-        }
-    </script>
 </body>
+<!-- Подключаем jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Скрипт для смены аватара с превью -->
+<script>
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+                $('#imagePreview').hide();
+                $('#imagePreview').fadeIn(650);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#avatar").change(function () {
+        readURL(this);
+    });
+</script>
+<!-- Скрипт для отправки кода на сервер -->
+<script>
+    function verify2FACode() {
+        var code = $('#verificationCode').val();
+        $.ajax({
+            type: "POST",
+            url: "/Home/Verify2FACode",
+            data: { code: code },
+            success: function (response) {
+                if (response.success) {
+                    $('#verifyMessage').removeClass('text-danger').addClass('text-success').text(response.message);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    $('#verifyMessage').removeClass('text-success').addClass('text-danger').text(response.message);
+                }
+            },
+            error: function () {
+                $('#verifyMessage').removeClass('text-success').addClass('text-danger').text('Ошибка сервера. Повторите попытку.');
+            }
+        });
+    }
+</script>
+@*Отключение 2FA*@
+<script>
+    function disable2FA() {
+        $.ajax({
+            type: "POST",
+            url: "/Home/Disable2FA", // URL метода отключения 2FA
+            success: function (response) {
+                if (response.success) {
+                    $('#verifyMessage').removeClass('text-danger').addClass('text-success').text(response.message);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    $('#verifyMessage').removeClass('text-success').addClass('text-danger').text(response.message);
+                }
+            },
+            error: function () {
+                $('#verifyMessage').removeClass('text-success').addClass('text-danger').text('Ошибка сервера. Повторите попытку.');
+            }
+        });
+    }
+</script>
+
+<!-- _Enable2FAModal.cshtml -->
+<div class="modal fade" id="googleAuthModal" tabindex="-1" aria-labelledby="googleAuthModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <!-- Шапка модального окна -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="googleAuthModalLabel">Подключение Google Authenticator</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <!-- Тело модального окна -->
+            <div class="modal-body">
+                <p>Для включения двухфакторной аутентификации через Google Authenticator:</p>
+                <ol>
+                    <li>Установите приложение <b>Google Authenticator</b> на телефон</li>
+                    <li>Отсканируйте QR-код или введите код вручную</li>
+                    <li>Введите полученный в приложении 6-значный код</li>
+                </ol>
+                <!-- QR-код -->
+                <div class="text-center mb-3">
+                    <img src="@ViewBag.QrCodeImageUrl" alt="QR Code" class="img-fluid rounded" style="max-width: 200px;" />
+                </div>
+                <!-- Секретный ключ для ручного ввода -->
+                <p>Или введите вручную: <strong>@ViewBag.SecretKey</strong></p>
+                <!-- Поле для ввода кода -->
+                <div class="mb-3">
+                    <label for="verificationCode" class="form-label">Код подтверждения</label>
+                    <input type="text" class="form-control" id="verificationCode" placeholder="Например, 123456" />
+                </div>
+                <!-- Сообщение о результате проверки -->
+                <div id="verifyMessage" class="mt-2"></div>
+            </div>
+            <!-- Футер модального окна -->
+            <div class="modal-footer" style="justify-content:center;">
+                <button type="button" class="button button__play" onclick="verify2FACode()" style="justify-content:center;">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+</div>

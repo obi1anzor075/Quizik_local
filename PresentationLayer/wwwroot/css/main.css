@@ -13,6 +13,11 @@ text-decoration:none !important;
     z-index:1;
 }
 
+.hr {
+    color: grey;
+    margin: 0;
+    height: 2px !important;
+}
 
 /* Стиль для загрузочного экрана */
 #loading {

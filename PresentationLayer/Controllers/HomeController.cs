@@ -13,6 +13,16 @@ using Microsoft.AspNetCore.StaticFiles;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Processing;
+using Microsoft.AspNetCore.WebUtilities;
+using QRCoder;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Text;
+using OtpNet;
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Manage.Internal;
+
 
 namespace PresentationLayer.Controllers
 {
@@ -20,62 +30,75 @@ namespace PresentationLayer.Controllers
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
+        private readonly UrlEncoder _urlEncoder;
         private readonly LocalizedIdentityErrorDescriber _localizedIdentityErrorDescriber;
         private readonly IPasswordHasher<User> _passwordHasher;
 
         private readonly SharedViewLocalizer _localizer;
 
-        public HomeController(SignInManager<User> signInManager, UserManager<User> userManager, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer)
+        public HomeController(SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _urlEncoder = urlEncoder;
             _localizedIdentityErrorDescriber = localizedIdentityErrorDescriber;
             _passwordHasher = passwordHasher;
             _localizer = localizer;
         }
 
         public IActionResult Login()
-        {            
-            
-            // Локализация
+        {
             var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
-
-            // Передача строк в ViewData
             ViewData["LocalizedStrings"] = localizedStrings;
+
             if (User.Identity.IsAuthenticated)
             {
                 var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
                 if (user != null)
                 {
+                    if (user.TwoFactorEnabled && !_signInManager.IsSignedIn(User))
+                    {
+                        return RedirectToAction("Verify2FA", new { userId = user.Id });
+                    }
+
                     SaveUserNameInCookie(user.Name);
                     return RedirectToAction("SelectMode");
                 }
             }
 
-
-
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> LoginAsync(LoginVM model)
         {
             // Локализация
             var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
-
-            // Передача строк в ViewData
             ViewData["LocalizedStrings"] = localizedStrings;
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email!, model.Password!, model.RememberMe, lockoutOnFailure: false);
+                var user = await _userManager.FindByNameAsync(model.Email!);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, _localizedIdentityErrorDescriber.InvalidLogin().Description);
+                    return View(model);
+                }
+
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password!, model.RememberMe, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Email!);
                     return RedirectToAction("SelectMode", "Home");
                 }
+                else if (result.RequiresTwoFactor)
+                {
+                    // Перенаправление на страницу 2FA
+                    return RedirectToAction("Verify2FA", new { userId = ((IdentityUser)user).Id, rememberMe = model.RememberMe });
+                }
+
                 ModelState.AddModelError(string.Empty, _localizedIdentityErrorDescriber.InvalidLogin().Description);
-                return View(model);
             }
 
             return View(model);
@@ -146,8 +169,32 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Login", "Home");
         }
 
+        [HttpGet]
+        public IActionResult Verify2FA(string userId, bool rememberMe)
+        {
+            return View(new Verify2FAModel { UserId = userId, RememberMe = rememberMe });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Verify2FA(Verify2FAModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null) return NotFound();
+
+            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(model.Code, model.RememberMe, rememberClient: false);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("SelectMode", "Home");
+            }
+
+            ModelState.AddModelError(string.Empty, "Неверный код подтверждения.");
+            return View(model);
+        }
+
         [Authorize]
-        public IActionResult SelectMode()
+        public async Task<IActionResult> SelectMode()
         {
             // Локализация
             var localizedStrings = _localizer.GetAllLocalizedStrings("SelectMode");
@@ -155,12 +202,6 @@ namespace PresentationLayer.Controllers
             // Передача строк в ViewData
             ViewData["LocalizedStrings"] = localizedStrings;
 
-            return View();
-        }
-
-        [Authorize]
-        public async Task<IActionResult> Profile()
-        {
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Account");
@@ -186,9 +227,53 @@ namespace PresentationLayer.Controllers
             }
 
             ViewBag.ProfilePicture = base64ProfilePicture;
+
+            return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Account");
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return RedirectToAction("Login");
+
+            string base64ProfilePicture = string.Empty;
+
+            if (user.ProfilePicture != null && user.ProfilePicture.Length > 0)
+            {
+                // Определение MIME-типа на основе расширения файла
+                var provider = new FileExtensionContentTypeProvider();
+                string contentType = "application/octet-stream"; // Тип по умолчанию
+
+                if (provider.TryGetContentType(user.ProfilePictureFileName, out string detectedContentType))
+                {
+                    contentType = detectedContentType;
+                }
+
+                base64ProfilePicture = $"data:{contentType};base64,{Convert.ToBase64String(user.ProfilePicture)}";
+            }
+
+            ViewBag.ProfilePicture = base64ProfilePicture;
             ViewBag.Name = user.Name;
             ViewBag.Email = user.Email;
-            return View();
+
+            // Получаем QR-код для 2FA (если пользователь уже включал 2FA или готовится его включить)
+            var secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                await _userManager.ResetAuthenticatorKeyAsync(user);
+                secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            }
+            string qrCodeUrl = $"otpauth://totp/QuizApp:{user.UserName}?secret={secretKey}&issuer=QuizApp&digits=6";
+            ViewBag.QrCodeImageUrl = GenerateQrCode(qrCodeUrl);
+            ViewBag.SecretKey = secretKey;
+
+            return View(user);
         }
 
         [HttpPost]
@@ -201,10 +286,12 @@ namespace PresentationLayer.Controllers
             user.Email = updatedUser.Email;
             user.UserName = updatedUser.Email;
             user.NormalizedEmail = updatedUser.Email.ToUpper();
-            user.ProfilePictureFileName = avatar.FileName;
 
+            // Проверяем, был ли загружен новый аватар
             if (avatar != null && avatar.Length > 0)
             {
+                user.ProfilePictureFileName = avatar.FileName;
+
                 using MemoryStream ms = new MemoryStream();
                 await avatar.CopyToAsync(ms);
                 var imageBytes = ms.ToArray();
@@ -216,6 +303,87 @@ namespace PresentationLayer.Controllers
 
             await _userManager.UpdateAsync(user);
             return RedirectToAction("Profile");
+        }
+
+
+        // Генерация QR-кода для подключения Google Authenticator
+        [HttpGet]
+        public async Task<IActionResult> Enable2FA()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            // Генерация секретного ключа, если его нет
+            var secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                await _userManager.ResetAuthenticatorKeyAsync(user);
+                secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            }
+
+            // Формируем URL для сканирования Google Authenticator
+            string qrCodeUrl = $"otpauth://totp/Quizik:{user.UserName}?secret={secretKey}&issuer=QuizApp&digits=6";
+            var qrCodeImageUrl = GenerateQrCode(qrCodeUrl);
+
+            ViewBag.QrCodeImageUrl = qrCodeImageUrl;
+            ViewBag.SecretKey = secretKey;
+
+            return PartialView("_Enable2FAModal");
+        }
+        
+        //Отключение 2FA
+        [HttpPost]
+        public async Task<IActionResult> Disable2FA()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Пользователь не найден." });
+            }
+
+            // Отключаем 2FA
+            user.TwoFactorEnabled = false;
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Json(new { success = true, message = "Двухфакторная аутентификация отключена." });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Ошибка при отключении 2FA." });
+            }
+        }
+
+        // Метод генерации QR-кода
+        private string GenerateQrCode(string setupCode)
+        {
+            // Создаём генератор QR-кода
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(setupCode, QRCodeGenerator.ECCLevel.Q);
+
+            // Генерируем QR-код в формате PNG
+            PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
+            byte[] qrCodeImage = qrCode.GetGraphic(20);
+
+            // Преобразуем изображение в Base64 для вывода в браузере
+            string base64Image = Convert.ToBase64String(qrCodeImage);
+            return $"data:image/png;base64,{base64Image}";
+        }
+
+        // Валидация кода из Google Authenticator
+        [HttpPost]
+        public async Task<IActionResult> Verify2FACode(string code)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var isValid = await _userManager.VerifyTwoFactorTokenAsync(user, "Authenticator", code);
+            if (isValid)
+            {
+                user.TwoFactorEnabled = true;
+                await _userManager.UpdateAsync(user);
+                return Json(new { success = true, message = "2FA успешно активирована!" });
+            }
+
+            return Json(new { success = false, message = "Неверный код. Повторите попытку." });
         }
 
         [AllowAnonymous]
@@ -366,7 +534,7 @@ namespace PresentationLayer.Controllers
 
         private byte[] ResizeImageIfNecessary(byte[] imageBytes, int maxWidth, int maxHeight)
         {
-            using var imageWithFormat = Image.Load(imageBytes);
+            using var imageWithFormat = SixLabors.ImageSharp.Image.Load(imageBytes);
             var image = imageWithFormat;//получение самого изображения
             var format = imageWithFormat.Metadata.DecodedImageFormat; //получение формата
 
@@ -375,7 +543,7 @@ namespace PresentationLayer.Controllers
                 image.Mutate(x => x.Resize(new ResizeOptions
                 {
                     Mode = ResizeMode.Max, //сохранине пропорций
-                    Size = new Size(maxWidth, maxHeight)
+                    Size = new SixLabors.ImageSharp.Size(maxWidth, maxHeight)
                 }));
             }
 

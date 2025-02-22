@@ -20,7 +20,7 @@
 
 <header class="head__part">
     <div class="settings">
-        <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector">
+        <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector" style="display:none;">
             <input type="hidden" name="culture" id="selectedLanguage" value="ru-RU">
             <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
 

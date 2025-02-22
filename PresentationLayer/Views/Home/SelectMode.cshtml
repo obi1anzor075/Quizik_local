@@ -22,7 +22,7 @@
         <header>
             <div class="head__mode_part">
                 <div class="head__mode_left">
-                    <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector">
+                    <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector" style="display:none;">
                         <input type="hidden" name="culture" id="selectedLanguage" value="ru-RU">
                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
 
@@ -48,11 +48,17 @@
                 <img src="~/img/logo.svg" class="main__logo_landing" alt="Логотип Quizik" />
                 </div>
                 <div class="head__mode_right">
-                    <div class="google__logout">
-                        <a class="google__logout_btn" asp-controller="Home" asp-action="Logout">@Localizer["LogoutButton"]</a>
+                <div class="google__logout profile-selector">
+                    <!--a class="google__logout_btn" asp-controller="Home" asp-action="Logout">Localizer["LogoutButton"]</a>-->
+                    <!-- Круглый аватар, подтягивается из БД, если нет – используется аватар по умолчанию -->
+                    <img src="@ViewBag.ProfilePicture" alt="Alternate Text" class="profile-photo" />
+                    <!-- Выпадающее меню -->
+                    <div class="profile-menu">
+                        <a asp-action="Profile">Профиль</a>
+                        <a asp-action="Logout">Выход</a>
+                    </div>
                     </div>
                     <div id="body">
-
                         <div id="chat-circle" class="btn btn-raised">
                             <div id="chat-overlay"></div>
                             <i class="material-icons">
@@ -344,6 +350,24 @@
     });
 
     </script>
+
+<script>
+    // Открытие/закрытие выпадающего меню при клике на аватар
+    document.querySelector('.profile-selector').addEventListener('click', function (e) {
+        const menu = document.querySelector('.profile-menu');
+        menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+        e.stopPropagation(); // предотвращаем закрытие при клике внутри
+    });
+
+    // Закрытие меню при клике вне его области
+    document.addEventListener('click', function () {
+        const menu = document.querySelector('.profile-menu');
+        if (menu) {
+            menu.style.display = 'none';
+        }
+    });
+</script>
+
 
     @*Скрипты для переключателя языков*@
 <script>
