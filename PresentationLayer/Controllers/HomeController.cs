@@ -1,25 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
 using System.Diagnostics;
-using BusinessLogicLayer.Services.Contracts;
 using DataAccessLayer.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using PresentationLayer.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using PresentationLayer.ErrorDescriber;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Globalization;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Localization;
 using PresentationLayer.Utilities;
+using Microsoft.AspNetCore.StaticFiles;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Processing;
 
 namespace PresentationLayer.Controllers
 {
@@ -101,23 +94,26 @@ namespace PresentationLayer.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM model)
-        {            
-            
+        {
             // Локализация
             var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
-
-            // Передача строк в ViewData
             ViewData["LocalizedStrings"] = localizedStrings;
 
             if (ModelState.IsValid)
             {
+                // Деструктуризованный кортеж с данными изобрадения и его именем
+                var (imageData, fileName) = GetRandomProfilePicture();
+
                 User user = new()
                 {
                     UserName = model.Email,
                     Name = model.UserName,
                     Email = model.Email,
                     CreatedAt = DateTime.Now,
+                    ProfilePicture = imageData,
+                    ProfilePictureFileName = fileName // Сохраняем имя файла
                 };
+
                 var result = await _userManager.CreateAsync(user, model.Password!);
 
                 if (result.Succeeded)
@@ -125,6 +121,7 @@ namespace PresentationLayer.Controllers
                     await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("SelectMode", "Home");
                 }
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
@@ -134,6 +131,14 @@ namespace PresentationLayer.Controllers
             return View(model);
         }
 
+
+        [AllowAnonymous]
+        public IActionResult LoginGoogle()
+        {
+            string redirectUrl = Url.Action("GoogleResponse", "Home");
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            return new ChallengeResult("Google", properties);
+        }
 
         public async Task<IActionResult> Logout()
         {
@@ -153,24 +158,64 @@ namespace PresentationLayer.Controllers
             return View();
         }
 
-        // Delimetrer string
-        static string GetFirstWord(string input)
+        [Authorize]
+        public async Task<IActionResult> Profile()
         {
-            // Разделяем строку по пробелам и берем первое слово
-            string[] words = input.Split(' ');
-            if (words.Length > 0)
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Account");
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            string base64ProfilePicture = string.Empty;
+
+            if (user.ProfilePicture != null && user.ProfilePicture.Length > 0)
             {
-                return words[0];
+                // Определение MIME-типа на основе расширения файла
+                var provider = new FileExtensionContentTypeProvider();
+                string contentType = "application/octet-stream"; // Тип по умолчанию
+
+                if (provider.TryGetContentType(user.ProfilePictureFileName, out string detectedContentType))
+                {
+                    contentType = detectedContentType;
+                }
+
+                base64ProfilePicture = $"data:{contentType};base64,{Convert.ToBase64String(user.ProfilePicture)}";
             }
-            return string.Empty;
+
+            ViewBag.ProfilePicture = base64ProfilePicture;
+            ViewBag.Name = user.Name;
+            ViewBag.Email = user.Email;
+            return View();
         }
 
-        [AllowAnonymous]
-        public IActionResult LoginGoogle()
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(User updatedUser, IFormFile avatar)
         {
-            string redirectUrl = Url.Action("GoogleResponse", "Home");
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
-            return new ChallengeResult("Google", properties);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            user.Name = updatedUser.Name;
+            user.Email = updatedUser.Email;
+            user.UserName = updatedUser.Email;
+            user.NormalizedEmail = updatedUser.Email.ToUpper();
+            user.ProfilePictureFileName = avatar.FileName;
+
+            if (avatar != null && avatar.Length > 0)
+            {
+                using MemoryStream ms = new MemoryStream();
+                await avatar.CopyToAsync(ms);
+                var imageBytes = ms.ToArray();
+
+                var resizedImage = ResizeImageIfNecessary(imageBytes, maxWidth: 150, maxHeight: 150);
+
+                user.ProfilePicture = resizedImage;
+            }
+
+            await _userManager.UpdateAsync(user);
+            return RedirectToAction("Profile");
         }
 
         [AllowAnonymous]
@@ -267,7 +312,17 @@ namespace PresentationLayer.Controllers
             HttpContext.Response.Cookies.Append("UserName", userName, cookieOptions);
         }
 
-
+        // Delimetrer string
+        static string GetFirstWord(string input)
+        {
+            // Разделяем строку по пробелам и берем первое слово
+            string[] words = input.Split(' ');
+            if (words.Length > 0)
+            {
+                return words[0];
+            }
+            return string.Empty;
+        }
 
         [HttpGet]
         public IActionResult GetUserName()
@@ -294,6 +349,41 @@ namespace PresentationLayer.Controllers
             return LocalRedirect(returnUrl);
         }
 
+        private (byte[] ImageData, string FileName) GetRandomProfilePicture()
+        {
+            var imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img/default-profile-pictures");
+            var images = Directory.GetFiles(imageFolder);
+            if (images.Length == 0)
+                return (null, null);
+
+            var random = new Random();
+            var randomImagePath = images[random.Next(images.Length)];
+            var imageData = System.IO.File.ReadAllBytes(randomImagePath);
+            var fileName = Path.GetFileName(randomImagePath); // Извлекаем только имя файла
+
+            return (imageData, fileName);
+        }
+
+        private byte[] ResizeImageIfNecessary(byte[] imageBytes, int maxWidth, int maxHeight)
+        {
+            using var imageWithFormat = Image.Load(imageBytes);
+            var image = imageWithFormat;//получение самого изображения
+            var format = imageWithFormat.Metadata.DecodedImageFormat; //получение формата
+
+            if (image.Width > maxWidth || image.Height > maxHeight)
+            {
+                image.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max, //сохранине пропорций
+                    Size = new Size(maxWidth, maxHeight)
+                }));
+            }
+
+            //сохранение изобрадения в том же формате
+            using MemoryStream ms = new MemoryStream();
+            image.Save(ms, format);
+            return ms.ToArray();
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

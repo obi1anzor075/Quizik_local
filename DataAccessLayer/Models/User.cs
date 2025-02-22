@@ -14,5 +14,7 @@ namespace DataAccessLayer.Models
         [Required]
         public string? Name { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public byte[]? ProfilePicture { get; set; }
+        public string? ProfilePictureFileName { get; set; }
     }
 }

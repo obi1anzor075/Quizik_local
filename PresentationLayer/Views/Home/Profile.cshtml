@@ -1,0 +1,105 @@
+﻿@model DataAccessLayer.Models.User
+@{
+}
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/landing.css">
+</head>
+<body>
+
+    <!-- Шапка (логотип, кнопки, язык и т.д.) -->
+    <div class="head__part">
+        <!-- Левая пустая колонка -->
+        <div></div>
+
+        <!-- Логотип по центру -->
+        <div></div>
+
+        <!-- Правая колонка (пример - селектор языка) -->
+        <div class="settings">
+            <div class="language-selector">
+                <div class="selected-flag" style="background-image: url('/img/flag-en.png');"></div>
+                <div class="flag-dropdown">
+                    <img src="/img/flag-ru.png" alt="Russian" />
+                    <img src="/img/flag-en.png" alt="English" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основная часть - Страница профиля -->
+    <div class="ctr">
+        <!-- Блок с формой редактирования профиля -->
+        <div class="play__field" style="flex-direction: column; gap: 20px;">
+            <h2 style="color: #fff; margin-top: 0;">User Profile</h2>
+
+            <!-- Аватар -->
+            <div style="text-align: center;">
+                <img src="@ViewBag.ProfilePicture" alt="Фото профиля" style="width:150px;height:150px;object-fit: cover;border-radius: 100%;" />
+            </div>
+
+            <!-- Форма редактирования -->
+            <form asp-controller="Home" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" style="width: 100%;">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <!-- Имя -->
+                <div class="input__name_wrapper">
+                    <label for="userName" style="color: white;">Name</label>
+                    <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="YOUR NAME" value="@ViewBag.Name" required />
+                    <span class="validator_error text-danger" asp-validation-for="Name"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="input__email_wrapper">
+                    <label for="userEmail" style="color: white;">Email</label>
+                    <input asp-for="Email" type="email" id="userEmail" class="input__email" placeholder="YOUR EMAIL" value="@ViewBag.Email" required />
+                    <span class="validator_error text-danger" asp-validation-for="Email"></span>
+                </div>
+
+                <!-- Загрузка нового аватара -->
+                <div class="input__password_wrapper">
+                    <label for="avatar" style="color: white;">Profile Picture</label>
+                    <input asp-for="ProfilePicture" type="file" accept="image/*" id="avatar" name="avatar" />
+                    <span class="validator_error text-danger" asp-validation-for="ProfilePicture"></span>
+                </div>
+
+                <!-- Кнопка сохранить изменения -->
+                <button type="submit" class="button button__play">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Скрипт для скрытия лоадера и работы селектора языка (пример) -->
+    <script>
+        // Скрытие лоадера после загрузки
+        window.addEventListener('load', () => {
+          const loading = document.getElementById('loading');
+          // Добавляем класс для анимации opacity
+          loading.classList.add('hidden');
+          // Полностью убираем из потока через 1с (после анимации)
+          setTimeout(() => {
+            loading.style.display = 'none';
+          }, 1000);
+        });
+
+        // Открытие/закрытие флагов (селектор языка)
+        const selectedFlag = document.querySelector('.selected-flag');
+        const dropdown = document.querySelector('.flag-dropdown');
+        if (selectedFlag && dropdown) {
+          selectedFlag.addEventListener('click', () => {
+            dropdown.classList.toggle('show');
+          });
+          // Закрыть при клике вне области
+          document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && e.target !== selectedFlag) {
+              dropdown.classList.remove('show');
+            }
+          });
+        }
+    </script>
+</body>
