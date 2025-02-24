@@ -117,10 +117,65 @@
 .modal-content {
     background-color: #1C1A1B;
     color: #fff;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px 9px #1c1a1b;
+    border: none;
 }
+
 /* Закрывающая кнопка в тёмном модальном окне */
 .btn-close.btn-close-white {
     filter: invert(1);
+}
+
+.button-cancel:hover {
+    transform: translateY(4px);
+    box-shadow: 0px 0px 0px #570917 !important;
+}
+
+/*Стили для анимации кнопки отмены*/
+@keyframes pulseInvert{
+    0% {
+        transform: scale(1);
+        background-color: red;
+    }
+
+    50% {
+        transform: scale(1.05);
+        background-color: #570917; /* Темнее */
+    }
+
+    100% {
+        transform: scale(1);
+        background-color: red;
+    }
+}
+.button-pulse-invert{
+    animation: pulseInvert 1s infinite;
+}
+.button-canel:hover {
+    background-color: #ad0000;
+}
+
+/* Стили для анимации кнопки обычной */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        background-color: #41CAC2;
+    }
+
+    50% {
+        transform: scale(1.05);
+        background-color: #2c8f89; /* Темнее */
+    }
+
+    100% {
+        transform: scale(1);
+        background-color: #41CAC2;
+    }
+}
+
+.button-pulse {
+    animation: pulse 1s infinite;
 }
 
 @media(max-width:900px) {

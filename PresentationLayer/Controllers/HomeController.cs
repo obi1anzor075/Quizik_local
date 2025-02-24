@@ -22,12 +22,17 @@ using System.Text;
 using OtpNet;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Manage.Internal;
+using DataAccessLayer.DataContext;
+using BusinessLogicLayer.Services;
+using BusinessLogicLayer.Services.Contracts;
+using DataAccessLayer.Repositories.Contracts;
 
 
 namespace PresentationLayer.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly DataStoreDbContext _context;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly UrlEncoder _urlEncoder;
@@ -36,14 +41,25 @@ namespace PresentationLayer.Controllers
 
         private readonly SharedViewLocalizer _localizer;
 
-        public HomeController(SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer)
+        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
+
+        private readonly IUserRepository _userRepository;
+        private readonly IImageService _imageService;
+
+        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer, IUserService userService,IAuthService authService ,IUserRepository userRepository, IImageService imageService)
         {
+            _context = context;
             _signInManager = signInManager;
             _userManager = userManager;
             _urlEncoder = urlEncoder;
             _localizedIdentityErrorDescriber = localizedIdentityErrorDescriber;
             _passwordHasher = passwordHasher;
             _localizer = localizer;
+            _userService = userService;
+            _authService = authService;
+            _userRepository = userRepository;
+            _imageService = imageService;
         }
 
         public IActionResult Login()
@@ -125,7 +141,7 @@ namespace PresentationLayer.Controllers
             if (ModelState.IsValid)
             {
                 // Деструктуризованный кортеж с данными изобрадения и его именем
-                var (imageData, fileName) = GetRandomProfilePicture();
+                var (imageData, fileName) = await _imageService.GetRandomProfilePictureAsync();
 
                 User user = new()
                 {
@@ -242,36 +258,20 @@ namespace PresentationLayer.Controllers
             if (user == null)
                 return RedirectToAction("Login");
 
-            string base64ProfilePicture = string.Empty;
-
-            if (user.ProfilePicture != null && user.ProfilePicture.Length > 0)
-            {
-                // Определение MIME-типа на основе расширения файла
-                var provider = new FileExtensionContentTypeProvider();
-                string contentType = "application/octet-stream"; // Тип по умолчанию
-
-                if (provider.TryGetContentType(user.ProfilePictureFileName, out string detectedContentType))
-                {
-                    contentType = detectedContentType;
-                }
-
-                base64ProfilePicture = $"data:{contentType};base64,{Convert.ToBase64String(user.ProfilePicture)}";
-            }
-
-            ViewBag.ProfilePicture = base64ProfilePicture;
             ViewBag.Name = user.Name;
             ViewBag.Email = user.Email;
 
-            // Получаем QR-код для 2FA (если пользователь уже включал 2FA или готовится его включить)
-            var secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
-            if (string.IsNullOrEmpty(secretKey))
-            {
-                await _userManager.ResetAuthenticatorKeyAsync(user);
-                secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
-            }
-            string qrCodeUrl = $"otpauth://totp/QuizApp:{user.UserName}?secret={secretKey}&issuer=QuizApp&digits=6";
-            ViewBag.QrCodeImageUrl = GenerateQrCode(qrCodeUrl);
-            ViewBag.SecretKey = secretKey;
+            // Получаем изображение профиля в формате Base64
+            ViewBag.ProfilePicture = await _userService.GetProfilePictureBase64Async(user);
+
+            // Генерация QR-кода для 2FA
+            ViewBag.QrCodeImageUrl = await _userService.GenerateQRCodeForUserAsync(user);
+
+            // Генерация секретного ключа
+            ViewBag.SecretKey = await _userService.GenerateSecretKeyForUserAsync(user);
+
+            // Получаем результаты викторин
+            ViewBag.QuizResults = await _userService.GetQuizResultsAsync(user.Id);
 
             return View(user);
         }
@@ -287,86 +287,35 @@ namespace PresentationLayer.Controllers
             user.UserName = updatedUser.Email;
             user.NormalizedEmail = updatedUser.Email.ToUpper();
 
-            // Проверяем, был ли загружен новый аватар
             if (avatar != null && avatar.Length > 0)
             {
                 user.ProfilePictureFileName = avatar.FileName;
 
-                using MemoryStream ms = new MemoryStream();
-                await avatar.CopyToAsync(ms);
-                var imageBytes = ms.ToArray();
+                var imageBytes = await _imageService.ProcessImageAsync(avatar);
 
-                var resizedImage = ResizeImageIfNecessary(imageBytes, maxWidth: 150, maxHeight: 150);
-
-                user.ProfilePicture = resizedImage;
+                user.ProfilePicture = await _imageService.ResizeImageIfNecessaryAsync(imageBytes, maxWidth: 150, maxHeight: 150);
             }
 
             await _userManager.UpdateAsync(user);
             return RedirectToAction("Profile");
         }
 
-
-        // Генерация QR-кода для подключения Google Authenticator
-        [HttpGet]
-        public async Task<IActionResult> Enable2FA()
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            // Генерация секретного ключа, если его нет
-            var secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
-            if (string.IsNullOrEmpty(secretKey))
-            {
-                await _userManager.ResetAuthenticatorKeyAsync(user);
-                secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
-            }
-
-            // Формируем URL для сканирования Google Authenticator
-            string qrCodeUrl = $"otpauth://totp/Quizik:{user.UserName}?secret={secretKey}&issuer=QuizApp&digits=6";
-            var qrCodeImageUrl = GenerateQrCode(qrCodeUrl);
-
-            ViewBag.QrCodeImageUrl = qrCodeImageUrl;
-            ViewBag.SecretKey = secretKey;
-
-            return PartialView("_Enable2FAModal");
-        }
-        
         //Отключение 2FA
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Disable2FA()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Json(new { success = false, message = "Пользователь не найден." });
-            }
-
-            // Отключаем 2FA
-            user.TwoFactorEnabled = false;
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
+            var result = await _authService.Disable2FAAsync(User);
+            if (result is OkObjectResult okResult)
             {
                 return Json(new { success = true, message = "Двухфакторная аутентификация отключена." });
             }
-            else
+            else if (result is BadRequestObjectResult badRequestResult)
             {
+                // Обработка ошибки
                 return Json(new { success = false, message = "Ошибка при отключении 2FA." });
             }
-        }
-
-        // Метод генерации QR-кода
-        private string GenerateQrCode(string setupCode)
-        {
-            // Создаём генератор QR-кода
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(setupCode, QRCodeGenerator.ECCLevel.Q);
-
-            // Генерируем QR-код в формате PNG
-            PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
-            byte[] qrCodeImage = qrCode.GetGraphic(20);
-
-            // Преобразуем изображение в Base64 для вывода в браузере
-            string base64Image = Convert.ToBase64String(qrCodeImage);
-            return $"data:image/png;base64,{base64Image}";
+            return View("Error", new ErrorViewModel { ErrorMessage = "Unknown error" });
         }
 
         // Валидация кода из Google Authenticator
@@ -515,42 +464,6 @@ namespace PresentationLayer.Controllers
             }
 
             return LocalRedirect(returnUrl);
-        }
-
-        private (byte[] ImageData, string FileName) GetRandomProfilePicture()
-        {
-            var imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img/default-profile-pictures");
-            var images = Directory.GetFiles(imageFolder);
-            if (images.Length == 0)
-                return (null, null);
-
-            var random = new Random();
-            var randomImagePath = images[random.Next(images.Length)];
-            var imageData = System.IO.File.ReadAllBytes(randomImagePath);
-            var fileName = Path.GetFileName(randomImagePath); // Извлекаем только имя файла
-
-            return (imageData, fileName);
-        }
-
-        private byte[] ResizeImageIfNecessary(byte[] imageBytes, int maxWidth, int maxHeight)
-        {
-            using var imageWithFormat = SixLabors.ImageSharp.Image.Load(imageBytes);
-            var image = imageWithFormat;//получение самого изображения
-            var format = imageWithFormat.Metadata.DecodedImageFormat; //получение формата
-
-            if (image.Width > maxWidth || image.Height > maxHeight)
-            {
-                image.Mutate(x => x.Resize(new ResizeOptions
-                {
-                    Mode = ResizeMode.Max, //сохранине пропорций
-                    Size = new SixLabors.ImageSharp.Size(maxWidth, maxHeight)
-                }));
-            }
-
-            //сохранение изобрадения в том же формате
-            using MemoryStream ms = new MemoryStream();
-            image.Save(ms, format);
-            return ms.ToArray();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

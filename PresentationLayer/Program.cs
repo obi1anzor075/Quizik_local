@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using PresentationLayer.Utilities;
 using Microsoft.AspNetCore.Components.Forms;
 using PresentationLayer;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -115,9 +116,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Sql"));
 });
 
+builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
+
+builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddTransient<IImageService>(provider =>
+    new ImageService(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img/default-profile-pictures"))); 
 builder.Services.AddScoped<IQuestionsService, QuestionsService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<CultureHelper>();
 
 builder.Services.AddSignalR();

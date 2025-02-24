@@ -121,7 +121,7 @@
                             @if (Model.TwoFactorEnabled)
                             {
                                 <!-- Если 2FA включена – кнопка для отключения -->
-                                <button type="button" class="button button__play disable-2fa" onclick="disable2FA()" style="width:fit-content; background-color:red;    box-shadow: 0px 4px 0px #570917;">
+                                <button type="button" id="button-cancel" class="button button__play button-cancel disable-2fa" onclick="disable2FA()" style="width:fit-content; background-color:red;    box-shadow: 0px 4px 0px #570917;">
                                     Отключить
                                 </button>
                             }
@@ -167,31 +167,48 @@
 </script>
 <!-- Скрипт для отправки кода на сервер -->
 <script>
-    function verify2FACode() {
-        var code = $('#verificationCode').val();
-        $.ajax({
-            type: "POST",
-            url: "/Home/Verify2FACode",
-            data: { code: code },
-            success: function (response) {
-                if (response.success) {
-                    $('#verifyMessage').removeClass('text-danger').addClass('text-success').text(response.message);
-                    setTimeout(function () {
-                        location.reload();
-                    }, 2000);
-                } else {
-                    $('#verifyMessage').removeClass('text-success').addClass('text-danger').text(response.message);
-                }
-            },
-            error: function () {
-                $('#verifyMessage').removeClass('text-success').addClass('text-danger').text('Ошибка сервера. Повторите попытку.');
+function verify2FACode() {
+    var code = $('#verificationCode').val();
+    var button = $('#button-play'); // Кнопка с id 'button-play'
+
+    // Добавляем класс для пульсации, кнопка начинает пульсировать
+    button.addClass('button-pulse');
+        button.text("Подождите...");
+
+    $.ajax({
+        type: "POST",
+        url: "/Home/Verify2FACode",
+        data: { code: code },
+        success: function (response) {
+            if (response.success) {
+                $('#verifyMessage').removeClass('text-danger').addClass('text-success').text(response.message);
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            } else {
+                $('#verifyMessage').removeClass('text-success').addClass('text-danger').text(response.message);
             }
-        });
-    }
+        },
+        error: function () {
+            $('#verifyMessage').removeClass('text-success').addClass('text-danger').text('Ошибка сервера. Повторите попытку.');
+        },
+        complete: function() {
+            // Убираем анимацию пульсации, когда запрос завершен
+            button.removeClass('button-pulse');
+            button.text("Подтвердить");
+        }
+    });
+}
 </script>
 @*Отключение 2FA*@
 <script>
     function disable2FA() {
+        var button = $('#button-cancel'); // Кнопка с id 'button-cancel'
+
+        // Добавляем класс для пульсации, кнопка начинает пульсировать
+        button.addClass('button-pulse-invert');
+        button.text("Подождите..."); // Изменяем текст кнопки на "Подождите"
+
         $.ajax({
             type: "POST",
             url: "/Home/Disable2FA", // URL метода отключения 2FA
@@ -207,9 +224,15 @@
             },
             error: function () {
                 $('#verifyMessage').removeClass('text-success').addClass('text-danger').text('Ошибка сервера. Повторите попытку.');
+            },
+            complete: function () {
+                // Убираем анимацию пульсации, когда запрос завершен
+                button.removeClass('button-pulse-invert');
+                button.text("Отменить"); // Восстанавливаем исходный текст кнопки
             }
         });
     }
+
 </script>
 
 <!-- _Enable2FAModal.cshtml -->
@@ -245,7 +268,7 @@
             </div>
             <!-- Футер модального окна -->
             <div class="modal-footer" style="justify-content:center;">
-                <button type="button" class="button button__play" onclick="verify2FACode()" style="justify-content:center;">Подтвердить</button>
+                <button type="button" class="button button__play" id="button-play" onclick="verify2FACode()" style="justify-content:center;">Подтвердить</button>
             </div>
         </div>
     </div>

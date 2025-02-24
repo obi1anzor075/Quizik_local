@@ -222,12 +222,28 @@ namespace PresentationLayer.Controllers
         }
         public async Task<IActionResult> Finish(string difficultyLevel)
         {
-            //Получение пользователя
+            // Получение пользователя
             var user = await _userManager.GetUserAsync(User);
 
-            ViewBag.DifficultyLevel = difficultyLevel;
+            // Сохранение локализованного уровня сложности на английском
+            string englishDifficultyLevel = difficultyLevel switch
+            {
+                "Легкий" => "Simple",  // Russian
+                "Сложный" => "Hard",   // Russian
+                "Дуэль" => "Duel",     // Russian
+                "Simple" => "Simple",  // English
+                "Hard" => "Hard",      // English
+                "Duel" => "Duel",      // English
+                "簡單的" => "Simple",    // Chinese
+                "難的" => "Hard",      // Chinese
+                "決鬥" => "Duel",      // Chinese
+                _ => "Simple"         // Default
+            };
 
-            // Attempt to retrieve the correct answers count from cookies, defaulting to 0 if it doesn't exist
+            // Передача английского уровня сложности в ViewBag
+            ViewBag.DifficultyLevel = englishDifficultyLevel;
+
+            // Попытка получить количество правильных ответов из cookies
             if (!int.TryParse(Request.Cookies["CorrectAnswersCount"], out int correctAnswersCount))
             {
                 correctAnswersCount = 0;
@@ -235,20 +251,22 @@ namespace PresentationLayer.Controllers
 
             ViewBag.CorrectAnswersCount = correctAnswersCount;
 
+            // Попытка получить общее количество вопросов из cookies
             if (!int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int totalQuestionsCount))
             {
                 totalQuestionsCount = 0;
             }
             ViewBag.TotalQuestionsCount = totalQuestionsCount;
 
-            //Сохранение в БД результата
+            // Сохранение результата в БД
             var result = new QuizResult
             {
                 UserId = user.Id,
                 Score = correctAnswersCount,
-                Type = difficultyLevel,
+                Type = englishDifficultyLevel,
                 DatePlayed = DateTime.Now
             };
+
             _dbContext.QuizResults.Add(result);
             await _dbContext.SaveChangesAsync();
 

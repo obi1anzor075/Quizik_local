@@ -41,15 +41,12 @@
                             item.removeEventListener('mouseover', handleMouseOver);
                             item.removeEventListener('mouseout', handleMouseOut);
                         });
+                        nextQuestionBtn.removeAttribute('disabled'); // Enable the "Continue" button
                     })
                     .catch(error => {
                         console.error('Error:', error);
                     });
-
-                nextQuestionBtn.removeAttribute('disabled'); // Enable the "Continue" button
-        }
-
-        
+            }
         }
     }
 

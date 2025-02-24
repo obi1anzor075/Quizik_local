@@ -2,33 +2,93 @@
 using BusinessLogicLayer.Services.Contracts;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.Models;
+using DataAccessLayer.Repositories.Contracts;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using PresentationLayer.ErrorDescriber;
+using QRCoder;
 
 namespace BusinessLogicLayer.Services
 {
     public class UserService : IUserService
     {
+        private readonly UserManager<User> _userManager;
         private readonly DataStoreDbContext _context;
 
-        public UserService(DataStoreDbContext context)
+        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IFileProvider _fileProvider; // Для работы с изображениями
+
+        public UserService(UserManager<User> userManager, DataStoreDbContext context, IPasswordHasher<User> passwordHasher, IFileProvider fileProvider)
         {
+            _userManager = userManager;
             _context = context;
+            _passwordHasher = passwordHasher;
+            _fileProvider = fileProvider;
         }
 
-        public async Task SaveUserAsync(User user)
+        public async Task<string> GenerateQRCodeForUserAsync(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                await _userManager.ResetAuthenticatorKeyAsync(user);
+                secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            }
+
+            string qrCodeUrl = $"otpauth://totp/QuizApp:{user.UserName}?secret={secretKey}&issuer=QuizApp&digits=6";
+            return GenerateQrCode(qrCodeUrl);
+        }
+        public async Task<string> GenerateSecretKeyForUserAsync(User user)
+        {
+            var secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                await _userManager.ResetAuthenticatorKeyAsync(user);
+                secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
+            }
+
+            return secretKey;
+        }
+        public async Task<List<QuizResult>> GetQuizResultsAsync(string userId)
+        {
+            return await _context.QuizResults
+                                 .Where(qr => qr.UserId == userId)
+                                 .OrderByDescending(qr => qr.DatePlayed)
+                                 .ToListAsync();
+        }        
+        
+        public async Task<string> GetProfilePictureBase64Async(User user)
+        {
+            if (user.ProfilePicture != null && user.ProfilePicture.Length > 0)
+            {
+                var provider = new FileExtensionContentTypeProvider();
+                string contentType = "application/octet-stream"; // Тип по умолчанию
+
+                if (provider.TryGetContentType(user.ProfilePictureFileName, out string detectedContentType))
+                {
+                    contentType = detectedContentType;
+                }
+
+                return $"data:{contentType};base64,{Convert.ToBase64String(user.ProfilePicture)}";
+            }
+
+            return string.Empty;
         }
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        //Вспомогательные методы
+        private string GenerateQrCode(string setupCode)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            // Генерация QR-кода
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(setupCode, QRCodeGenerator.ECCLevel.Q);
+            PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
+            byte[] qrCodeImage = qrCode.GetGraphic(20);
+
+            return $"data:image/png;base64,{Convert.ToBase64String(qrCodeImage)}";
         }
 
-        public async Task<User> GetUserByIdAsync(int id)
-        {
-            return await _context.Users.FindAsync(id);
-        }
     }
+
 }
