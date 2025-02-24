@@ -19,6 +19,7 @@ namespace DataAccessLayer.DataContext
         public virtual DbSet<Question> Questions { get; set; }
         public virtual DbSet<HardQuestion> HardQuestions { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<QuizResult> QuizResults { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -87,6 +88,15 @@ namespace DataAccessLayer.DataContext
                     .IsUnicode(false)
                     .HasColumnName("correct_answer2");
             });
+
+            modelBuilder.Entity<QuizResult>()
+                .HasOne(qr => qr.User)
+                .WithMany() // или .WithMany(u => u.QuizResults), если коллекция определена в классе User
+                .HasForeignKey(qr => qr.UserId)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_QuizResults_AspNetUsers_UserId");
+
             OnModelCreatingPartial(modelBuilder);
         }
 

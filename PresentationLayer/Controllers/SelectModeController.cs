@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 using PresentationLayer.Hubs;
 using Microsoft.Data.SqlClient;
 using PresentationLayer.Utilities;
+using Microsoft.AspNetCore.Identity;
 
 namespace PresentationLayer.Controllers
 {
@@ -19,13 +20,16 @@ namespace PresentationLayer.Controllers
         private readonly DataStoreDbContext _dbContext;
         private readonly IHubContext<GameHub, IChatClient> _gameHubContext;
 
+        private readonly UserManager<User> _userManager;
+
         private readonly CultureHelper _cultureHelper;
         public readonly SharedViewLocalizer _localizer;
 
-        public SelectModeController(DataStoreDbContext dbContext, IHubContext<GameHub, IChatClient> gameHubContext, CultureHelper cultureHelper, SharedViewLocalizer localizer)
+        public SelectModeController(DataStoreDbContext dbContext, IHubContext<GameHub, IChatClient> gameHubContext, UserManager<User> userManager,CultureHelper cultureHelper, SharedViewLocalizer localizer)
         {
             _dbContext = dbContext;
             _gameHubContext = gameHubContext;
+            _userManager = userManager;
             _cultureHelper = cultureHelper;
             _localizer = localizer;
         }
@@ -216,8 +220,11 @@ namespace PresentationLayer.Controllers
             string difficultyLevel = "Дуэль";
             return RedirectToAction("Finish", new { difficultyLevel });
         }
-        public IActionResult Finish(string difficultyLevel)
+        public async Task<IActionResult> Finish(string difficultyLevel)
         {
+            //Получение пользователя
+            var user = await _userManager.GetUserAsync(User);
+
             ViewBag.DifficultyLevel = difficultyLevel;
 
             // Attempt to retrieve the correct answers count from cookies, defaulting to 0 if it doesn't exist
@@ -233,6 +240,17 @@ namespace PresentationLayer.Controllers
                 totalQuestionsCount = 0;
             }
             ViewBag.TotalQuestionsCount = totalQuestionsCount;
+
+            //Сохранение в БД результата
+            var result = new QuizResult
+            {
+                UserId = user.Id,
+                Score = correctAnswersCount,
+                Type = difficultyLevel,
+                DatePlayed = DateTime.Now
+            };
+            _dbContext.QuizResults.Add(result);
+            await _dbContext.SaveChangesAsync();
 
             return View();
         }
