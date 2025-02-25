@@ -1,4 +1,8 @@
-﻿.play__field {
+﻿.success {
+    color: #2ce917 !important;
+}
+
+.play__field {
     display: flex;
     justify-content: space-evenly;
     align-items: center;

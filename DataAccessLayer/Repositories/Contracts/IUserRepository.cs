@@ -13,5 +13,8 @@ namespace DataAccessLayer.Repositories.Contracts
         Task<string> GetAuthenticatorKeyAsync(User user);
         Task<string> ResetAuthenticatorKeyAsync(User user);
         Task<IdentityResult> UpdateAsync(User user);
+
+        Task<bool> CheckPasswordAsync(User user, string currentPassword);
+        Task<bool> ChangePasswordAsync(User user,string currentPassword, string newPassword);
     }
 }

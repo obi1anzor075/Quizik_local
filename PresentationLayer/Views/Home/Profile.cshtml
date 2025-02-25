@@ -58,7 +58,7 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <!-- Имя -->
                 <div class="input__name_wrapper">
-                    <label for="userName" style="color: white;">Name</label>
+                    <label for="userName" style="color: white;">Имя</label>
                     <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="Ваше имя" value="@ViewBag.Name" required />
                     <span class="validator_error text-danger" asp-validation-for="Name"></span>
                 </div>
@@ -80,29 +80,29 @@
         <!-- Блок безопасность  -->
         <div class="play__field" style="flex-direction: column; gap: 20px;">
             <h2 style="color: #fff; margin-top: 0;text-align:center;">Безопасность</h2>
+        <form asp-controller="Home" asp-action="ChangePassword" method="post" enctype="multipart/form-data" style="width: 100%;" id="changePasswordForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger">xfzg</div>
+                <span id="passwordError" class="text-danger"></span>
 
-            <!-- Форма редактирования данных -->
-            <form asp-controller="Home" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" style="width: 100%;">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <!-- Текущий пароль -->
                 <div class="input__current_password_wrapperr">
-                    <label for="userName" style="color: white;">Текущий пароль</label>
-                    <input asp-for="Name" type="text" id="userName" class="input__password" placeholder="Текущий пароль" required />
-                    <span class="validator_error text-danger" asp-validation-for="Name"></span>
+                    <label for="currentPassword" style="color: white;">Текущий пароль</label>
+                    <input type="password" id="currentPassword" class="input__password" placeholder="Текущий пароль" required />
+                    <span id="currentPasswordError" class="text-danger"></span>
                 </div>
 
                 <!-- Новый пароль -->
                 <div class="input__new_password_wrapper">
-                    <label for="userEmail" style="color: white;">Новый пароль</label>
-                    <input asp-for="Email" type="email" id="userEmail" class="input__password" placeholder="Новый пароль" required />
-                    <span class="validator_error text-danger" asp-validation-for="Email"></span>
-                </div>                
-                
+                    <label for="newPassword" style="color: white;">Новый пароль</label>
+                    <input type="password" id="newPassword" class="input__password" placeholder="Новый пароль" required />
+                    <span id="newPasswordError" class="text-danger"></span>
+                </div>
+
                 <!-- Подтверждение пароля -->
                 <div class="input__confirm_new_password_wrapper">
-                    <label for="userEmail" style="color: white;">Повтор пароля</label>
-                    <input asp-for="Email" type="email" id="userEmail" class="input__password" placeholder="Повтор пароля" required />
-                    <span class="validator_error text-danger" asp-validation-for="Email"></span>
+                    <label for="confirmPassword" style="color: white;">Повтор пароля</label>
+                    <input type="password" id="confirmPassword" class="input__password" placeholder="Повтор пароля" required />
+                    <span id="confirmPasswordError" class="text-danger"></span>
                 </div>
 
                 <hr class="hr" style="width: -webkit-fill-available;" />
@@ -113,7 +113,6 @@
                         <div>
                             <h5 style="text-align:center;">Стороннее приложение-аутентификатор</h5>
                             <p>
-                                Использовать аутентификатор в качестве меры двухфакторной аутентификации.
                                 При входе вам потребуется ввести код безопасности, предложенный аутентификатором.
                             </p>
                         </div>
@@ -165,7 +164,7 @@
         readURL(this);
     });
 </script>
-<!-- Скрипт для отправки кода на сервер -->
+<!-- Скрипт для отправки кода 2FA на сервер -->
 <script>
 function verify2FACode() {
     var code = $('#verificationCode').val();
@@ -200,7 +199,7 @@ function verify2FACode() {
     });
 }
 </script>
-@*Отключение 2FA*@
+<!--Отключение 2FA-->
 <script>
     function disable2FA() {
         var button = $('#button-cancel'); // Кнопка с id 'button-cancel'
@@ -233,6 +232,95 @@ function verify2FACode() {
         });
     }
 
+</script>
+<!--Логика смены пароля и проверки в реальном времени-->
+<script>
+    $(document).ready(function () {
+
+        // Проверка текущего пароля через AJAX
+        $('#currentPassword').on('blur', function () {
+            var currentPassword = $(this).val();
+
+            if (currentPassword.length > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/VerifyCurrentPassword", // URL для проверки пароля
+                    data: { currentPassword: currentPassword },
+                    success: function (response) {
+                        if (!response.success) {
+                            $('#currentPasswordError').text('Неверный текущий пароль');
+                        } else {
+                            $('#currentPasswordError').text('');
+                        }
+                    },
+                    error: function () {
+                        $('#currentPasswordError').text('Ошибка сервера');
+                    }
+                });
+            }
+        });
+
+        // Проверка совпадения паролей
+        $('#confirmPassword').on('blur', function () {
+            var newPassword = $('#newPassword').val();
+            var confirmPassword = $(this).val();
+
+            if (newPassword !== confirmPassword) {
+                $('#confirmPasswordError').text('Пароли не совпадают');
+            } else {
+                $('#confirmPasswordError').text('');
+            }
+        });
+
+        // Отправка формы
+        $('#changePasswordForm').on('submit', function (event) {
+            event.preventDefault(); // Предотвращаем отправку формы
+
+            var currentPassword = $('#currentPassword').val();
+            var newPassword = $('#newPassword').val();
+            var confirmPassword = $('#confirmPassword').val();
+            $('#passwordError').removeClass('success');
+            $('#passwordError').text('');
+
+            // Валидация данных
+            if (currentPassword.length == 0) {
+                $('#currentPasswordError').text('Текущий пароль обязателен');
+                return;
+            }
+
+            if (newPassword.length == 0) {
+                $('#newPasswordError').text('Новый пароль обязателен');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                $('#confirmPasswordError').text('Пароли не совпадают');
+                return;
+            }
+
+            // Отправка данных
+            $.ajax({
+                type: "POST",
+                url: "/Home/ChangePassword", // URL для смены пароля
+                data: {
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('#passwordError').addClass('success');
+                        $('#passwordError').text('Пароль успешно изменен.');
+                        // Перенаправление или другие действия после успешного изменения пароля
+                    } else {
+                        $('#passwordError').text('Пароль не соответсвет требованиям.');
+                    }
+                },
+                error: function () {
+                    $('#passwordError').text('Ошибка сервера');
+                }
+            });
+        });
+    });
 </script>
 
 <!-- _Enable2FAModal.cshtml -->

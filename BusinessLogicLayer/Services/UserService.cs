@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using BusinessLogicLayer.Services.Contracts;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.Models;
@@ -17,13 +18,16 @@ namespace BusinessLogicLayer.Services
         private readonly UserManager<User> _userManager;
         private readonly DataStoreDbContext _context;
 
+        private readonly IUserRepository _userRepository;
+
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IFileProvider _fileProvider; // Для работы с изображениями
 
-        public UserService(UserManager<User> userManager, DataStoreDbContext context, IPasswordHasher<User> passwordHasher, IFileProvider fileProvider)
+        public UserService(UserManager<User> userManager, DataStoreDbContext context, IUserRepository userRepository, IPasswordHasher<User> passwordHasher, IFileProvider fileProvider)
         {
             _userManager = userManager;
             _context = context;
+            _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _fileProvider = fileProvider;
         }
@@ -75,6 +79,22 @@ namespace BusinessLogicLayer.Services
             }
 
             return string.Empty;
+        }
+
+        public async Task<bool> VerifyCurrentPasswordAsync(ClaimsPrincipal principal, string currentPassword)
+        {
+            var user = await _userRepository.GetUserAsync(principal);
+            if (user == null) return false;
+
+            return await _userRepository.CheckPasswordAsync(user, currentPassword);
+        }
+
+        public async Task<bool> ChangePasswordAsync(ClaimsPrincipal principal, string currentPassword, string newPassword)
+        {
+            var user = await _userRepository.GetUserAsync(principal);
+            if (user == null) return false;
+
+            return await _userRepository.ChangePasswordAsync(user, currentPassword, newPassword);
         }
 
         //Вспомогательные методы

@@ -170,7 +170,6 @@ namespace PresentationLayer.Controllers
             return View(model);
         }
 
-
         [AllowAnonymous]
         public IActionResult LoginGoogle()
         {
@@ -179,6 +178,32 @@ namespace PresentationLayer.Controllers
             return new ChallengeResult("Google", properties);
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> VerifyCurrentPassword(string currentPassword)
+        {
+            var isValid = await _userService.VerifyCurrentPasswordAsync(User, currentPassword);
+
+            return Json(new {success = isValid});
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword)
+        {
+            var isPasswordChanged = await _userService.ChangePasswordAsync(User, currentPassword, newPassword);
+
+            if (isPasswordChanged)
+            {
+                return Json(new { success = true, message = "Пароль успешно изменен." });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Пароль не соответствует требованиям безопасности." });
+            }
+        }
+
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -186,12 +211,14 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Verify2FA(string userId, bool rememberMe)
         {
             return View(new Verify2FAModel { UserId = userId, RememberMe = rememberMe });
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Verify2FA(Verify2FAModel model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -220,7 +247,7 @@ namespace PresentationLayer.Controllers
 
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Home");
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -252,7 +279,7 @@ namespace PresentationLayer.Controllers
         {
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Home");
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -277,6 +304,7 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> UpdateProfile(User updatedUser, IFormFile avatar)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -320,6 +348,7 @@ namespace PresentationLayer.Controllers
 
         // Валидация кода из Google Authenticator
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Verify2FACode(string code)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -411,6 +440,7 @@ namespace PresentationLayer.Controllers
         }
 
 
+        [Authorize]
         private void SaveUserNameInCookie(string userName)
         {
             var cookieOptions = new CookieOptions
@@ -442,6 +472,7 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult GetUserName()
         {
             if (HttpContext.Request.Cookies.TryGetValue("userName", out var userName))
@@ -452,6 +483,7 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult SetLanguage(string culture, string returnUrl)
         {
             if (!string.IsNullOrEmpty(culture))

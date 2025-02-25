@@ -52,5 +52,22 @@ namespace DataAccessLayer.Repositories
             return await _userManager.UpdateAsync(user);
         }
 
+        public async Task<bool> CheckPasswordAsync(User user, string currentPassword)
+        {
+            return await _userManager.CheckPasswordAsync(user, currentPassword);
+        }
+
+        public async Task<bool> ChangePasswordAsync(User user, string currentPassword, string newPassword)
+        {
+            var passwordValid = await _userManager.CheckPasswordAsync(user, currentPassword);
+            if (!passwordValid)
+            {
+                return false; // Текущий пароль неверный
+            }
+
+            var result =  await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            return result.Succeeded;
+        }
+
     }
 }
