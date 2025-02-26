@@ -37,109 +37,127 @@
         <!-- Блок с формой редактирования профиля -->
         <div class="play__field" style="flex-direction: column; gap: 20px;">
             <h2 style="color: #fff; margin-top: 0;text-align:center;">Профиль пользователя</h2>
-            
-            <form asp-controller="Home" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" style="width: 100%;">
-            <!-- блок смены аватара -->
-            <div class="avatar-upload">
-                <div class="avatar-edit">
-                    <input asp-for="ProfilePicture" type="file" accept="image/*" id="avatar" name="avatar" />
-                    <label for="avatar"><img class="img-edit" src="~/img/pencil-solid.svg" alt="Alternate Text" /></label>
-                    <span class="validator_error text-danger" asp-validation-for="ProfilePicture"></span>
-                </div>
-                <div class="avatar-preview">
-                    <div id="imagePreview" style="background-image: url(@ViewBag.ProfilePicture);">
+            <div class="play__field_wrapper">
+                <form asp-controller="Home" asp-action="UpdateProfile" class="play__field_content" method="post" enctype="multipart/form-data" style="width: 100%;">
+                    <!-- блок смены аватара -->
+                    <div class="avatar-upload">
+                        <div class="avatar-edit">
+                            <input asp-for="ProfilePicture" type="file" accept="image/*" id="avatar" name="avatar" />
+                            <label for="avatar"><img class="img-edit" src="~/img/pencil-solid.svg" alt="Alternate Text" /></label>
+                            <span class="validator_error text-danger" asp-validation-for="ProfilePicture"></span>
+                        </div>
+                        <div class="avatar-preview">
+                            <div id="imagePreview" style="background-image: url(@ViewBag.ProfilePicture);">
+                            </div>
+                        </div>
                     </div>
-                </div>
+
+                    <hr class="hr" style="width: -webkit-fill-available;" />
+
+                    <!-- Форма редактирования данных -->
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <!-- Имя -->
+                    <div class="input__name_wrapper">
+                        <label for="userName" style="color: white;">Имя</label>
+                        <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="Ваше имя" value="@ViewBag.Name" required />
+                        <span class="validator_error text-danger" asp-validation-for="Name"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="input__email_wrapper">
+                        <label for="userEmail" style="color: white;">Email</label>
+                        <input asp-for="Email" type="email" id="userEmail" class="input__email" placeholder="EMAIL" value="@ViewBag.Email" required />
+                        <span class="validator_error text-danger" asp-validation-for="Email"></span>
+                    </div>
+
+                    <!-- Кнопка сохранить изменения -->
+                    <button type="submit" class="button button__play">
+                        Сохранить
+                    </button>
+                </form>
             </div>
-
-            <hr class="hr" style="width: -webkit-fill-available;" />
-
-            <!-- Форма редактирования данных -->
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <!-- Имя -->
-                <div class="input__name_wrapper">
-                    <label for="userName" style="color: white;">Имя</label>
-                    <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="Ваше имя" value="@ViewBag.Name" required />
-                    <span class="validator_error text-danger" asp-validation-for="Name"></span>
-                </div>
-
-                <!-- Email -->
-                <div class="input__email_wrapper">
-                    <label for="userEmail" style="color: white;">Email</label>
-                    <input asp-for="Email" type="email" id="userEmail" class="input__email" placeholder="EMAIL" value="@ViewBag.Email" required />
-                    <span class="validator_error text-danger" asp-validation-for="Email"></span>
-                </div>
-
-                <!-- Кнопка сохранить изменения -->
-                <button type="submit" class="button button__play">
-                    Сохранить
-                </button>
-            </form>
         </div>        
         
         <!-- Блок безопасность  -->
         <div class="play__field" style="flex-direction: column; gap: 20px;">
             <h2 style="color: #fff; margin-top: 0;text-align:center;">Безопасность</h2>
-        <form asp-controller="Home" asp-action="ChangePassword" method="post" enctype="multipart/form-data" style="width: 100%;" id="changePasswordForm">
-                <div asp-validation-summary="ModelOnly" class="text-danger">xfzg</div>
-                <span id="passwordError" class="text-danger"></span>
+            <div class="play__field_wrapper">
+                <form asp-controller="Home" asp-action="ChangePassword" method="post" enctype="multipart/form-data" class="play__field_content" id="changePasswordForm" style="width: 100%;">
+                    <div asp-validation-summary="ModelOnly" class="text-danger">xfzg</div>
+                    <span id="passwordError" class="text-danger"></span>
 
-                <!-- Текущий пароль -->
-                <div class="input__current_password_wrapperr">
-                    <label for="currentPassword" style="color: white;">Текущий пароль</label>
-                    <input type="password" id="currentPassword" class="input__password" placeholder="Текущий пароль" required />
-                    <span id="currentPasswordError" class="text-danger"></span>
-                </div>
+                    <!-- Текущий пароль -->
+                    <div class="input__current_password_wrapperr">
+                        <label for="currentPassword" style="color: white;">Текущий пароль</label>
+                        <input type="password" id="currentPassword" class="input__password" placeholder="Текущий пароль" required />
+                        <span id="currentPasswordError" class="text-danger"></span>
+                    </div>
 
-                <!-- Новый пароль -->
-                <div class="input__new_password_wrapper">
-                    <label for="newPassword" style="color: white;">Новый пароль</label>
-                    <input type="password" id="newPassword" class="input__password" placeholder="Новый пароль" required />
-                    <span id="newPasswordError" class="text-danger"></span>
-                </div>
+                    <!-- Новый пароль -->
+                    <div class="input__new_password_wrapper">
+                        <label for="newPassword" style="color: white;">Новый пароль</label>
+                        <input type="password" id="newPassword" class="input__password" placeholder="Новый пароль" required />
+                        <span id="newPasswordError" class="text-danger"></span>
+                    </div>
 
-                <!-- Подтверждение пароля -->
-                <div class="input__confirm_new_password_wrapper">
-                    <label for="confirmPassword" style="color: white;">Повтор пароля</label>
-                    <input type="password" id="confirmPassword" class="input__password" placeholder="Повтор пароля" required />
-                    <span id="confirmPasswordError" class="text-danger"></span>
-                </div>
+                    <!-- Подтверждение пароля -->
+                    <div class="input__confirm_new_password_wrapper">
+                        <label for="confirmPassword" style="color: white;">Повтор пароля</label>
+                        <input type="password" id="confirmPassword" class="input__password" placeholder="Повтор пароля" required />
+                        <span id="confirmPasswordError" class="text-danger"></span>
+                    </div>
 
-                <hr class="hr" style="width: -webkit-fill-available;" />
+                    <hr class="hr" style="width: -webkit-fill-available;" />
 
-                <div class="container">
-                    <!-- Блок настройки двухфакторной аутентификации -->
-                    <div class="twofa-section d-flex align-items-center justify-content-between flex-column">
-                        <div>
-                            <h5 style="text-align:center;">Стороннее приложение-аутентификатор</h5>
-                            <p>
-                                При входе вам потребуется ввести код безопасности, предложенный аутентификатором.
-                            </p>
-                        </div>
-                        <div>
-                            @if (Model.TwoFactorEnabled)
-                            {
-                                <!-- Если 2FA включена – кнопка для отключения -->
-                                <button type="button" id="button-cancel" class="button button__play button-cancel disable-2fa" onclick="disable2FA()" style="width:fit-content; background-color:red;    box-shadow: 0px 4px 0px #570917;">
-                                    Отключить
-                                </button>
-                            }
-                            else
-                            {
-                                <!-- Если 2FA не включена – кнопка для включения (открывает модальное окно) -->
-                                <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#googleAuthModal" style="width:fit-content;">
-                                    Включить
-                                </button>
-                            }
+                    <div class="container">
+                        <!-- Блок настройки двухфакторной аутентификации -->
+                        <div class="twofa-section d-flex align-items-center justify-content-between flex-column">
+                            <div>
+                                <h5 style="text-align:center;">Стороннее приложение-аутентификатор</h5>
+                                <p>
+                                    При входе вам потребуется ввести код безопасности, предложенный аутентификатором.
+                                </p>
+                            </div>
+                            <div>
+                                @if (Model.TwoFactorEnabled)
+                                {
+                                    <!-- Если 2FA включена – кнопка для отключения -->
+                                    <button type="button" id="button-cancel" class="button button__play button-cancel disable-2fa" onclick="disable2FA()" style="width:fit-content; background-color:red;    box-shadow: 0px 4px 0px #570917;">
+                                        Отключить
+                                    </button>
+                                }
+                                else
+                                {
+                                    <!-- Если 2FA не включена – кнопка для включения (открывает модальное окно) -->
+                                    <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#googleAuthModal" style="width:fit-content;">
+                                        Включить
+                                    </button>
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Кнопка сохранить изменения -->
-                <button type="submit" class="button button__play">
-                    Сохранить
+                    <!-- Кнопка сохранить изменения -->
+                    <button type="submit" class="button button__play">
+                        Сохранить
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Еще  -->
+        <div class="play__field" style="flex-direction: column; gap: 20px;">
+            <h2 style="color: #fff; margin-top: 0; text-align: center;">Ещё</h2>
+            <div class="play__field_wrapper">
+                <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#quizResultsModal" style="width:fit-content;">
+                 История игр
                 </button>
-            </form>
+                <!-- Кнопка для открытия модального окна с политикой конфиденциальности -->
+                <button type="button" id="privacyPolicyButton" class="button button__play" data-bs-toggle="modal" data-bs-target="#privacyPolicyModal" style="width: fit-content;">
+                    Политика конфиденциальности
+                </button>
+            </div>
+
         </div>
     </div>
 </body>
@@ -148,180 +166,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Скрипт для смены аватара с превью -->
-<script>
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
-                $('#imagePreview').hide();
-                $('#imagePreview').fadeIn(650);
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-    $("#avatar").change(function () {
-        readURL(this);
-    });
-</script>
-<!-- Скрипт для отправки кода 2FA на сервер -->
-<script>
-function verify2FACode() {
-    var code = $('#verificationCode').val();
-    var button = $('#button-play'); // Кнопка с id 'button-play'
-
-    // Добавляем класс для пульсации, кнопка начинает пульсировать
-    button.addClass('button-pulse');
-        button.text("Подождите...");
-
-    $.ajax({
-        type: "POST",
-        url: "/Home/Verify2FACode",
-        data: { code: code },
-        success: function (response) {
-            if (response.success) {
-                $('#verifyMessage').removeClass('text-danger').addClass('text-success').text(response.message);
-                setTimeout(function () {
-                    location.reload();
-                }, 2000);
-            } else {
-                $('#verifyMessage').removeClass('text-success').addClass('text-danger').text(response.message);
-            }
-        },
-        error: function () {
-            $('#verifyMessage').removeClass('text-success').addClass('text-danger').text('Ошибка сервера. Повторите попытку.');
-        },
-        complete: function() {
-            // Убираем анимацию пульсации, когда запрос завершен
-            button.removeClass('button-pulse');
-            button.text("Подтвердить");
-        }
-    });
-}
-</script>
-<!--Отключение 2FA-->
-<script>
-    function disable2FA() {
-        var button = $('#button-cancel'); // Кнопка с id 'button-cancel'
-
-        // Добавляем класс для пульсации, кнопка начинает пульсировать
-        button.addClass('button-pulse-invert');
-        button.text("Подождите..."); // Изменяем текст кнопки на "Подождите"
-
-        $.ajax({
-            type: "POST",
-            url: "/Home/Disable2FA", // URL метода отключения 2FA
-            success: function (response) {
-                if (response.success) {
-                    $('#verifyMessage').removeClass('text-danger').addClass('text-success').text(response.message);
-                    setTimeout(function () {
-                        location.reload();
-                    }, 2000);
-                } else {
-                    $('#verifyMessage').removeClass('text-success').addClass('text-danger').text(response.message);
-                }
-            },
-            error: function () {
-                $('#verifyMessage').removeClass('text-success').addClass('text-danger').text('Ошибка сервера. Повторите попытку.');
-            },
-            complete: function () {
-                // Убираем анимацию пульсации, когда запрос завершен
-                button.removeClass('button-pulse-invert');
-                button.text("Отменить"); // Восстанавливаем исходный текст кнопки
-            }
-        });
-    }
-
-</script>
+<script src="~/js/avatar.js"></script>
+<!-- Скрипт 2FA -->
+<script src="~/js/twofa.js"></script>
 <!--Логика смены пароля и проверки в реальном времени-->
-<script>
-    $(document).ready(function () {
-
-        // Проверка текущего пароля через AJAX
-        $('#currentPassword').on('blur', function () {
-            var currentPassword = $(this).val();
-
-            if (currentPassword.length > 0) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Home/VerifyCurrentPassword", // URL для проверки пароля
-                    data: { currentPassword: currentPassword },
-                    success: function (response) {
-                        if (!response.success) {
-                            $('#currentPasswordError').text('Неверный текущий пароль');
-                        } else {
-                            $('#currentPasswordError').text('');
-                        }
-                    },
-                    error: function () {
-                        $('#currentPasswordError').text('Ошибка сервера');
-                    }
-                });
-            }
-        });
-
-        // Проверка совпадения паролей
-        $('#confirmPassword').on('blur', function () {
-            var newPassword = $('#newPassword').val();
-            var confirmPassword = $(this).val();
-
-            if (newPassword !== confirmPassword) {
-                $('#confirmPasswordError').text('Пароли не совпадают');
-            } else {
-                $('#confirmPasswordError').text('');
-            }
-        });
-
-        // Отправка формы
-        $('#changePasswordForm').on('submit', function (event) {
-            event.preventDefault(); // Предотвращаем отправку формы
-
-            var currentPassword = $('#currentPassword').val();
-            var newPassword = $('#newPassword').val();
-            var confirmPassword = $('#confirmPassword').val();
-            $('#passwordError').removeClass('success');
-            $('#passwordError').text('');
-
-            // Валидация данных
-            if (currentPassword.length == 0) {
-                $('#currentPasswordError').text('Текущий пароль обязателен');
-                return;
-            }
-
-            if (newPassword.length == 0) {
-                $('#newPasswordError').text('Новый пароль обязателен');
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                $('#confirmPasswordError').text('Пароли не совпадают');
-                return;
-            }
-
-            // Отправка данных
-            $.ajax({
-                type: "POST",
-                url: "/Home/ChangePassword", // URL для смены пароля
-                data: {
-                    currentPassword: currentPassword,
-                    newPassword: newPassword
-                },
-                success: function (response) {
-                    if (response.success) {
-                        $('#passwordError').addClass('success');
-                        $('#passwordError').text('Пароль успешно изменен.');
-                        // Перенаправление или другие действия после успешного изменения пароля
-                    } else {
-                        $('#passwordError').text('Пароль не соответсвет требованиям.');
-                    }
-                },
-                error: function () {
-                    $('#passwordError').text('Ошибка сервера');
-                }
-            });
-        });
-    });
-</script>
+<script src="~/js/password-change.js"></script>
 
 <!-- _Enable2FAModal.cshtml -->
 <div class="modal fade" id="googleAuthModal" tabindex="-1" aria-labelledby="googleAuthModalLabel" aria-hidden="true">
@@ -361,3 +210,52 @@ function verify2FACode() {
         </div>
     </div>
 </div>
+
+<!-- Модальное окно для истории игр -->
+<div class="modal fade" id="quizResultsModal" tabindex="-1" aria-labelledby="quizResultsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quizResultsModalLabel">История игр</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <table class="custom-modal-table">
+                    <thead>
+                        <tr>
+                            <th>Тип викторины</th>
+                            <th>Очки</th>
+                            <th>Дата игры</th>
+                            <th>Место</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.QuizResults != null && (ViewBag.QuizResults as List<DataAccessLayer.Models.QuizResult>).Any())
+                        {
+                            foreach (var result in ViewBag.QuizResults as List<DataAccessLayer.Models.QuizResult>)
+                            {
+                                <tr>
+                                    <td>@result.Type</td>
+                                    <td>@result.Score</td>
+                                    <td>@result.DatePlayed.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>@(result.Place.HasValue ? result.Place.Value.ToString() : "-")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" style="text-align:center;">Нет результатов</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button type="button" class="button button__play" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

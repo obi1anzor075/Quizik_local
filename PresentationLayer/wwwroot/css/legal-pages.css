@@ -1,0 +1,191 @@
+﻿.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2, h3 {
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+ul {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Стили для текста */
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+/* Стили для ссылок */
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Кнопки */
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    background-color: #41CAC2;
+    border-radius: 15px;
+    gap: 5px;
+    height: 50px;
+}
+
+.button > span {
+    font-weight: 600;
+    font-size: 14px
+}
+.button:hover {
+    transform: translateY(4px);
+    box-shadow: 0px 0px 0px #2c8f89;
+}
+
+.button__landing {
+    padding: 12px 16px;
+}
+
+.button__play {
+    height: 55px;
+}
+
+.button__play:hover {
+    color: white;
+}
+
+.button__play {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 32px;
+    border-radius: 8px;
+    background-color: #41CAC2;
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0px 4px 0px #2c8f89;
+    transition: .1s all ease-in-out;
+}
+
+.button:active {
+    transform: scale(0.95);
+}
+
+.button__wrapper{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:100%;
+}
+/* Стили для разделов */
+.section {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .section h2 {
+        margin-top: 0;
+    }
+
+/* Таблицы */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #007BFF;
+    color: white;
+}
+
+td {
+    background-color: #f9f9f9;
+}
+
+table tr:nth-child(even) td {
+    background-color: #f1f1f1;
+}
+
+/* Формы */
+form {
+    margin-top: 20px;
+}
+
+input[type="text"], input[type="email"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Мобильная адаптивность */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    table, th, td {
+        font-size: 14px;
+    }
+
+    .section {
+        padding: 10px;
+    }
+}

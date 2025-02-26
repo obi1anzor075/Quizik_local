@@ -2,6 +2,15 @@
     color: #2ce917 !important;
 }
 
+.play__field_content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: space-between;
+}
+
 .play__field {
     display: flex;
     justify-content: space-evenly;
@@ -10,6 +19,20 @@
     gap: 10px;
     padding: 16px;
     background: #00000061;
+    border-radius: 15px;
+    flex-direction: column;
+    gap: 20px;
+    height: 770px;
+    width: clamp(320px, 50vw, 420px);
+}
+
+.play__field_wrapper {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
     border-radius: 15px;
     flex-direction: column;
     gap: 20px;
@@ -125,6 +148,64 @@
     box-shadow: 0px 0px 10px 9px #1c1a1b;
     border: none;
 }
+
+/*Стиль таблицы*/
+.custom-modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(0, 0, 0, 0.7);
+    margin-bottom: 0;
+}
+
+    .custom-modal-table th,
+    .custom-modal-table td {
+        border: 1px solid #444;
+        padding: 10px;
+        color: #fff;
+        text-align: center;
+    }
+
+    .custom-modal-table th {
+        background-color: #333;
+        font-weight: bold;
+    }
+
+    .custom-modal-table tbody tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-modal-table tbody tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+@media (max-width: 576px) {
+    .custom-modal-table th,
+    .custom-modal-table td {
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+}
+
+.history-card {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+    .history-card .table {
+        margin-bottom: 0;
+    }
+
+    .history-card th, .history-card td {
+        vertical-align: middle;
+    }
+
+    .history-card th {
+        font-weight: bold;
+    }
+
+    
 
 /* Закрывающая кнопка в тёмном модальном окне */
 .btn-close.btn-close-white {

@@ -9,7 +9,6 @@ namespace BusinessLogicLayer.Services.Contracts
     {
         Task<string> GenerateQRCodeForUserAsync(User user);
         Task<string> GenerateSecretKeyForUserAsync(User user);
-        Task<List<QuizResult>> GetQuizResultsAsync(string userId);
         Task<string> GetProfilePictureBase64Async(User user);
 
         Task<bool> VerifyCurrentPasswordAsync(ClaimsPrincipal principal, string currentPassword);

@@ -16,17 +16,14 @@ namespace BusinessLogicLayer.Services
     public class UserService : IUserService
     {
         private readonly UserManager<User> _userManager;
-        private readonly DataStoreDbContext _context;
-
         private readonly IUserRepository _userRepository;
 
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IFileProvider _fileProvider; // Для работы с изображениями
 
-        public UserService(UserManager<User> userManager, DataStoreDbContext context, IUserRepository userRepository, IPasswordHasher<User> passwordHasher, IFileProvider fileProvider)
+        public UserService(UserManager<User> userManager, IUserRepository userRepository, IPasswordHasher<User> passwordHasher, IFileProvider fileProvider)
         {
             _userManager = userManager;
-            _context = context;
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _fileProvider = fileProvider;
@@ -54,14 +51,7 @@ namespace BusinessLogicLayer.Services
             }
 
             return secretKey;
-        }
-        public async Task<List<QuizResult>> GetQuizResultsAsync(string userId)
-        {
-            return await _context.QuizResults
-                                 .Where(qr => qr.UserId == userId)
-                                 .OrderByDescending(qr => qr.DatePlayed)
-                                 .ToListAsync();
-        }        
+        }       
         
         public async Task<string> GetProfilePictureBase64Async(User user)
         {

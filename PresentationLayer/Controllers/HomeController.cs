@@ -26,6 +26,7 @@ using DataAccessLayer.DataContext;
 using BusinessLogicLayer.Services;
 using BusinessLogicLayer.Services.Contracts;
 using DataAccessLayer.Repositories.Contracts;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace PresentationLayer.Controllers
@@ -43,11 +44,12 @@ namespace PresentationLayer.Controllers
 
         private readonly IUserService _userService;
         private readonly IAuthService _authService;
+        private readonly IQuizService _quizService;
 
         private readonly IUserRepository _userRepository;
         private readonly IImageService _imageService;
 
-        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer, IUserService userService,IAuthService authService ,IUserRepository userRepository, IImageService imageService)
+        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer, IUserService userService,IAuthService authService,IQuizService quizService, IUserRepository userRepository, IImageService imageService)
         {
             _context = context;
             _signInManager = signInManager;
@@ -58,6 +60,7 @@ namespace PresentationLayer.Controllers
             _localizer = localizer;
             _userService = userService;
             _authService = authService;
+            _quizService = quizService;
             _userRepository = userRepository;
             _imageService = imageService;
         }
@@ -274,6 +277,24 @@ namespace PresentationLayer.Controllers
             return View();
         }
 
+        // Страница политики конфиденциальности
+        public IActionResult PrivacyPolicy()
+        {
+            return View();
+        }
+
+        // Страница политики использования Cookies
+        public IActionResult CookiesPolicy()
+        {
+            return View();
+        }
+
+        // Страница правила использования
+        public IActionResult TermsofUse()
+        {
+            return View();
+        }
+
         [Authorize]
         public async Task<IActionResult> Profile()
         {
@@ -298,7 +319,7 @@ namespace PresentationLayer.Controllers
             ViewBag.SecretKey = await _userService.GenerateSecretKeyForUserAsync(user);
 
             // Получаем результаты викторин
-            ViewBag.QuizResults = await _userService.GetQuizResultsAsync(user.Id);
+            ViewBag.QuizResults = await _quizService.GetQuizResultsByUserAsync(user.Id);
 
             return View(user);
         }
