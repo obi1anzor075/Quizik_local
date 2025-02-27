@@ -19,6 +19,7 @@ namespace DataAccessLayer.DataContext
         public virtual DbSet<Question> Questions { get; set; }
         public virtual DbSet<HardQuestion> HardQuestions { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<AdminRegistrationToken> AdminRegistrationTokens { get; set; }
         public virtual DbSet<QuizResult> QuizResults { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

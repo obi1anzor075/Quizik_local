@@ -22,6 +22,6 @@ namespace PresentationLayer.ViewModels
 
         [Required(ErrorMessage = "Вы не согласились с правилами использования")]
         public bool TermOfService { get; set; }
-
+        public string? Token { get; set; }
     }
 }

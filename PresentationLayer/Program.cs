@@ -121,12 +121,15 @@ builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IQuizRepository, QuizRepository>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddTransient<IAdminTokenRepository, AdminTokenRepository>();
+
 builder.Services.AddTransient<IImageService>(provider =>
     new ImageService(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img/default-profile-pictures"))); 
 builder.Services.AddScoped<IQuestionsService, QuestionsService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IQuizService, QuizService>();
+builder.Services.AddScoped<IAdminTokenService, AdminTokenService>();
 builder.Services.AddScoped<CultureHelper>();
 
 builder.Services.AddSignalR();
@@ -202,5 +205,65 @@ app.MapControllerRoute(
 
 app.MapHub<GameHub>("/gamehub");
 
+// Инициализация ролей при запуске
+using (var scope = app.Services.CreateScope())
+{
+    var service = scope.ServiceProvider;
+    try
+    {
+        var roleManager = service.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = service.GetRequiredService<UserManager<User>>();
+
+        await SeedRolesAsync(roleManager);
+        await SeedAdminUserAsync(userManager);
+    }
+    catch (Exception ex)
+    {
+        // Логирование ошибок
+        var logger = service.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ошибка инициализации ролей");
+    }
+}
+
 app.Run();
+
+async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+{
+    // Определяем список ролей, которые нам нужны
+    string[] roles = new string[] { "Admin", "User" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
+
+async Task SeedAdminUserAsync(UserManager<User> userManager)
+{
+    // Создаем админа, если его нет (замените данные на нужные)
+    string adminEmail = "admin@quizik.fun";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        adminUser = new User
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            Name = "Администратор",
+            CreatedAt = DateTime.Now
+        };
+
+        var result = await userManager.CreateAsync(adminUser, "Admin123$"); // Укажите надежный пароль
+
+        if (result.Succeeded)
+        {
+            // Добавляем роль "Admin" для этого пользователя
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+}
 public partial class Program { }

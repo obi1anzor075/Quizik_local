@@ -7,6 +7,7 @@
 
 @{
     var Localizer = ViewData["LocalizedStrings"] as Dictionary<string, string>;
+
 }
 
 @{
@@ -69,6 +70,7 @@
                             <input asp-for="Password" class="input__password" required type="password" id="password" name="password" placeholder="@Localizer["PasswordPlaceholder"]" />
                             <span class="validator_error text-danger" asp-validation-for="Password"></span>
                         </div>
+                        <input type="hidden" name="token" value="@Context.Request.Query["token"]" />
 
                         <div class="input__password_wrapper">
                             <input asp-for="ConfirmPassword" class="input__password" required type="password" id="ConfirmPassword" name="ConfirmPassword" placeholder="@Localizer["ConfirmPasswordPlaceholder"]" />

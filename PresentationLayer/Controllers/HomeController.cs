@@ -45,11 +45,12 @@ namespace PresentationLayer.Controllers
         private readonly IUserService _userService;
         private readonly IAuthService _authService;
         private readonly IQuizService _quizService;
+        private readonly IAdminTokenService _adminTokenService;
 
         private readonly IUserRepository _userRepository;
         private readonly IImageService _imageService;
 
-        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer, IUserService userService,IAuthService authService,IQuizService quizService, IUserRepository userRepository, IImageService imageService)
+        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer, IUserService userService,IAuthService authService,IQuizService quizService, IAdminTokenService adminTokenService, IUserRepository userRepository, IImageService imageService)
         {
             _context = context;
             _signInManager = signInManager;
@@ -61,6 +62,7 @@ namespace PresentationLayer.Controllers
             _userService = userService;
             _authService = authService;
             _quizService = quizService;
+            _adminTokenService = adminTokenService;
             _userRepository = userRepository;
             _imageService = imageService;
         }
@@ -141,6 +143,8 @@ namespace PresentationLayer.Controllers
             var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
             ViewData["LocalizedStrings"] = localizedStrings;
 
+            var token = model.Token;
+
             if (ModelState.IsValid)
             {
                 // Деструктуризованный кортеж с данными изобрадения и его именем
@@ -160,7 +164,19 @@ namespace PresentationLayer.Controllers
 
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, false);
+                    bool isAdmin = await _adminTokenService.ValidateTokenAsync(token);
+
+                    if (isAdmin)
+                    {
+                        await _userManager.AddToRoleAsync(user, "Admin");
+                        await _adminTokenService.InvalidateTokenAsync(token);
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "User");
+                    }
+
+                    await _signInManager.SignInAsync(user,isPersistent: false);
                     return RedirectToAction("SelectMode", "Home");
                 }
 

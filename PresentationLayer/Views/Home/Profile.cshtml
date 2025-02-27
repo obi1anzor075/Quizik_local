@@ -152,10 +152,18 @@
                 <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#quizResultsModal" style="width:fit-content;">
                  История игр
                 </button>
-                <!-- Кнопка для открытия модального окна с политикой конфиденциальности -->
-                <button type="button" id="privacyPolicyButton" class="button button__play" data-bs-toggle="modal" data-bs-target="#privacyPolicyModal" style="width: fit-content;">
+
+                <a href="@Url.Action("PrivacyPolicy", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
                     Политика конфиденциальности
-                </button>
+                </a>
+
+                <a href="@Url.Action("CookiesPolicy", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
+                    Политика использования Cookies
+                </a>
+
+                <a href="@Url.Action("TermsOfUse", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
+                    Правила использования
+                </a>
             </div>
 
         </div>
