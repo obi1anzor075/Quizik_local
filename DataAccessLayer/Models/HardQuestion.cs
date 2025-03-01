@@ -7,7 +7,7 @@ namespace DataAccessLayer.Models
     {
         public int QuestionId { get; set; }
         public string QuestionText { get; set; }
-        public string ImageUrl { get; set; }
+        public byte[]? ImageData { get; set; }
         public string CorrectAnswer { get; set; }
         public string CorrectAnswer2 { get; set; }
     }

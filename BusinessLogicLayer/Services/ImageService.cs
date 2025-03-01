@@ -63,4 +63,14 @@ public class ImageService : IImageService
         return (imageData, fileName);
     }
 
+    public string DecodeImageAsync(byte[] imageData, string contentType = "image/jpeg")
+    {
+        if (imageData == null || imageData.Length == 0)
+            return string.Empty;
+
+        string base64String = Convert.ToBase64String(imageData);
+
+        return $"data:{contentType};base64,{base64String}";
+    }
+
 }

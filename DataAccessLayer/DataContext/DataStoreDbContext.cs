@@ -53,10 +53,10 @@ namespace DataAccessLayer.DataContext
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("correct_answer");
-                entity.Property(e => e.ImageUrl)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("image_url");
+                // Изменили на бинарное представление
+                entity.Property(e => e.ImageData)
+                    .HasColumnName("image_data")
+                    .HasColumnType("varbinary(max)");
                 entity.Property(e => e.QuestionText)
                     .HasMaxLength(255)
                     .IsUnicode(false)
@@ -76,10 +76,10 @@ namespace DataAccessLayer.DataContext
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("question_text");
-                entity.Property(e => e.ImageUrl)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("image_url");
+                // Изменили на бинарное представление
+                entity.Property(e => e.ImageData)
+                    .HasColumnName("image_data")
+                    .HasColumnType("varbinary(max)");
                 entity.Property(e => e.CorrectAnswer)
                     .HasMaxLength(255)
                     .IsUnicode(false)

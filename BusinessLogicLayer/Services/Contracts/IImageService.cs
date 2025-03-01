@@ -14,4 +14,6 @@ public interface IImageService
     Task<byte[]> ProcessImageAsync(IFormFile avatar);
     Task<(byte[] ImageData, string FileName)> GetRandomProfilePictureAsync();
 
+    string DecodeImageAsync(byte[] imageData, string contentType = "image/jpeg");
+
 }

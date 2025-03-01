@@ -10,7 +10,7 @@ public partial class Question
 
     public string QuestionText { get; set; } = null!;
 
-    public string? ImageUrl { get; set; }
+    public byte[]? ImageData { get; set; }
 
     public string CorrectAnswer { get; set; } = null!;
 

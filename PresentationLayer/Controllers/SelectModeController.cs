@@ -11,6 +11,7 @@ using PresentationLayer.Hubs;
 using Microsoft.Data.SqlClient;
 using PresentationLayer.Utilities;
 using Microsoft.AspNetCore.Identity;
+using BusinessLogicLayer.Services.Contracts;
 
 namespace PresentationLayer.Controllers
 {
@@ -25,13 +26,23 @@ namespace PresentationLayer.Controllers
         private readonly CultureHelper _cultureHelper;
         public readonly SharedViewLocalizer _localizer;
 
-        public SelectModeController(DataStoreDbContext dbContext, IHubContext<GameHub, IChatClient> gameHubContext, UserManager<User> userManager,CultureHelper cultureHelper, SharedViewLocalizer localizer)
+        private readonly IImageService _imageService;
+
+        public SelectModeController(DataStoreDbContext dbContext, 
+            IHubContext<GameHub, 
+                IChatClient> gameHubContext, 
+            UserManager<User> userManager,
+            CultureHelper cultureHelper, 
+            SharedViewLocalizer localizer, 
+            IImageService imageService
+        )
         {
             _dbContext = dbContext;
             _gameHubContext = gameHubContext;
             _userManager = userManager;
             _cultureHelper = cultureHelper;
             _localizer = localizer;
+            _imageService = imageService;
         }
 
         private void ResetQuestionIndex()
@@ -109,7 +120,7 @@ namespace PresentationLayer.Controllers
             {
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
-                ViewBag.ImageUrl = nextQuestion.ImageUrl;
+                ViewBag.ImageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
                 ViewBag.QuestionExplanation = nextQuestion.QuestionExplanation;
 
                 var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
@@ -160,7 +171,7 @@ namespace PresentationLayer.Controllers
             {
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
-                ViewBag.ImageUrl = nextQuestion.ImageUrl;
+                ViewBag.ImageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
 
                 return View();
             }
@@ -196,7 +207,7 @@ namespace PresentationLayer.Controllers
             {
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
-                ViewBag.ImageUrl = nextQuestion.ImageUrl;
+                ViewBag.ImageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
                 ViewBag.QuestionExplanation = nextQuestion.QuestionExplanation;
 
                 var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
@@ -212,7 +223,11 @@ namespace PresentationLayer.Controllers
 
                 ViewBag.Answers = answers;
 
-                await _gameHubContext.Clients.Group("DuelRoom").ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, nextQuestion.QuestionExplanation,answers);
+                await _gameHubContext.Clients.Group("DuelRoom").ReceiveQuestion(nextQuestion.QuestionId, 
+                    nextQuestion.QuestionText, 
+                    _imageService.DecodeImageAsync(nextQuestion.ImageData), 
+                    nextQuestion.QuestionExplanation,answers
+                );
 
                 return View();
             }

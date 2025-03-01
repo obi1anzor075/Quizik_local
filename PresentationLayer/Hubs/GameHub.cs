@@ -31,15 +31,19 @@ namespace PresentationLayer.Hubs
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
+
+        private readonly IImageService _imageService;
+
         private static readonly Dictionary<string, GameRoom> Rooms = new();
         private static readonly Dictionary<string, Timer> RoomTimers = new();
 
-        public GameHub(IDistributedCache cache, DataStoreDbContext dbContext, IHttpContextAccessor httpContextAccessor, IUserService userService)
+        public GameHub(IDistributedCache cache, DataStoreDbContext dbContext, IHttpContextAccessor httpContextAccessor, IUserService userService, IImageService imageService)
         {
             _cache = cache;
             _dbContext = dbContext;
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
+            _imageService = imageService;
         }
 
         public Task<string> GetUserName()
@@ -281,7 +285,7 @@ namespace PresentationLayer.Hubs
                     playerState.CurrentQuestionIndex = questionIndex + 1; // Обновляем индекс следующего вопроса
                     await SavePlayerState(userName, playerState);
 
-                    await Clients.Client(Context.ConnectionId).ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, nextQuestion.ImageUrl, nextQuestion.QuestionExplanation,answers);
+                    await Clients.Client(Context.ConnectionId).ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, _imageService.DecodeImageAsync(nextQuestion.ImageData), nextQuestion.QuestionExplanation,answers);
                     Console.WriteLine($"Question sent: {nextQuestion.QuestionId} - {nextQuestion.QuestionText}");
                 }
             }

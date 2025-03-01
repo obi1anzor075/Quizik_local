@@ -10,6 +10,9 @@ namespace DataAccessLayer.Repositories.Contracts
     public interface IQuizRepository
     {
         Task<IEnumerable<QuizResult>> GetQuizResultsByUserIdAsync(string userId);
-
+        Task<IEnumerable<Question>> GetAllQuestionsAsync();
+        Task<IEnumerable<HardQuestion>> GetAllHardQuestionsAsync();
+        Task AddQuestionAsync(Question question, string tableName);
+        Task AddHardQuestionAsync(HardQuestion hardQuestion, string tableName);
     }
 }

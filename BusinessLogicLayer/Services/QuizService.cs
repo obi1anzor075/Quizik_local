@@ -22,5 +22,29 @@ namespace BusinessLogicLayer.Services
         {
             return await _quizRepository.GetQuizResultsByUserIdAsync(userId);
         }
+
+        // Получение всех простых вопросов
+        public async Task<IEnumerable<Question>> GetAllQuestionsAsync()
+        {
+            return await _quizRepository.GetAllQuestionsAsync();
+        }
+
+        // Получение всех сложных вопросов
+        public async Task<IEnumerable<HardQuestion>> GetAllHardQuestionsAsync()
+        {
+            return await _quizRepository.GetAllHardQuestionsAsync();
+        }
+
+        // Добавление простого/дуэльного вопроса в таблицу
+        public async Task AddQuestionAsync(Question question, string tableName)
+        {
+            await _quizRepository.AddQuestionAsync(question, tableName);
+        }
+
+        // Добавление сложного вопроса в таблицу
+        public async Task AddHardQuestionAsync(HardQuestion hardQuestion, string tableNAme)
+        {
+            await _quizRepository.AddHardQuestionAsync(hardQuestion, tableNAme);
+        }
     }
 }
