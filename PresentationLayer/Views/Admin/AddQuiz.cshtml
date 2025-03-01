@@ -1,0 +1,156 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Добавление викторины";
+}
+
+<head>
+    <link href="~/css/profile.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- Шапка (логотип, кнопки, язык и т.д.) -->
+    <div class="head__part">
+        <!-- Левая пустая колонка -->
+        <div></div>
+
+        <!-- Логотип по центру -->
+        <div></div>
+
+        <!-- Правая колонка (пример - селектор языка) -->
+        <div class="settings">
+            <div class="language-selector">
+                @*                 <div class="selected-flag" style="background-image: url('/img/flag-en.png');"></div>
+                <div class="flag-dropdown">
+                <img src="/img/flag-ru.png" alt="Russian" />
+                <img src="/img/flag-en.png" alt="English" />
+                </div> *@
+            </div>
+        </div>
+    </div>
+
+    <!-- Основная часть - Страница профиля -->
+    <div class="ctr profile-ctr">
+        <!-- Блок с формой редактирования профиля -->
+        <div class="play__field" style="flex-direction: column; gap: 20px;">
+            <h2 style="color: #fff; margin-top: 0;text-align:center;">Добавить викторину</h2>
+            <div class="play__field_wrapper">
+                <form asp-controller="Admin" asp-action="UpdateProfile" class="play__field_content" method="post" enctype="multipart/form-data" style="width: 100%;">
+
+                    <!-- Форма редактирования данных -->
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <!-- Имя -->
+                    <div class="input__name_wrapper">
+                        <label for="userName" style="color: white;">Имя</label>
+                        <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="Ваше имя" value="@ViewBag.Name" required />
+                        <span class="validator_error text-danger" asp-validation-for="Name"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="input__email_wrapper">
+                        <label for="userEmail" style="color: white;">Email</label>
+                        <input asp-for="Email" type="email" id="userEmail" class="input__email" placeholder="EMAIL" value="@ViewBag.Email" required />
+                        <span class="validator_error text-danger" asp-validation-for="Email"></span>
+                    </div>
+
+                    <!-- Кнопка сохранить изменения -->
+                    <button type="submit" class="button button__play">
+                        Сохранить
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Блок безопасность  -->
+        <div class="play__field" style="flex-direction: column; gap: 20px;">
+            <h2 style="color: #fff; margin-top: 0;text-align:center;">Безопасность</h2>
+            <div class="play__field_wrapper">
+                <form asp-controller="Home" asp-action="ChangePassword" method="post" enctype="multipart/form-data" class="play__field_content" id="changePasswordForm" style="width: 100%;">
+                    <div asp-validation-summary="ModelOnly" class="text-danger">xfzg</div>
+                    <span id="passwordError" class="text-danger"></span>
+
+                    <!-- Текущий пароль -->
+                    <div class="input__current_password_wrapperr">
+                        <label for="currentPassword" style="color: white;">Текущий пароль</label>
+                        <input type="password" id="currentPassword" class="input__password" placeholder="Текущий пароль" required />
+                        <span id="currentPasswordError" class="text-danger"></span>
+                    </div>
+
+                    <!-- Новый пароль -->
+                    <div class="input__new_password_wrapper">
+                        <label for="newPassword" style="color: white;">Новый пароль</label>
+                        <input type="password" id="newPassword" class="input__password" placeholder="Новый пароль" required />
+                        <span id="newPasswordError" class="text-danger"></span>
+                    </div>
+
+                    <!-- Подтверждение пароля -->
+                    <div class="input__confirm_new_password_wrapper">
+                        <label for="confirmPassword" style="color: white;">Повтор пароля</label>
+                        <input type="password" id="confirmPassword" class="input__password" placeholder="Повтор пароля" required />
+                        <span id="confirmPasswordError" class="text-danger"></span>
+                    </div>
+
+                    <hr class="hr" style="width: -webkit-fill-available;" />
+
+                    <div class="container">
+                        <!-- Блок настройки двухфакторной аутентификации -->
+                        <div class="twofa-section d-flex align-items-center justify-content-between flex-column">
+                            <div>
+                                <h5 style="text-align:center;">Стороннее приложение-аутентификатор</h5>
+                                <p>
+                                    При входе вам потребуется ввести код безопасности, предложенный аутентификатором.
+                                </p>
+                            </div>
+                            <div>
+                                @if (Model.TwoFactorEnabled)
+                                {
+                                    <!-- Если 2FA включена – кнопка для отключения -->
+                                    <button type="button" id="button-cancel" class="button button__play button-cancel disable-2fa" onclick="disable2FA()" style="width:fit-content; background-color:red;    box-shadow: 0px 4px 0px #570917;">
+                                        Отключить
+                                    </button>
+                                }
+                                else
+                                {
+                                    <!-- Если 2FA не включена – кнопка для включения (открывает модальное окно) -->
+                                    <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#googleAuthModal" style="width:fit-content;">
+                                        Включить
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопка сохранить изменения -->
+                    <button type="submit" class="button button__play">
+                        Сохранить
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Еще  -->
+        <div class="play__field" style="flex-direction: column; gap: 20px;">
+            <h2 style="color: #fff; margin-top: 0; text-align: center;">Ещё</h2>
+            <div class="play__field_wrapper">
+                <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#quizResultsModal" style="width:fit-content;">
+                    История игр
+                </button>
+
+                <a href="@Url.Action("PrivacyPolicy", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
+                    Политика конфиденциальности
+                </a>
+
+                <a href="@Url.Action("CookiesPolicy", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
+                    Политика использования Cookies
+                </a>
+
+                <a href="@Url.Action("TermsOfUse", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
+                    Правила использования
+                </a>
+            </div>
+
+        </div>
+    </div>
+</body>

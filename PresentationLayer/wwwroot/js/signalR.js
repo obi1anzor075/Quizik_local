@@ -8,7 +8,7 @@
 
     // Установка соединения с хабом SignalR
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/gameHub") // Укажите URL вашего хаба SignalR
+        .withUrl("/gameHub") // URL хаба SignalR
         .build();
 
     connection.start().then(function () {

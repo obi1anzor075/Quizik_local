@@ -20,5 +20,10 @@ namespace PresentationLayer.Controllers
             var adminLink = Url.Action("Register", "Home", new { token }, Request.Scheme);
             return Content($"Ссылка для регистрации администратора: {adminLink}");
         }
+
+        public IActionResult AddQuiz()
+        {
+            return View();
+        }
     }
 }

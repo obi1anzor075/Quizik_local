@@ -243,6 +243,7 @@ async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
 
 async Task SeedAdminUserAsync(UserManager<User> userManager)
 {
+
     // Создаем админа, если его нет (замените данные на нужные)
     string adminEmail = "admin@quizik.fun";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
