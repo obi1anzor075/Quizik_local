@@ -41,11 +41,16 @@ public class ImageService : IImageService
         return ms.ToArray();
     }
 
-    public async Task<byte[]> ProcessImageAsync(IFormFile avatar)
+    public async Task<byte[]> ProcessImageAsync(IFormFile imageFile)
     {
-        using MemoryStream ms = new MemoryStream();
-        await avatar.CopyToAsync(ms);
-        return ms.ToArray();
+        if (imageFile == null || imageFile.Length == 0)
+            return null;
+
+        using (var memoryStream = new MemoryStream())
+        {
+            await imageFile.CopyToAsync(memoryStream);
+            return memoryStream.ToArray();
+        }
     }
 
     // Асинхронный метод для получения случайной картинки

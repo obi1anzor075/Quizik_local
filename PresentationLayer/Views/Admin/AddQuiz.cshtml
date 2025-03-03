@@ -1,156 +1,449 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
     ViewData["Title"] = "Добавление викторины";
 }
 
 <head>
     <link href="~/css/profile.css" rel="stylesheet" />
+    <!-- Подключаем Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <style>
+        @@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+        html, body {
+            height: 100%;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            width: -webkit-fill-available;
+        }
+
+        .swiper {
+            width: 500px;
+            padding: 50px;
+        }
+
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 300px;
+            height:fit-content;
+            /* высота определяется содержимым */
+            background: #00000061;
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .question-form {
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+            .add-btn:disabled {
+                background: gray;
+            }
+        /*Стили для загрузки фото*/
+        *,
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        .setting {
+            background: #00000061;
+            margin: 0 auto 3px;
+            padding: 12px;
+            width: 300px;
+            border-radius: 5px;
+        }
+
+            .setting a[data-action] {
+                cursor: pointer;
+                color: #555;
+                font-size: 14px;
+                line-height: 24px;
+                transition: color 0.2s;
+            }
+
+                .setting a[data-action] i {
+                    width: 1.25em;
+                    text-align: center;
+                }
+
+                .setting a[data-action]:hover {
+                    color: #41CAC2;
+                }
+
+                .setting a[data-action].disabled {
+                    opacity: 0.35;
+                    cursor: default;
+                }
+
+                    .setting a[data-action].disabled:hover {
+                        color: #41CAC2;
+                    }
+
+        .image_picker .settings_wrap {
+            overflow: hidden;
+            position: relative;
+        }
+
+            .image_picker .settings_wrap .drop_target,
+            .image_picker .settings_wrap .settings_actions {
+                float: left;
+            }
+
+            .image_picker .settings_wrap .drop_target {
+                margin-right: 18px;
+            }
+
+            .image_picker .settings_wrap .settings_actions {
+                margin-top: 12px;
+            }
+
+        .settings_actions.vertical a {
+            display: block;
+        }
+
+        .drop_target {
+            position: relative;
+            cursor: pointer;
+            background: #e6e6e6;
+            border-radius: 4px;
+            width: 72px;
+            height: 72px;
+            padding: 4px 6px 6px;
+            transition: all 0.2s;
+        }
+
+            .drop_target input[type="file"] {
+                visibility: hidden;
+            }
+
+            .drop_target_img {
+                position: absolute;
+                top:0;
+                display: block;
+                width: 60px;
+                height: 100%;
+                background-size: contain;
+                transition: background 0.2s;
+            }
+
+            .drop_target_img:hover{
+                filter: invert(1);
+            }
+
+            .drop_target:hover,
+            .drop_target.dropping {
+                background: #41CAC2;
+            }
+
+                .drop_target:hover:before,
+                .drop_target.dropping:before,  {
+                    color: rgba(0,0,0,0.6);
+                }
+
+            .drop_target .image_preview {
+                width: 100%;
+                height: 100%;
+                background: no-repeat center;
+                background-size: contain;
+                position: relative;
+                z-index: 2;
+            }
+
+        .image_details {
+            width: 192px;
+            padding:1px 4px;
+            background: #e6e6e6;
+            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            left: 84px;
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+
+        .dropped ~ .image_details {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .image_details:before {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-right-color: #e6e6e6;
+            position: absolute;
+            left: -12px;
+            top: 10px;
+        }
+
+        .image_details .input_line {
+            display: block;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+            .image_details .input_line:last-of-type {
+                margin-bottom: 0;
+            }
+
+            .image_details .input_line span,
+            .image_details .input_line input {
+                float: left;
+                line-height: 24px;
+            }
+
+            .image_details .input_line span {
+                font-size: 12px;
+                color: #666;
+                width: 20%;
+            }
+
+            .image_details .input_line input[type="text"] {
+                width: 100%;
+                color: #444444;
+                appearance: none;
+                border: 1px solid #e6e6e6;
+                border-radius: 3px;
+                background: #fff;
+                height: 24px;
+                line-height: 18px;
+                padding: 3px 5px;
+                font-size: 14px;
+                transition: border 0.2s;
+            }
+
+                .image_details .input_line input[type="text"]:hover,
+                .image_details .input_line input[type="text"]:focus {
+                    outline: 0;
+                    border: 1px solid #41CAC2;
+                }
+
+                .image_details .input_line input[type="text"]::-webkit-input-placeholder {
+                    font-size: 14px;
+                    color: #999;
+                }
+
+        .image_details a.confirm {
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            margin-top: -12px;
+            display: block;
+            width: 21px;
+            height: 21px;
+            border-radius: 100%;
+            background: #eee;
+            line-height: 23px;
+            text-align: center;
+            font-size: 16px;
+        }
+    </style>
 </head>
 
 <body>
-
-    <!-- Шапка (логотип, кнопки, язык и т.д.) -->
+    <!-- Шапка (логотип, настройки и т.д.) -->
     <div class="head__part">
-        <!-- Левая пустая колонка -->
         <div></div>
-
-        <!-- Логотип по центру -->
         <div></div>
-
-        <!-- Правая колонка (пример - селектор языка) -->
         <div class="settings">
             <div class="language-selector">
-                @*                 <div class="selected-flag" style="background-image: url('/img/flag-en.png');"></div>
-                <div class="flag-dropdown">
-                <img src="/img/flag-ru.png" alt="Russian" />
-                <img src="/img/flag-en.png" alt="English" />
-                </div> *@
+                @* Селектор языка закомментирован *@
             </div>
         </div>
     </div>
 
-    <!-- Основная часть - Страница профиля -->
-    <div class="ctr profile-ctr">
-@*         <!-- Блок с формой редактирования профиля -->
-        <div class="play__field" style="flex-direction: column; gap: 20px;">
-            <h2 style="color: #fff; margin-top: 0;text-align:center;">Добавить викторину</h2>
-            <div class="play__field_wrapper">
-                <form asp-controller="Admin" asp-action="UpdateProfile" class="play__field_content" method="post" enctype="multipart/form-data" style="width: 100%;">
-
-                    <!-- Форма редактирования данных -->
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <!-- Имя -->
-                    <div class="input__name_wrapper">
-                        <label for="userName" style="color: white;">Имя</label>
-                        <input asp-for="Name" type="text" id="userName" class="input__name" placeholder="Ваше имя" value="@ViewBag.Name" required />
-                        <span class="validator_error text-danger" asp-validation-for="Name"></span>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="input__email_wrapper">
-                        <label for="userEmail" style="color: white;">Email</label>
-                        <input asp-for="Email" type="email" id="userEmail" class="input__email" placeholder="EMAIL" value="@ViewBag.Email" required />
-                        <span class="validator_error text-danger" asp-validation-for="Email"></span>
-                    </div>
-
-                    <!-- Кнопка сохранить изменения -->
-                    <button type="submit" class="button button__play">
-                        Сохранить
-                    </button>
-                </form>
-            </div>
-        </div> *@
-
-        <!-- Блок безопасность  -->
-        <div class="play__field" style="flex-direction: column; gap: 20px;">
-            <h2 style="color: #fff; margin-top: 0;text-align:center;">Безопасность</h2>
-            <div class="play__field_wrapper">
-                <form asp-controller="Home" asp-action="ChangePassword" method="post" enctype="multipart/form-data" class="play__field_content" id="changePasswordForm" style="width: 100%;">
-                    <div asp-validation-summary="ModelOnly" class="text-danger">xfzg</div>
-                    <span id="passwordError" class="text-danger"></span>
-
-                    <!-- Текущий пароль -->
-                    <div class="input__current_password_wrapperr">
-                        <label for="currentPassword" style="color: white;">Текущий пароль</label>
-                        <input type="password" id="currentPassword" class="input__password" placeholder="Текущий пароль" required />
-                        <span id="currentPasswordError" class="text-danger"></span>
-                    </div>
-
-                    <!-- Новый пароль -->
-                    <div class="input__new_password_wrapper">
-                        <label for="newPassword" style="color: white;">Новый пароль</label>
-                        <input type="password" id="newPassword" class="input__password" placeholder="Новый пароль" required />
-                        <span id="newPasswordError" class="text-danger"></span>
-                    </div>
-
-                    <!-- Подтверждение пароля -->
-                    <div class="input__confirm_new_password_wrapper">
-                        <label for="confirmPassword" style="color: white;">Повтор пароля</label>
-                        <input type="password" id="confirmPassword" class="input__password" placeholder="Повтор пароля" required />
-                        <span id="confirmPasswordError" class="text-danger"></span>
-                    </div>
-
-                    <hr class="hr" style="width: -webkit-fill-available;" />
-
-                    <div class="container">
-                        <!-- Блок настройки двухфакторной аутентификации -->
-                        <div class="twofa-section d-flex align-items-center justify-content-between flex-column">
-                            <div>
-                                <h5 style="text-align:center;">Стороннее приложение-аутентификатор</h5>
-                                <p>
-                                    При входе вам потребуется ввести код безопасности, предложенный аутентификатором.
-                                </p>
+    <!-- Swiper с одним слайдом -->
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <form asp-action="AddQuestion" method="post" id="addQuestionForm" class="question-form">
+                    <h3>Добавить новый вопрос</h3>
+                    <!-- Выпадающий список для выбора таблицы -->
+                    <select id="tableName" name="TableName" required>
+                        <option value="">Выберите таблицу</option>
+                        @foreach (var table in Model)
+                        {
+                            <option value="@table">@table</option>
+                        }
+                    </select>
+                    <input type="text" name="QuestionText" id="questionText" placeholder="Текст вопроса" required />
+                    <input type="text" name="CorrectAnswer" id="correctAnswer" placeholder="Правильный ответ" required />
+                    <input type="text" name="CorrectAnswer2" id="correctAnswer2" placeholder="Правильный ответ" value="none" required style="display:none"/>
+                    <input type="text" name="Answer1" id="answer1" placeholder="Вариант 1" required />
+                    <input type="text" name="Answer2" id="answer2" placeholder="Вариант 2" required />
+                    <input type="text" name="Answer3" id="answer3" placeholder="Вариант 3" required />
+                    <input type="text" name="Answer4" id="answer4" placeholder="Вариант 4" required />
+                    <textarea id="questionExplanation" name="QuestionExplanataion" placeholder="Объяснение вопроса (необязательно)"></textarea>
+                    <div class="setting image_picker">
+                        <div class="settings_wrap">
+                            <label class="drop_target">
+                                <div class="image_preview"></div>
+                                <img class="drop_target_img" src="~/img/svg-icons/cloud-arrow-up-solid.svg" alt="Выбрать из загрузок"  />
+                                <input id="inputFile" name="ImageFile" type="file" required />
+                            </label>
+                            <div class="settings_actions vertical">
+                                <a data-action="choose_from_uploaded">
+                                    <img src="~/img/svg-icons/image-solid.svg" alt="Выбрать из загрузок" style="width:15px; height:15px;" />
+                                    Choose from Uploads
+                                </a><a class="disabled" data-action="remove_current_image">
+                                    <img src="~/img/svg-icons/trash-solid.svg" alt="Удалить текущую иконку" style="width:15px; height:15px;" />
+                                    Remove Current Image
+                                </a>
                             </div>
-                            <div>
-                                @if (Model.TwoFactorEnabled)
-                                {
-                                    <!-- Если 2FA включена – кнопка для отключения -->
-                                    <button type="button" id="button-cancel" class="button button__play button-cancel disable-2fa" onclick="disable2FA()" style="width:fit-content; background-color:red;    box-shadow: 0px 4px 0px #570917;">
-                                        Отключить
-                                    </button>
-                                }
-                                else
-                                {
-                                    <!-- Если 2FA не включена – кнопка для включения (открывает модальное окно) -->
-                                    <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#googleAuthModal" style="width:fit-content;">
-                                        Включить
-                                    </button>
-                                }
+                            <div class="image_details">
+                                <label class="input_line image_title">
+                                    <input type="text" placeholder="Title" />
+                                </label>
+                                <!--label.input_line.image_alt//input(type='text' placeholder='Alternative Text')
+                                -->
+                                <!--a.confirm(data-action='confirm_image_details')//i.fa.fa-check-circle
+                                -->
                             </div>
                         </div>
                     </div>
-
-                    <!-- Кнопка сохранить изменения -->
-                    <button type="submit" class="button button__play">
-                        Сохранить
-                    </button>
+                    <button type="submit" class="add-btn">Добавить</button>
                 </form>
             </div>
         </div>
-
-        <!-- Еще  -->
-        <div class="play__field" style="flex-direction: column; gap: 20px;">
-            <h2 style="color: #fff; margin-top: 0; text-align: center;">Ещё</h2>
-            <div class="play__field_wrapper">
-                <button type="button" class="button button__play" data-bs-toggle="modal" data-bs-target="#quizResultsModal" style="width:fit-content;">
-                    История игр
-                </button>
-
-                <a href="@Url.Action("PrivacyPolicy", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
-                    Политика конфиденциальности
-                </a>
-
-                <a href="@Url.Action("CookiesPolicy", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
-                    Политика использования Cookies
-                </a>
-
-                <a href="@Url.Action("TermsOfUse", "Home")" type="button" class="button button__play" style="width: min-content; text-align: center;">
-                    Правила использования
-                </a>
-            </div>
-
-        </div>
     </div>
+
+    <!-- Подключаем Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- Подключение jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Инициализация Swiper без стрелок и пагинации -->
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            effect: "flip",
+            grabCursor: true,
+            loop: true,              // Для анимации flip даже с одним слайдом
+            allowTouchMove: false    // Отключаем ручное перелистывание
+        });
+
+        document.getElementById("addQuestionForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Формируем данные формы, используя FormData для передачи файла
+            var formData = new FormData(this);
+
+            fetch("/Admin/AddQuestion", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+
+                    // Запускаем flip-эффект
+                    swiper.slideNext();
+
+                    // По завершении анимации очищаем форму и возвращаем flip назад
+                    setTimeout(() => {
+                        document.getElementById("addQuestionForm").reset();
+                        swiper.slidePrev();
+                    }, 600);
+                } else {
+                    alert("Ошибка: " + data.message);
+                }
+            })
+            .catch(error => console.error("Ошибка:", error));
+        });
+    </script>
+    <!-- Форма загрузки фото -->
+    <script>
+        var $dropzone = $('.image_picker'),
+            $droptarget = $('.drop_target'),
+            $dropinput = $('#inputFile'),
+            $dropimg = $('.image_preview'),
+            $remover = $('[data-action="remove_current_image"]');
+
+        $dropzone.on('dragover', function() {
+          $droptarget.addClass('dropping');
+          return false;
+        });
+
+        $dropzone.on('dragend dragleave', function() {
+          $droptarget.removeClass('dropping');
+          return false;
+        });
+
+        $dropzone.on('drop', function(e) {
+          $droptarget.removeClass('dropping');
+          $droptarget.addClass('dropped');
+          $remover.removeClass('disabled');
+          e.preventDefault();
+
+          var file = e.originalEvent.dataTransfer.files[0],
+              reader = new FileReader();
+
+          reader.onload = function(event) {
+            $dropimg.css('background-image', 'url(' + event.target.result + ')');
+          };
+
+          console.log(file);
+          reader.readAsDataURL(file);
+
+          return false;
+        });
+
+        $dropinput.change(function(e) {
+          $droptarget.addClass('dropped');
+          $remover.removeClass('disabled');
+          $('.image_title input').val('');
+
+          var file = $dropinput.get(0).files[0],
+              reader = new FileReader();
+
+          reader.onload = function(event) {
+            $dropimg.css('background-image', 'url(' + event.target.result + ')');
+          }
+
+          reader.readAsDataURL(file);
+        });
+
+        $remover.on('click', function() {
+          $dropimg.css('background-image', '');
+          $droptarget.removeClass('dropped');
+          $remover.addClass('disabled');
+          $('.image_title input').val('');
+        });
+
+        $('.image_title input').blur(function() {
+          if ($(this).val() != '') {
+            $droptarget.removeClass('dropped');
+          }
+        });</script>
 </body>

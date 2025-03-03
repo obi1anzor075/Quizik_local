@@ -14,5 +14,7 @@ namespace DataAccessLayer.Repositories.Contracts
         Task<IEnumerable<HardQuestion>> GetAllHardQuestionsAsync();
         Task AddQuestionAsync(Question question, string tableName);
         Task AddHardQuestionAsync(HardQuestion hardQuestion, string tableName);
+        Task<IEnumerable<string>> GetTableNamesAsync();
+
     }
 }

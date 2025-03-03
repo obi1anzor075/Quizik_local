@@ -4,6 +4,7 @@ using DataAccessLayer.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,14 +50,25 @@ namespace DataAccessLayer.Repositories
 
             // Проверка, начинается ли таблица с этих прейфиксов
             bool isAllowed = allowedPrefixes.Any(prefix => tableName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
-            if (isAllowed)
+            if (!isAllowed)
             {
                 throw new ArgumentException("Недопустимое имя таблицы", nameof(tableName));
             }
 
             // SQL запрос
-            string sql = $"INSERT INTO {tableName} (QuestionText, ImageData, CorrectAnswer, Answer1, Answer2, Answer3, Answer4, question_explanation) " +
-                 "VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)";
+            string sql = $@"
+                INSERT INTO {tableName}
+                (
+                    question_text,
+                    image_url,
+                    correct_answer,
+                    answer1,
+                    answer2,
+                    answer3,
+                    answer4,
+                    question_explanation
+                )
+                VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)";
 
             await _context.Database.ExecuteSqlRawAsync(
                 sql,
@@ -83,7 +95,7 @@ namespace DataAccessLayer.Repositories
             }
 
             // SQL запрос
-            string sql = $"INSERT INTO {tableName} (QuestionText, ImageData, CorrectAnswer, CorrectAnswer2) " +
+            string sql = $"INSERT INTO {tableName} (question_text, image_url, correct_answer, correct_answer2) " +
                  "VALUES (@p0, @p1, @p2, @p3)";
 
             await _context.Database.ExecuteSqlRawAsync(
@@ -93,6 +105,16 @@ namespace DataAccessLayer.Repositories
                 hardQuestion.CorrectAnswer,
                 hardQuestion.CorrectAnswer2
             );
+        }
+
+        /// <summary>
+        /// Получает список имён таблиц, начинающихся с "Easy", "Duel" или "Hard"
+        /// </summary>
+        /// <returns>Список имён таблиц</returns>
+        public async Task<IEnumerable<string>> GetTableNamesAsync()
+        {
+            string sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE 'Easy%' OR TABLE_NAME LIKE 'Duel%' OR TABLE_NAME LIKE 'Hard%'";
+            return await _context.Database.SqlQueryRaw<string>(sql).ToListAsync();
         }
 
     }

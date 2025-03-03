@@ -11,7 +11,7 @@ namespace BusinessLogicLayer.Services.Contracts;
 public interface IImageService
 {
     Task<byte[]> ResizeImageIfNecessaryAsync(byte[] imageBytes, int maxWidth, int maxHeight);
-    Task<byte[]> ProcessImageAsync(IFormFile avatar);
+    Task<byte[]> ProcessImageAsync(IFormFile imageFike);
     Task<(byte[] ImageData, string FileName)> GetRandomProfilePictureAsync();
 
     string DecodeImageAsync(byte[] imageData, string contentType = "image/jpeg");

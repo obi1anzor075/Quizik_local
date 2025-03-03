@@ -1,4 +1,5 @@
-﻿using DataAccessLayer.Models;
+﻿using BusinessLogicLayer.DTO;
+using DataAccessLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,8 @@ namespace BusinessLogicLayer.Services.Contracts
         Task<IEnumerable<QuizResult>> GetQuizResultsByUserAsync(string userId);
         Task<IEnumerable<Question>> GetAllQuestionsAsync();
         Task<IEnumerable<HardQuestion>> GetAllHardQuestionsAsync();
-        Task AddQuestionAsync(Question question, string tableName);
+        Task AddQuestionAsync(QuestionDTO model);
         Task AddHardQuestionAsync(HardQuestion hardQuestion, string tableName);
+        Task<IEnumerable<string>> GetTableNamesAsync();
     }
 }
