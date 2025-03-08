@@ -39,10 +39,10 @@ namespace PresentationLayer.Controllers
         [HttpPost]
         public async Task<IActionResult> AddQuestion([FromForm]QuestionViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return Json(new { success = false, message = "Некорректные данные!" });
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return Json(new { success = false, message = "Некорректные данные!" });
+            //}
 
             byte[] imageData = await _imageService.ProcessImageAsync(model.ImageFile);
 
