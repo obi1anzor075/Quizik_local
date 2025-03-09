@@ -84,18 +84,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
-// Configure cookie authentication
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromDays(30); // Длительность сеанса при RememberMe
-    options.SlidingExpiration = true;
-    options.LoginPath = "/Home/Login";
-    options.LogoutPath = "/Home/Logout";
-    options.AccessDeniedPath = "/Home/AccessDenied";
-    options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-});
+
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -156,6 +145,18 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
     .AddDefaultTokenProviders();
 
+// Configure cookie authentication
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(30); // Длительность сеанса при RememberMe
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Home/Login";
+    options.LogoutPath = "/Home/Logout";
+    options.AccessDeniedPath = "/Home/AccessDenied";
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
 
 // Регистрация LocalizedIdentityErrorDescriber
 builder.Services.AddScoped<LocalizedIdentityErrorDescriber>();

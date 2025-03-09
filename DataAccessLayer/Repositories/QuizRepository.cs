@@ -43,69 +43,17 @@ namespace DataAccessLayer.Repositories
                 .ToListAsync();
         }
 
-        public async Task AddQuestionAsync(Question question, string tableName)
+        public async Task AddQuestionAsync(Question question)
         {
-            // Допустимые префиксы для таблиц
-            string[] allowedPrefixes = new string[] { "Easy", "Duel" };
-
-            // Проверка, начинается ли таблица с этих прейфиксов
-            bool isAllowed = allowedPrefixes.Any(prefix => tableName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
-            if (!isAllowed)
-            {
-                throw new ArgumentException("Недопустимое имя таблицы", nameof(tableName));
-            }
-
-            // SQL запрос
-            string sql = $@"
-                INSERT INTO {tableName}
-                (
-                    question_text,
-                    image_url,
-                    correct_answer,
-                    answer1,
-                    answer2,
-                    answer3,
-                    answer4,
-                    question_explanation
-                )
-                VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)";
-
-            await _context.Database.ExecuteSqlRawAsync(
-                sql,
-                question.QuestionText,
-                question.ImageData,
-                question.CorrectAnswer,
-                question.Answer1,
-                question.Answer2,
-                question.Answer3,
-                question.Answer4,
-                question.QuestionExplanation
-            );
+            await _context.AddAsync(question);
         }
 
-        public async Task AddHardQuestionAsync(HardQuestion hardQuestion, string tableName)
+
+        public async Task AddHardQuestionAsync(HardQuestion question)
         {
-            // Допустимые префиксы для таблиц
-            string allowedPrefix =  "Hard";
-
-            // Проверка, начинается ли таблица с этих прейфиксов
-            if (!tableName.StartsWith(allowedPrefix, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ArgumentException("Имя таблицы для сложных вопросов должно начинаться с 'Hard'", nameof(tableName));
-            }
-
-            // SQL запрос
-            string sql = $"INSERT INTO {tableName} (question_text, image_url, correct_answer, correct_answer2) " +
-                 "VALUES (@p0, @p1, @p2, @p3)";
-
-            await _context.Database.ExecuteSqlRawAsync(
-                sql,
-                hardQuestion.QuestionText,
-                hardQuestion.ImageData,
-                hardQuestion.CorrectAnswer,
-                hardQuestion.CorrectAnswer2
-            );
+            await _context.HardQuestions.AddAsync(question);
         }
+
 
         /// <summary>
         /// Получает список имён таблиц, начинающихся с "Easy", "Duel" или "Hard"

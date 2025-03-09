@@ -13,8 +13,8 @@ namespace BusinessLogicLayer.Services.Contracts
         Task<IEnumerable<QuizResult>> GetQuizResultsByUserAsync(string userId);
         Task<IEnumerable<Question>> GetAllQuestionsAsync();
         Task<IEnumerable<HardQuestion>> GetAllHardQuestionsAsync();
-        Task AddQuestionAsync(QuestionDTO model);
-        Task AddHardQuestionAsync(HardQuestion hardQuestion, string tableName);
+        Task AddQuestionAsync(Question question);
+        Task AddHardQuestionAsync(HardQuestion hardQuestion);
         Task<IEnumerable<string>> GetTableNamesAsync();
     }
 }

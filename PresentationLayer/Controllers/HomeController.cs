@@ -116,7 +116,7 @@ namespace PresentationLayer.Controllers
                 else if (result.RequiresTwoFactor)
                 {
                     // Перенаправление на страницу 2FA
-                    return RedirectToAction("Verify2FA", new { userId = ((IdentityUser)user).Id, rememberMe = model.RememberMe });
+                    return RedirectToAction("Verify2FA", "Home", new { userId = ((IdentityUser)user).Id, rememberMe = model.RememberMe });
                 }
 
                 ModelState.AddModelError(string.Empty, _localizedIdentityErrorDescriber.InvalidLogin().Description);
@@ -165,6 +165,7 @@ namespace PresentationLayer.Controllers
                 if (result.Succeeded)
                 {
                     bool isAdmin = await _adminTokenService.ValidateTokenAsync(token);
+                    SaveUserNameInCookie(model.UserName!);
 
                     if (isAdmin)
                     {
@@ -230,14 +231,14 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         public IActionResult Verify2FA(string userId, bool rememberMe)
         {
             return View(new Verify2FAModel { UserId = userId, RememberMe = rememberMe });
         }
 
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Verify2FA(Verify2FAModel model)
         {
             if (!ModelState.IsValid) return View(model);

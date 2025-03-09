@@ -40,45 +40,15 @@ namespace BusinessLogicLayer.Services
         }
 
         // Добавление простого/дуэльного вопроса в таблицу
-        public async Task AddQuestionAsync(QuestionDTO model)
+        public async Task AddQuestionAsync(Question question)
         {
-            if (model.TableName.StartsWith("Hard", StringComparison.OrdinalIgnoreCase))
-            {
-                var hardQuestion = new HardQuestion
-                {
-                    QuestionText = model.QuestionText,
-                    ImageData = model.ImageData,
-                    CorrectAnswer = model.CorrectAnswer,
-                    CorrectAnswer2 = model.CorrectAnswer2
-                };
-                await _quizRepository.AddHardQuestionAsync(hardQuestion, model.TableName);
-            }
-            else if (model.TableName.StartsWith("Easy", StringComparison.OrdinalIgnoreCase) ||
-                     model.TableName.StartsWith("Duel", StringComparison.OrdinalIgnoreCase))
-            {
-                var question = new Question
-                {
-                    QuestionText = model.QuestionText,
-                    ImageData = model.ImageData,
-                    CorrectAnswer = model.CorrectAnswer,
-                    Answer1 = model.Answer1,
-                    Answer2 = model.Answer2,
-                    Answer3 = model.Answer3,
-                    Answer4 = model.Answer4,
-                    QuestionExplanation = string.Empty
-                };
-                await _quizRepository.AddQuestionAsync(question, model.TableName);
-            }
-            else
-            {
-                throw new ArgumentException("Неверное имя таблицы!");
-            }
+            await _quizRepository.AddQuestionAsync(question);
         }
 
         // Добавление сложного вопроса в таблицу
-        public async Task AddHardQuestionAsync(HardQuestion hardQuestion, string tableNAme)
+        public async Task AddHardQuestionAsync(HardQuestion hardQuestion)
         {
-            await _quizRepository.AddHardQuestionAsync(hardQuestion, tableNAme);
+            await _quizRepository.AddHardQuestionAsync(hardQuestion);
         }
 
         public async Task<IEnumerable<string>> GetTableNamesAsync()

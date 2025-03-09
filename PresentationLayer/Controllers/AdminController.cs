@@ -37,31 +37,57 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddQuestion([FromForm]QuestionViewModel model)
+        public async Task<IActionResult> AddQuestion([FromForm] QuestionVM model)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return Json(new { success = false, message = "Некорректные данные!" });
-            //}
-
             byte[] imageData = await _imageService.ProcessImageAsync(model.ImageFile);
 
             try
             {
-                // Маппинг из ViewModel в DTO
-                var questionDto = new QuestionDTO
+                // Маппинг из ViewModel в Question
+                var question = new Question
                 {
                     QuestionText = model.QuestionText,
-                    CorrectAnswer = model.CorrectAnswer,
-                    CorrectAnswer2 = model.CorrectAnswer2,
+                    CorrectAnswerIndex = model.CorrectAnswerIndex,
                     Answer1 = model.Answer1,
                     Answer2 = model.Answer2,
                     Answer3 = model.Answer3,
                     Answer4 = model.Answer4,
-                    TableName = model.TableName,
+                    Category = model.Category,
+                    QuestionExplanation = model.QuestionExplanation,
                     ImageData = imageData
                 };
-                await _quizService.AddQuestionAsync(questionDto);
+                await _quizService.AddQuestionAsync(question);
+                return Json(new { success = true, message = "Вопрос успешно добавлен!" });
+            }
+            catch (ArgumentException argEx)
+            {
+                // Если возникла ошибка валидации имени таблицы или другая аргументная ошибка
+                return Json(new { success = false, message = "Ошибка: " + argEx.Message });
+            }
+            catch (Exception ex)
+            {
+                // Общая обработка ошибок
+                return Json(new { success = false, message = "Ошибка при добавлении вопроса: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddHardQuestion([FromForm] HardQuestionVM model)
+        {
+            byte[] imageData = await _imageService.ProcessImageAsync(model.ImageFile);
+
+            try
+            {
+                var hardQuestion = new HardQuestion
+                {
+                    QuestionText = model.QuestionText,
+                    CorrectAnswer = model.CorrectAnswer,
+                    CorrectAnswer2 = model.CorrectAnswer2,
+                    QuestionExplanation = model.QuestionExplanation,
+                    Category = model.Category,
+                    ImageData = imageData,
+                };
+                await _quizService.AddHardQuestionAsync(hardQuestion);
                 return Json(new { success = true, message = "Вопрос успешно добавлен!" });
             }
             catch (ArgumentException argEx)

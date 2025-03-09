@@ -94,6 +94,7 @@ margin-top:50px;
     border-radius: 15px;
     gap: 5px;
     height: 50px;
+    width: clamp(280px, 15vw, 320px) !important;
 }
 
 .button > span {
@@ -128,7 +129,7 @@ color:white;
     font-size: 20px;
     font-weight: 700;
     line-height: 32px;
-    width: 50%;
+    width: fit-content;
     border-radius: 8px;
     background-color: #41CAC2;
     box-sizing: border-box;
@@ -292,7 +293,6 @@ font-size:clamp(0.85rem,2.1vw,1.1rem);
 .checkbox {
     display: flex;
     justify-content: left;
-    width: 80%;
 }
 
 .checkbox-label {

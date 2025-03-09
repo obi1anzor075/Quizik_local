@@ -28,77 +28,74 @@ namespace DataAccessLayer.DataContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Question>(entity =>
-            {
-                entity.HasKey(e => e.QuestionId).HasName("PK__Question__2EC21549E80C6BEB");
+            base.OnModelCreating(modelBuilder);
 
-                entity.Property(e => e.QuestionId).HasColumnName("question_id");
-                entity.Property(e => e.Answer1)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("answer1");
-                entity.Property(e => e.Answer2)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("answer2");
-                entity.Property(e => e.Answer3)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("answer3");
-                entity.Property(e => e.Answer4)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("answer4");
-                entity.Property(e => e.CorrectAnswer)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("correct_answer");
-                // Изменили на бинарное представление
-                entity.Property(e => e.ImageData)
-                    .HasColumnName("image_data")
-                    .HasColumnType("varbinary(max)");
-                entity.Property(e => e.QuestionText)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("question_text");
-                entity.Property(e => e.QuestionExplanation)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("question_explanation");
-            });
-
+            // Конфигурация для таблицы HardQuestions
             modelBuilder.Entity<HardQuestion>(entity =>
             {
-                entity.HasKey(e => e.QuestionId).HasName("PK__HardQuestion__2EC21549E80C6BEB");
+                entity.ToTable("HardQuestions");
+                entity.HasKey(e => e.QuestionId);
 
-                entity.Property(e => e.QuestionId).HasColumnName("question_id");
+                entity.Property(e => e.QuestionId)
+                    .HasColumnName("question_id");
+
                 entity.Property(e => e.QuestionText)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("question_text");
-                // Изменили на бинарное представление
-                entity.Property(e => e.ImageData)
-                    .HasColumnName("image_data")
-                    .HasColumnType("varbinary(max)");
+
                 entity.Property(e => e.CorrectAnswer)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("correct_answer");
+
                 entity.Property(e => e.CorrectAnswer2)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("correct_answer2");
+
+                entity.Property(e => e.QuestionExplanation)
+                    .HasColumnName("question_explanation");
+
+                entity.Property(e => e.ImageData)
+                    .HasColumnName("image_data");
+
+                entity.Property(e => e.Category)
+                    .HasColumnName("category")
+                    .HasMaxLength(50);
             });
 
-            modelBuilder.Entity<QuizResult>()
-                .HasOne(qr => qr.User)
-                .WithMany() // или .WithMany(u => u.QuizResults), если коллекция определена в классе User
-                .HasForeignKey(qr => qr.UserId)
-                .HasPrincipalKey(u => u.Id)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK_QuizResults_AspNetUsers_UserId");
+            // Конфигурация для таблицы Questions (Easy и Duel)
+            modelBuilder.Entity<Question>(entity =>
+            {
+                entity.ToTable("Questions");
+                entity.HasKey(e => e.QuestionId);
 
-            OnModelCreatingPartial(modelBuilder);
+                entity.Property(e => e.QuestionId)
+                    .HasColumnName("question_id");
+
+                entity.Property(e => e.QuestionText)
+                    .HasColumnName("question_text");
+
+                entity.Property(e => e.Answer1)
+                    .HasColumnName("answer1");
+
+                entity.Property(e => e.Answer2)
+                    .HasColumnName("answer2");
+
+                entity.Property(e => e.Answer3)
+                    .HasColumnName("answer3");
+
+                entity.Property(e => e.Answer4)
+                    .HasColumnName("answer4");
+
+                entity.Property(e => e.CorrectAnswerIndex)
+                    .HasColumnName("correct_answer_index");
+
+                entity.Property(e => e.QuestionExplanation)
+                    .HasColumnName("question_explanation");
+
+                entity.Property(e => e.ImageData)
+                    .HasColumnName("image_data");
+
+                entity.Property(e => e.Category)
+                    .HasColumnName("category")
+                    .HasMaxLength(50);
+            });
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

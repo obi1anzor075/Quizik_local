@@ -110,11 +110,14 @@ namespace PresentationLayer.Controllers
             // Извлекаем текущее значение индекса вопроса из сессии
             int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
 
+            string category = gameMode.Replace("Easy", "");
 
-            // Динамическое формирование SQL-запроса
-            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
-
-            var nextQuestion = _dbContext.Questions.FromSqlRaw(sqlQuery).FirstOrDefault();
+            var nextQuestion = _dbContext.Questions
+                .Where(q => q.Category == category)
+                .OrderBy(q => q.QuestionId)
+                .Skip(currentQuestionIndex)
+                .Take(1)
+                .FirstOrDefault();
 
             if (nextQuestion != null)
             {
@@ -163,9 +166,14 @@ namespace PresentationLayer.Controllers
 
             int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
 
-            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
+            string category = gameMode.Replace("Hard", "");
 
-            var nextQuestion = _dbContext.HardQuestions.FromSqlRaw(sqlQuery).FirstOrDefault();
+            var nextQuestion = _dbContext.HardQuestions
+                .Where(q => q.Category == category)
+                .OrderBy(q => q.QuestionId)
+                .Skip(currentQuestionIndex)
+                .Take(1)
+                .FirstOrDefault();
 
             if (nextQuestion != null)
             {
@@ -199,9 +207,14 @@ namespace PresentationLayer.Controllers
         {
             int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
 
-            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
+            string category = gameMode.Replace("Duel", "");
 
-            var nextQuestion = _dbContext.Questions.FromSqlRaw(sqlQuery).FirstOrDefault();
+            var nextQuestion = _dbContext.Questions
+                .Where(q => q.Category == category)
+                .OrderBy(q => q.QuestionId)
+                .Skip(currentQuestionIndex)
+                .Take(1)
+                .FirstOrDefault();
 
             if (nextQuestion != null)
             {

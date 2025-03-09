@@ -46,27 +46,17 @@ namespace PresentationLayer.Hubs
             _imageService = imageService;
         }
 
-        public Task<string> GetUserName()
-        {
-            var userName = _httpContextAccessor.HttpContext.Request.Cookies["userName"];
-            if (string.IsNullOrEmpty(userName))
-            {
-                throw new KeyNotFoundException("User name not found");
-            }
+        //public Task<string> GetUserName()
+        //{
+        //    var userName = _httpContextAccessor.HttpContext.Request.Cookies["userName"];
+        //    if (string.IsNullOrEmpty(userName))
+        //    {
+        //        throw new KeyNotFoundException("User name not found");
+        //    }
 
-            return Task.FromResult(userName);
-        }
+        //    return Task.FromResult(userName);
+        //}
 
-        public async Task JoinChat(UserConnection connection)
-        {
-            if (connection == null || string.IsNullOrEmpty(connection.UserName) || string.IsNullOrEmpty(connection.ChatRoom))
-            {
-                throw new ArgumentException("Invalid connection parameters");
-            }
-
-            await Groups.AddToGroupAsync(Context.ConnectionId, connection.ChatRoom);
-            await Clients.Group(connection.ChatRoom).ReceiveMessage("Quizik", $"Добро пожаловать, {connection.UserName}!");
-        }
 
         // Save UserName and GET
         /*public async Task SaveUserName()
@@ -89,7 +79,18 @@ namespace PresentationLayer.Hubs
               // Save the user to the database
               await _userService.SaveUserAsync(user);
           }
-        */
+        */        
+        public async Task JoinChat(UserConnection connection)
+        {
+            if (connection == null || string.IsNullOrEmpty(connection.UserName) || string.IsNullOrEmpty(connection.ChatRoom))
+            {
+                throw new ArgumentException("Invalid connection parameters");
+            }
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, connection.ChatRoom);
+            await Clients.Group(connection.ChatRoom).ReceiveMessage("Quizik", $"Добро пожаловать, {connection.UserName}!");
+        }
+
         public async Task JoinDuel(UserConnection connection)
         {
             try
@@ -158,8 +159,6 @@ namespace PresentationLayer.Hubs
             }
         }
 
-
-
         private void StartRoomTimer(string chatRoom)
         {
             if (RoomTimers.ContainsKey(chatRoom))
@@ -194,25 +193,26 @@ namespace PresentationLayer.Hubs
                     throw new KeyNotFoundException($"User '{userName}' not found in player states.");
                 }
 
-                string sqlQuery = $"SELECT * FROM {gameMode} WHERE question_id = {questionId}";
-                var question = _dbContext
-                    .Questions
-                    .FromSqlRaw(sqlQuery);
+                string category = gameMode.Replace("Duel", "");
+
+                var question = _dbContext.Questions
+                    .Where(q => q.Category == category && q.QuestionId == questionId)
+                    .OrderBy(q => q.QuestionId)
+                    .FirstOrDefault();
 
                 if (question == null)
                 {
                     throw new Exception($"Question with ID {questionId} not found.");
                 }
 
-                // SQL-запрос для получения всей строки (включая correct_answer)
-                string sqlQueryCorrectAns = $"SELECT * FROM {gameMode} WHERE question_id = {questionId}";
-
-                // Выполнение запроса и получение всех данных
-                var result = _dbContext.Questions
-                    .FromSqlRaw(sqlQueryCorrectAns)
-                    .FirstOrDefault();
-
-                string correctAnswer = result.CorrectAnswer;
+                string correctAnswer = question.CorrectAnswerIndex switch
+                {
+                    1 => question.Answer1,
+                    2 => question.Answer2,
+                    3 => question.Answer3,
+                    4 => question.Answer4,
+                    _ => string.Empty
+                };
 
                 var isCorrect = string.Equals(answer.Trim(), correctAnswer?.Trim(), StringComparison.OrdinalIgnoreCase);
 
@@ -225,9 +225,10 @@ namespace PresentationLayer.Hubs
 
                 await Clients.Caller.AnswerResult(isCorrect);
 
-                string sqlQueryCount = $"SELECT * FROM {gameMode}";
-
-                int questionCount = await _dbContext.Questions.FromSqlRaw(sqlQueryCount).CountAsync();
+                int questionCount = await _dbContext.Questions
+                    .Where(q => q.Category == category)
+                    .OrderBy(q => q.QuestionId)
+                    .CountAsync();
 
                 if (playerState.CurrentQuestionIndex >= questionCount)
                 {
@@ -235,7 +236,7 @@ namespace PresentationLayer.Hubs
                 }
                 else
                 {
-                    await GetNextQuestion(userName, chatRoom, playerState.CurrentQuestionIndex,"DuelPDD");
+                    await GetNextQuestion(userName, chatRoom, playerState.CurrentQuestionIndex,gameMode);
                 }
             }
             catch (Exception ex)
@@ -255,27 +256,23 @@ namespace PresentationLayer.Hubs
                 var playerState = await GetPlayerState(userName) ?? new PlayerState();
                 await SavePlayerState(userName, playerState);
 
-                Console.WriteLine("######################");
-                Console.WriteLine(gameMode);
-                Console.WriteLine(userName);
-                Console.WriteLine(questionIndex);
-                Console.WriteLine("######################");
+                string category = gameMode.Replace("Duel", "");
 
-                string sqlQueryCount = $"SELECT * FROM {gameMode}";
+                int questionsCount = await _dbContext.Questions
+                    .Where (q => q.Category == category)
+                    .CountAsync();
 
-                int questionsCount = await _dbContext.Questions.FromSqlRaw(sqlQueryCount).CountAsync();
                 if (questionIndex >= questionsCount)
                 {
                     await EndGame(chatRoom);
                     return;
                 }
-                Console.WriteLine("######################");
-                Console.WriteLine(questionsCount);
-                Console.WriteLine("######################");
-                string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {questionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
 
                 var nextQuestion = _dbContext.Questions
-                    .FromSqlRaw(sqlQuery)
+                    .Where(q => q.Category == category)
+                    .OrderBy(q => q.QuestionId)
+                    .Skip(questionIndex)
+                    .Take(1)
                     .FirstOrDefault();
 
                 if (nextQuestion != null)
@@ -297,79 +294,77 @@ namespace PresentationLayer.Hubs
             }
         }
 
-public async Task EndGame(string chatRoom)
-{
-    try
-    {
-        // Проверяем, активна ли игра для данной комнаты
-        if (!Rooms.ContainsKey(chatRoom) || !Rooms[chatRoom].IsGameActive)
+        public async Task EndGame(string chatRoom)
         {
-            Console.WriteLine($"EndGame already processed or game not active for chatRoom {chatRoom}");
-            return;
-        }
-
-        var duel = await GetOrCreateDuel(chatRoom);
-        var results = new Dictionary<string, int>();
-
-        if (duel != null)
-        {
-            if (!string.IsNullOrEmpty(duel.Player1))
+            try
             {
-                var player1State = await GetPlayerState(duel.Player1);
-                if (player1State != null)
+            // Проверяем, активна ли игра для данной комнаты
+            if (!Rooms.ContainsKey(chatRoom) || !Rooms[chatRoom].IsGameActive)
+            {
+                Console.WriteLine($"EndGame already processed or game not active for chatRoom {chatRoom}");
+                return;
+            }
+
+            var duel = await GetOrCreateDuel(chatRoom);
+            var results = new Dictionary<string, int>();
+
+            if (duel != null)
+            {
+                if (!string.IsNullOrEmpty(duel.Player1))
                 {
-                    results[duel.Player1] = player1State.Score;
+                    var player1State = await GetPlayerState(duel.Player1);
+                    if (player1State != null)
+                    {
+                        results[duel.Player1] = player1State.Score;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(duel.Player2))
+                {
+                    var player2State = await GetPlayerState(duel.Player2);
+                    if (player2State != null)
+                    {
+                        results[duel.Player2] = player2State.Score;
+                    }
+                }
+
+                // Log the results before sending
+                Console.WriteLine("Results before sending to client:");
+                foreach (var result in results)
+                {
+                    Console.WriteLine($"Player: {result.Key}, Score: {result.Value}");
+                }
+
+                await Clients.Group(chatRoom).EndGame(results);
+
+                // Set IsGameActive to false so EndGame cannot be called again
+                Rooms[chatRoom].IsGameActive = false;
+
+                // Clear the duel state
+                await ClearDuel(chatRoom);
+
+                // Clear the players' states
+                if (!string.IsNullOrEmpty(duel.Player1))
+                {
+                    await ClearPlayerState(duel.Player1);
+                }
+                if (!string.IsNullOrEmpty(duel.Player2))
+                {
+                    await ClearPlayerState(duel.Player2);
                 }
             }
-
-            if (!string.IsNullOrEmpty(duel.Player2))
+            else
             {
-                var player2State = await GetPlayerState(duel.Player2);
-                if (player2State != null)
-                {
-                    results[duel.Player2] = player2State.Score;
-                }
-            }
-
-            // Log the results before sending
-            Console.WriteLine("Results before sending to client:");
-            foreach (var result in results)
-            {
-                Console.WriteLine($"Player: {result.Key}, Score: {result.Value}");
-            }
-
-            await Clients.Group(chatRoom).EndGame(results);
-
-            // Set IsGameActive to false so EndGame cannot be called again
-            Rooms[chatRoom].IsGameActive = false;
-
-            // Clear the duel state
-            await ClearDuel(chatRoom);
-
-            // Clear the players' states
-            if (!string.IsNullOrEmpty(duel.Player1))
-            {
-                await ClearPlayerState(duel.Player1);
-            }
-            if (!string.IsNullOrEmpty(duel.Player2))
-            {
-                await ClearPlayerState(duel.Player2);
+                Console.WriteLine($"Error: Duel not found for chatRoom {chatRoom}");
             }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine($"Error: Duel not found for chatRoom {chatRoom}");
+            Console.WriteLine($"Error in EndGame: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            throw;
         }
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error in EndGame: {ex.Message}");
-        Console.WriteLine(ex.StackTrace);
-        throw;
-    }
-}
-
-
 
         private async Task ClearDuel(string chatRoom)
         {

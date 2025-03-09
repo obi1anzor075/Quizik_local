@@ -49,17 +49,33 @@ namespace PresentationLayer.Controllers
         [HttpGet("/Game/CheckAnswer/{gameMode}/{selectedAnswer}")]
         public async Task<IActionResult> CheckAnswer(string gameMode, string selectedAnswer)
         {
-            gameMode += GetCurrentLanguage();
+            string category = gameMode.Replace("Easy", "").Replace("Duel", "");
 
-            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {CurrentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
-            var question = _dbContext.Questions.FromSqlRaw(sqlQuery).FirstOrDefault();
+            // Извлекаем текущий вопрос
+            var question = _dbContext.Questions
+                .Where(q => q.Category == category)
+                .OrderBy(q => q.QuestionId)
+                .Skip(CurrentQuestionIndex)
+                .Take(1)
+                .FirstOrDefault();
 
             if (question == null)
             {
                 return Json(new { isCorrect = false, error = "Question not found." });
             }
 
-            bool isCorrect = (selectedAnswer.Trim().Normalize() == question.CorrectAnswer.Trim().Normalize());
+            // Определяем правильный ответ по индексу
+            string correctAnswerText = question.CorrectAnswerIndex switch
+            {
+                1 => question.Answer1,
+                2 => question.Answer2,
+                3 => question.Answer3,
+                4 => question.Answer4,
+                _ => string.Empty
+            };
+
+            // Сравнение выбранного ответа с правильным
+            bool isCorrect = (selectedAnswer.Trim().Normalize() == correctAnswerText.Trim().Normalize());
             CurrentQuestionIndex++;
 
             if (isCorrect)
@@ -68,25 +84,37 @@ namespace PresentationLayer.Controllers
                 correctAnswersCount++;
                 Response.Cookies.Append("CorrectAnswersCount", correctAnswersCount.ToString());
             }
-
-            var sqlQueryCount = $"SELECT * FROM {gameMode}";
-            int questionCount = await _dbContext.Questions.FromSqlRaw(sqlQueryCount).CountAsync();
-
+            // Возвращаем результат проверки обратно на клиент
             return Json(new { isCorrect });
         }
+
 
 
 
         [HttpGet("/Game/CheckHardAnswer/{gameMode}/{selectedAnswer}")]
         public async Task<IActionResult> CheckHardAnswer(string gameMode, string selectedAnswer)
         {
+            string category = gameMode.Replace("Hard", "");
+
             // Получаем текущий индекс вопроса из куки            
             int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
 
-            string sqlQuery = $"SELECT * FROM {gameMode} ORDER BY question_id OFFSET {currentQuestionIndex} ROWS FETCH NEXT 1 ROWS ONLY";
-
             // Получаем текущий вопрос из базы данных
-            var question = _dbContext.HardQuestions.FromSqlRaw(sqlQuery).FirstOrDefault();
+            var question = _dbContext.HardQuestions
+                .Where(q => q.Category == category)
+                .OrderBy(q => q.QuestionId)
+                .Skip(currentQuestionIndex)
+                .Take(1)
+                .FirstOrDefault();
+
+            // Получаем новый вопрос из базы данных
+            var newQuestion = _dbContext.HardQuestions
+                .Where(q => q.Category == category)
+                .OrderBy(q => q.QuestionId)
+                .Skip(currentQuestionIndex)
+                .Take(1)
+                .FirstOrDefault();
+
 
             // Проверяем, совпадает ли выбранный ответ с правильным ответом
             bool isCorrect = (selectedAnswer.ToUpper().Trim().Normalize() == question.CorrectAnswer.ToUpper().Trim().Normalize() ||
@@ -106,15 +134,11 @@ namespace PresentationLayer.Controllers
                     int.TryParse(Request.Cookies["CorrectAnswersCount"], out correctAnswersCount);
                 }
                 correctAnswersCount++;
-                Response.Cookies.Append("CorrectAnswersCount", correctAnswersCount.ToString(), new CookieOptions { Expires = DateTimeOffset.UtcNow.AddDays(1) });
+                Response.Cookies.Append("CorrectAnswersCount", correctAnswersCount.ToString(), new CookieOptions 
+                { 
+                    Expires = DateTimeOffset.UtcNow.AddDays(1) 
+                });
             }
-
-            var sqlQueryCount = $"SELECT * FROM {gameMode}";
-
-            int questionCount = await _dbContext.HardQuestions
-                .FromSqlRaw(sqlQueryCount)
-                .CountAsync();
-
             // Возвращаем результат проверки обратно на клиент
             return Json(new { isCorrect });
         }

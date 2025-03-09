@@ -1,26 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DataAccessLayer.Models;
-
-public partial class Question
+[Table("Questions")]
+public class Question
 {
+    [Key]
+    [Column("question_id")]
     public int QuestionId { get; set; }
 
-    public string QuestionText { get; set; } = null!;
+    [Column("question_text")]
+    public string QuestionText { get; set; }
 
-    public byte[]? ImageData { get; set; }
+    [Column("answer1")]
+    public string Answer1 { get; set; }
 
-    public string CorrectAnswer { get; set; } = null!;
+    [Column("answer2")]
+    public string Answer2 { get; set; }
 
-    public string? Answer1 { get; set; }
+    [Column("answer3")]
+    public string Answer3 { get; set; }
 
-    public string? Answer2 { get; set; }
+    [Column("answer4")]
+    public string Answer4 { get; set; }
 
-    public string? Answer3 { get; set; }
+    [Column("correct_answer_index")]
+    public int CorrectAnswerIndex { get; set; }
 
-    public string? Answer4 { get; set; }
     [Column("question_explanation")]
-    public string? QuestionExplanation { get; set; }
+    public string QuestionExplanation { get; set; }
+
+    [Column("image_data")]
+    public byte[] ImageData { get; set; }
+
+    [Column("category")]
+    public string Category { get; set; }
 }
