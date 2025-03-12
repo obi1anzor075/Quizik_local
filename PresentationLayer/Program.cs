@@ -86,10 +86,14 @@ builder.Services.AddSession(options =>
 
 
 
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration["Redis:ConnectionString"];
-});
+// Настройка Redis - кэша
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        // Берем строку подключения из appsettings.json
+        options.Configuration = builder.Configuration.GetConnectionString("Redis");
+        options.InstanceName = "Quizik_"; // Префикс для ключей
+    });
+
 
 
 // Добавление сервисов в контейнер

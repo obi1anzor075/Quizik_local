@@ -12,6 +12,7 @@ using Microsoft.Data.SqlClient;
 using PresentationLayer.Utilities;
 using Microsoft.AspNetCore.Identity;
 using BusinessLogicLayer.Services.Contracts;
+using Newtonsoft.Json;
 
 namespace PresentationLayer.Controllers
 {
@@ -50,6 +51,29 @@ namespace PresentationLayer.Controllers
             Response.Cookies.Append("CurrentQuestionIndex", "0");
         }
 
+        public IActionResult StartGame(string category, string difficulty)
+        {
+
+            // Выбираем 10 случайных вопросов для заданной категории.
+            var questionIds = _dbContext.Questions
+                .Where(q => q.Category == category)
+                .OrderBy(q => Guid.NewGuid())  // Перемешиваем случайным образом
+                .Take(10)
+                .Select(q => q.QuestionId)
+                .ToList();
+
+            // Сохраняем список вопросов и текущий индекс в сессии
+            HttpContext.Session.SetString("QuestionList", JsonConvert.SerializeObject(questionIds));
+            HttpContext.Session.SetInt32("CurrentQuestionIndex", 0);
+            // Сохраняем также данные о режиме игры и сложности, если они понадобятся в дальнейшем
+            HttpContext.Session.SetString("GameMode", category);
+            HttpContext.Session.SetString("Difficulty", difficulty);
+
+            // Перенаправляем пользователя на нужный метод (Easy или Hard) с параметром category
+            return RedirectToAction(difficulty == "Easy" ? "Easy" : "Hard", new { category });
+        }
+
+
         public IActionResult EasyPDD()
         {
             // Локализация
@@ -59,13 +83,7 @@ namespace PresentationLayer.Controllers
             ViewData["LocalizedStrings"] = localizedStrings;
 
             string currentCulture = _cultureHelper.GetCurrentCulture();
-            return currentCulture switch
-            {
-                "ru-RU" => Easy("EasyPDD"),
-                "en-US" => Easy("EasyPDD_us"),
-                "zh-CN" => Easy("EasyPDD_cn"),
-                _ => Easy("EasyPDD")
-            };
+            return StartGame("PDD", "Easy");
         }
 
         public IActionResult EasyGeography()
@@ -77,13 +95,7 @@ namespace PresentationLayer.Controllers
             ViewData["LocalizedStrings"] = localizedStrings;
 
             string currentCulture = _cultureHelper.GetCurrentCulture();
-            return currentCulture switch
-            {
-                "ru-RU" => Easy("EasyGeography"),
-                "en-US" => Easy("EasyGeography_us"),
-                "zh-CN" => Easy("EasyGeography_cn"),
-                _ => Easy("EasyGeography")
-            };
+            return StartGame("Geography", "Easy");
         }
 
         public IActionResult EasyWWII()
@@ -95,38 +107,48 @@ namespace PresentationLayer.Controllers
             ViewData["LocalizedStrings"] = localizedStrings;
 
             string currentCulture = _cultureHelper.GetCurrentCulture();
-            return currentCulture switch
-            {
-                "ru-RU" => Easy("EasyWWII"),
-                "en-US" => Easy("EasyWWII_us"),
-                "zh-CN" => Easy("EasyWWII_cn"),
-                _ => Easy("EasyWWII")
-            };
+            return StartGame("WWII", "Easy");
         }
-
-        public IActionResult Easy(string gameMode)
+        public IActionResult Easy(string category)
         {
+            // Извлекаем список вопросов из сессии
+            var questionListJson = HttpContext.Session.GetString("QuestionList");
+            if (string.IsNullOrEmpty(questionListJson))
+            {
+                // Если список вопросов отсутствует, перенаправляем на старт игры
+                return RedirectToAction("StartGame", new { gameMode = "Easy" + category });
+            }
 
-            // Извлекаем текущее значение индекса вопроса из сессии
-            int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
+            var questionIds = JsonConvert.DeserializeObject<List<int>>(questionListJson);
 
-            string category = gameMode.Replace("Easy", "");
+            // Извлекаем текущий индекс вопроса из сессии
+            int currentQuestionIndex = HttpContext.Session.GetInt32("CurrentQuestionIndex") ?? 0;
 
-            var nextQuestion = _dbContext.Questions
-                .Where(q => q.Category == category)
-                .OrderBy(q => q.QuestionId)
-                .Skip(currentQuestionIndex)
-                .Take(1)
-                .FirstOrDefault();
+            // Если вопросов больше нет, завершаем игру
+            if (currentQuestionIndex >= questionIds.Count)
+            {
+                string difficultyLevel = "Легкий";
+                return RedirectToAction("Finish", new { difficultyLevel });
+            }
+
+            // Получаем ID текущего вопроса из списка
+            int questionId = questionIds[currentQuestionIndex];
+            var nextQuestion = _dbContext.Questions.FirstOrDefault(q => q.QuestionId == questionId);
 
             if (nextQuestion != null)
             {
                 ViewBag.QuestionId = nextQuestion.QuestionId;
                 ViewBag.QuestionText = nextQuestion.QuestionText;
-                ViewBag.ImageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
+                ViewBag.ImageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData, contentType: "image/jpeg");
                 ViewBag.QuestionExplanation = nextQuestion.QuestionExplanation;
 
-                var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
+                var answers = new List<string>
+                {
+                    nextQuestion.Answer1,
+                    nextQuestion.Answer2,
+                    nextQuestion.Answer3,
+                    nextQuestion.Answer4
+                };
 
                 // Перемешиваем варианты ответов
                 var random = new Random();
@@ -139,41 +161,59 @@ namespace PresentationLayer.Controllers
                 }
 
                 ViewBag.Answers = answers;
+
+                // Увеличиваем индекс текущего вопроса в сессии для следующего запроса
+                HttpContext.Session.SetInt32("CurrentQuestionIndex", currentQuestionIndex + 1);
+
                 return View();
             }
 
-            string difficultyLevel = "Легкий";
-            return RedirectToAction("Finish", new { difficultyLevel });
+            // Если вопрос не найден, завершаем игру
+            string difficultyLevelFallback = "Легкий";
+            return RedirectToAction("Finish", new { difficultyLevel = difficultyLevelFallback });
         }
+
 
         public IActionResult HardPDD()
         {
-            return Hard("HardPDD");
+            return StartGame("PDD", "Hard");
         }
 
         public IActionResult HardGeography()
         {
-            return Hard("HardGeography");
+            return StartGame("Geography", "Hard");
         }
 
         public IActionResult HardWWII()
         {
-            return Hard("HardWWII");
+            return StartGame("WWII", "Hard");
         }
 
-        public IActionResult Hard(string gameMode)
+        public IActionResult Hard(string category)
         {
+            // Извлекаем список вопросов из сессии
+            var questionListJson = HttpContext.Session.GetString("QuestionList");
+            if (string.IsNullOrEmpty(questionListJson))
+            {
+                // Если список вопросов отсутствует, перенаправляем на старт игры
+                return RedirectToAction("StartGame", new { gameMode = "Hard" + category });
+            }
 
-            int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
+            var questionIds = JsonConvert.DeserializeObject<List<int>>(questionListJson);
 
-            string category = gameMode.Replace("Hard", "");
+            // Извлекаем текущий индекс вопроса из сессии
+            int currentQuestionIndex = HttpContext.Session.GetInt32("CurrentQuestionIndex") ?? 0;
 
-            var nextQuestion = _dbContext.HardQuestions
-                .Where(q => q.Category == category)
-                .OrderBy(q => q.QuestionId)
-                .Skip(currentQuestionIndex)
-                .Take(1)
-                .FirstOrDefault();
+            // Если вопросов больше нет, завершаем игру
+            if (currentQuestionIndex >= questionIds.Count)
+            {
+                string difficultyLevel = "Сложный";
+                return RedirectToAction("Finish", new { difficultyLevel });
+            }
+
+            // Получаем ID текущего вопроса из списка
+            int questionId = questionIds[currentQuestionIndex];
+            var nextQuestion = _dbContext.HardQuestions.FirstOrDefault(q => q.QuestionId == questionId);
 
             if (nextQuestion != null)
             {
@@ -181,33 +221,36 @@ namespace PresentationLayer.Controllers
                 ViewBag.QuestionText = nextQuestion.QuestionText;
                 ViewBag.ImageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
 
+                // Увеличиваем индекс текущего вопроса в сессии для следующего запроса
+                HttpContext.Session.SetInt32("CurrentQuestionIndex", currentQuestionIndex + 1);
+
                 return View();
             }
 
-            string difficultyLevel = "Сложный";
-            return RedirectToAction("Finish", new { difficultyLevel });
+            // Если вопрос не найден, завершаем игру
+            string difficultyLevelFallback = "Сложный";
+            return RedirectToAction("Finish", new { difficultyLevel = difficultyLevelFallback });
         }
+
 
         public Task<IActionResult> DuelPDD()
         {
-            return Duel("DuelPDD");
+            return Duel("PDD");
         }
 
         public Task<IActionResult> DuelGeography()
         {
-            return Duel("DuelGeography");
+            return Duel("Geography");
         }
         
         public Task<IActionResult>DuelWWII()
         {
-            return Duel("DuelWWII");
+            return Duel("WWII");
         }
 
-        public async Task<IActionResult> Duel(string gameMode)
+        public async Task<IActionResult> Duel(string category)
         {
             int.TryParse(Request.Cookies["CurrentQuestionIndex"], out int currentQuestionIndex);
-
-            string category = gameMode.Replace("Duel", "");
 
             var nextQuestion = _dbContext.Questions
                 .Where(q => q.Category == category)

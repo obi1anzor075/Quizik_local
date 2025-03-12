@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PresentationLayer", "Presen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quiz.Tests", "Quiz.Tests\Quiz.Tests.csproj", "{8C25CA26-A7DF-45FC-B86C-C57A662C3003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageUploader", "ImageUploader\ImageUploader.csproj", "{F5E583E6-008B-4AE9-83DE-AFF508F7E7F2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{8C25CA26-A7DF-45FC-B86C-C57A662C3003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C25CA26-A7DF-45FC-B86C-C57A662C3003}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C25CA26-A7DF-45FC-B86C-C57A662C3003}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5E583E6-008B-4AE9-83DE-AFF508F7E7F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5E583E6-008B-4AE9-83DE-AFF508F7E7F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5E583E6-008B-4AE9-83DE-AFF508F7E7F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5E583E6-008B-4AE9-83DE-AFF508F7E7F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
