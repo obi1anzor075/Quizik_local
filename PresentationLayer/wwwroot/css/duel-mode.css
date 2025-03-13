@@ -279,6 +279,7 @@ h2{
     justify-content: center;
     align-items: center;
     margin-bottom: 20px; /* Отступ между изображением и ответами */
+    width: fit-content;
 }
 
 .question-img > img {

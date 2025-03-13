@@ -10,6 +10,7 @@ using DataAccessLayer.DataContext;
 using BusinessLogicLayer.Services.Contracts;
 using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace PresentationLayer.Hubs
 {
@@ -323,79 +324,170 @@ namespace PresentationLayer.Hubs
             }
         }
 
-
-
         public async Task EndGame(string chatRoom)
         {
             try
             {
-            // Проверяем, активна ли игра для данной комнаты
-            if (!Rooms.ContainsKey(chatRoom) || !Rooms[chatRoom].IsGameActive)
-            {
-                Console.WriteLine($"EndGame already processed or game not active for chatRoom {chatRoom}");
-                return;
-            }
-
-            var duel = await GetOrCreateDuel(chatRoom);
-            var results = new Dictionary<string, int>();
-
-            if (duel != null)
-            {
-                if (!string.IsNullOrEmpty(duel.Player1))
+                var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                // Проверяем, активна ли игра для данной комнаты
+                if (!Rooms.ContainsKey(chatRoom) || !Rooms[chatRoom].IsGameActive)
                 {
-                    var player1State = await GetPlayerState(duel.Player1);
-                    if (player1State != null)
+                    Console.WriteLine($"EndGame already processed or game not active for chatRoom {chatRoom}");
+                    return;
+                }
+
+                var duel = await GetOrCreateDuel(chatRoom);
+                var results = new Dictionary<string, int>();
+
+                if (duel != null)
+                {
+                    if (!string.IsNullOrEmpty(duel.Player1))
                     {
-                        results[duel.Player1] = player1State.Score;
+                        var player1State = await GetPlayerState(duel.Player1);
+                        if (player1State != null)
+                        {
+                            results[duel.Player1] = player1State.Score;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(duel.Player2))
+                    {
+                        var player2State = await GetPlayerState(duel.Player2);
+                        if (player2State != null)
+                        {
+                            results[duel.Player2] = player2State.Score;
+                        }
+                    }
+
+                    // Вычисляем места для каждого игрока
+                    var ranking = results
+                        .OrderByDescending(r => r.Value)
+                        .Select((r, index) => new { UserId = r.Key, Score = r.Value, Place = index + 1 })
+                        .ToList();
+
+                    // Логирование результатов
+                    Console.WriteLine("Results before sending to client:");
+                    foreach (var r in ranking)
+                    {
+                        Console.WriteLine($"Player: {r.UserId}, Score: {r.Score}, Place: {r.Place}");
+                    }
+
+                    // Сохраняем результаты для каждого игрока в БД
+                    foreach (var rank in ranking)
+                    {
+                        var quizResult = new QuizResult
+                        {
+                            UserId = rank.UserId,
+                            Score = rank.Score,
+                            Type = "Дуэль",
+                            DatePlayed = DateTime.Now,
+                            Place = rank.Place
+                        };
+                        _dbContext.QuizResults.Add(quizResult);
+                    }
+                    await _dbContext.SaveChangesAsync();
+
+                    await Clients.Group(chatRoom).EndGame(results);
+
+                    // Отключаем игру для комнаты и очищаем состояния
+                    Rooms[chatRoom].IsGameActive = false;
+                    await ClearDuel(chatRoom);
+                    if (!string.IsNullOrEmpty(duel.Player1))
+                    {
+                        await ClearPlayerState(duel.Player1);
+                    }
+                    if (!string.IsNullOrEmpty(duel.Player2))
+                    {
+                        await ClearPlayerState(duel.Player2);
                     }
                 }
-
-                if (!string.IsNullOrEmpty(duel.Player2))
+                else
                 {
-                    var player2State = await GetPlayerState(duel.Player2);
-                    if (player2State != null)
-                    {
-                        results[duel.Player2] = player2State.Score;
-                    }
-                }
-
-                // Log the results before sending
-                Console.WriteLine("Results before sending to client:");
-                foreach (var result in results)
-                {
-                    Console.WriteLine($"Player: {result.Key}, Score: {result.Value}");
-                }
-
-                await Clients.Group(chatRoom).EndGame(results);
-
-                // Set IsGameActive to false so EndGame cannot be called again
-                Rooms[chatRoom].IsGameActive = false;
-
-                // Clear the duel state
-                await ClearDuel(chatRoom);
-
-                // Clear the players' states
-                if (!string.IsNullOrEmpty(duel.Player1))
-                {
-                    await ClearPlayerState(duel.Player1);
-                }
-                if (!string.IsNullOrEmpty(duel.Player2))
-                {
-                    await ClearPlayerState(duel.Player2);
+                    Console.WriteLine($"Error: Duel not found for chatRoom {chatRoom}");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"Error: Duel not found for chatRoom {chatRoom}");
+                Console.WriteLine($"Error in EndGame: {ex.Message}");
+                Console.WriteLine(ex.StackTrace);
+                throw;
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in EndGame: {ex.Message}");
-            Console.WriteLine(ex.StackTrace);
-            throw;
-        }
-    }
+
+
+
+
+        //    public async Task EndGame(string chatRoom)
+        //    {
+        //        try
+        //        {
+        //        // Проверяем, активна ли игра для данной комнаты
+        //        if (!Rooms.ContainsKey(chatRoom) || !Rooms[chatRoom].IsGameActive)
+        //        {
+        //            Console.WriteLine($"EndGame already processed or game not active for chatRoom {chatRoom}");
+        //            return;
+        //        }
+
+        //        var duel = await GetOrCreateDuel(chatRoom);
+        //        var results = new Dictionary<string, int>();
+
+        //        if (duel != null)
+        //        {
+        //            if (!string.IsNullOrEmpty(duel.Player1))
+        //            {
+        //                var player1State = await GetPlayerState(duel.Player1);
+        //                if (player1State != null)
+        //                {
+        //                    results[duel.Player1] = player1State.Score;
+        //                }
+        //            }
+
+        //            if (!string.IsNullOrEmpty(duel.Player2))
+        //            {
+        //                var player2State = await GetPlayerState(duel.Player2);
+        //                if (player2State != null)
+        //                {
+        //                    results[duel.Player2] = player2State.Score;
+        //                }
+        //            }
+
+        //            // Log the results before sending
+        //            Console.WriteLine("Results before sending to client:");
+        //            foreach (var result in results)
+        //            {
+        //                Console.WriteLine($"Player: {result.Key}, Score: {result.Value}");
+        //            }
+
+        //            await Clients.Group(chatRoom).EndGame(results);
+
+        //            // Set IsGameActive to false so EndGame cannot be called again
+        //            Rooms[chatRoom].IsGameActive = false;
+
+        //            // Clear the duel state
+        //            await ClearDuel(chatRoom);
+
+        //            // Clear the players' states
+        //            if (!string.IsNullOrEmpty(duel.Player1))
+        //            {
+        //                await ClearPlayerState(duel.Player1);
+        //            }
+        //            if (!string.IsNullOrEmpty(duel.Player2))
+        //            {
+        //                await ClearPlayerState(duel.Player2);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine($"Error: Duel not found for chatRoom {chatRoom}");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error in EndGame: {ex.Message}");
+        //        Console.WriteLine(ex.StackTrace);
+        //        throw;
+        //    }
+        //}
 
         private Task ClearDuel(string chatRoom)
         {
