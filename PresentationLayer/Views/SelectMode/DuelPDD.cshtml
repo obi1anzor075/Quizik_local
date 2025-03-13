@@ -169,7 +169,6 @@
         if (selectedElement) {
             selectedElement.classList.add(isCorrect ? 'correct' : 'incorrect');
         }
-        getNextQuestion(); // Запрашиваем следующий вопрос сразу после получения результата ответа
     });
 
     connection.on("GameReady", function () {
@@ -336,19 +335,9 @@
     async function getNextQuestion() {
         let gameMode = "DuelPDD";
         try {
-            // Читаем порядковый номер вопроса из cookie
-            let questionIndex = getCookie("questionIndex");
-            console.log(`Requesting next question: index=${questionIndex}`);
-            await connection.invoke("GetNextQuestion", userName, chatRoom, questionIndex, gameMode);
-            // Увеличиваем номер вопроса и сохраняем его в cookie
-            // Читаем значение из куки и преобразуем в integer
-            let questionIndex = parseInt(Cookies.get("questionIndex")) || 0; // Если кука не существует, то по умолчанию 0
-
-            // Увеличиваем значение на 1
-            questionIndex += 1;
-
-            // Сохраняем обновленное значение обратно в куку как строку
-            Cookies.set("questionIndex", questionIndex.toString());
+            const questionId = parseInt(document.getElementById(`questionText`).getAttribute(`data-question-id`)) || 0;
+            console.log(`Requesting next question: index=${questionId}`);
+            await connection.invoke("GetNextQuestion", userName, chatRoom, questionId, gameMode);
             } catch (err) {
             console.error(err);
         }

@@ -199,14 +199,17 @@ namespace PresentationLayer.Hubs
 
                 string category = gameMode.Replace("Duel", "");
 
-                var question = _dbContext.Questions
-                    .Where(q => q.Category == category && q.QuestionId == questionId)
+                Console.WriteLine($"Current Question Index from playerState: {questionId}");
+
+                var question = await _dbContext.Questions
+                    .Where(q => q.Category == category)
                     .OrderBy(q => q.QuestionId)
-                    .FirstOrDefault();
+                    .Skip(questionId)
+                    .FirstOrDefaultAsync();
 
                 if (question == null)
                 {
-                    throw new Exception($"Question with ID {questionId} not found.");
+                    throw new Exception($"Question at index {questionId} not found.");
                 }
 
                 string correctAnswer = question.CorrectAnswerIndex switch
@@ -218,30 +221,31 @@ namespace PresentationLayer.Hubs
                     _ => string.Empty
                 };
 
-                var isCorrect = string.Equals(answer.Trim(), correctAnswer?.Trim(), StringComparison.OrdinalIgnoreCase);
-
+                bool isCorrect = string.Equals(answer.Trim(), correctAnswer?.Trim(), StringComparison.OrdinalIgnoreCase);
                 if (isCorrect)
                 {
                     playerState.Score++;
                 }
 
                 await SavePlayerState(userName, playerState);
-
                 await Clients.Caller.AnswerResult(isCorrect);
 
                 int questionCount = await _dbContext.Questions
                     .Where(q => q.Category == category)
-                    .OrderBy(q => q.QuestionId)
                     .CountAsync();
 
-                if (playerState.CurrentQuestionIndex >= questionCount)
+                // Если текущий вопрос — последний, завершаем игру
+                if (questionId >= questionCount - 1)
                 {
                     await EndGame(chatRoom);
                 }
                 else
                 {
-                    string questionIndex = _httpContextAccessor.HttpContext.Request.Cookies["questionIndex"];
-                    await GetNextQuestion(userName, chatRoom, questionIndex, gameMode);
+                    // Увеличиваем индекс для следующего вопроса
+                    playerState.CurrentQuestionIndex++;
+                    questionId++;
+                    await SavePlayerState(userName, playerState);
+                    await GetNextQuestion(userName, chatRoom, questionId, gameMode);
                 }
             }
             catch (Exception ex)
@@ -251,7 +255,8 @@ namespace PresentationLayer.Hubs
                 throw;
             }
         }
-        public async Task GetNextQuestion(string userName, string chatRoom, string questionIndex, string gameMode)
+
+        public async Task GetNextQuestion(string userName, string chatRoom, int questionIndex, string gameMode)
         {
             try
             {
@@ -259,47 +264,56 @@ namespace PresentationLayer.Hubs
 
                 string category = gameMode.Replace("Duel", "");
 
-                var cookieValue = _httpContextAccessor.HttpContext.Request.Cookies["questionIndex"];
-
-                int.TryParse(cookieValue, out int questionIndexLocal);
-
                 int questionsCount = await _dbContext.Questions
                     .Where(q => q.Category == category)
                     .CountAsync();
 
-                if (questionIndexLocal >= questionsCount)
+                if (questionIndex >= questionsCount)
                 {
                     Console.WriteLine("No more questions available, ending game.");
                     await EndGame(chatRoom);
                     return;
                 }
 
-                var nextQuestion = _dbContext.Questions
+                var nextQuestion = await _dbContext.Questions
                     .Where(q => q.Category == category)
                     .OrderBy(q => q.QuestionId)
-                    .Skip(questionIndexLocal)
-                    .Take(1)
-                    .FirstOrDefault();
+                    .Skip(questionIndex)
+                    .FirstOrDefaultAsync();
 
-                    var answers = new List<string>
-                    {
-                        nextQuestion.Answer1,
-                        nextQuestion.Answer2,
-                        nextQuestion.Answer3,
-                        nextQuestion.Answer4
-                    };
+                if (nextQuestion == null)
+                {
+                    Console.WriteLine("Next question not found, ending game.");
+                    await EndGame(chatRoom);
+                    return;
+                }
 
-                    // Дождаться результата декодирования изображения
-                    var imageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
+                // Сохраняем текущий индекс вопроса в состоянии игрока
+                var playerState = await GetPlayerState(userName);
+                if (playerState != null)
+                {
+                    playerState.CurrentQuestionIndex = nextQuestion.QuestionId;
+                    await SavePlayerState(userName, playerState);
+                }
 
-                    await Clients.Client(Context.ConnectionId).ReceiveQuestion(
-                        nextQuestion.QuestionId,
-                        nextQuestion.QuestionText,
-                        imageUrl,
-                        nextQuestion.QuestionExplanation,
-                        answers);
+                var answers = new List<string>
+        {
+            nextQuestion.Answer1,
+            nextQuestion.Answer2,
+            nextQuestion.Answer3,
+            nextQuestion.Answer4
+        };
 
-                    Console.WriteLine($"Question sent: {nextQuestion.QuestionId} - {nextQuestion.QuestionText}");
+                var imageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
+
+                await Clients.Client(Context.ConnectionId).ReceiveQuestion(
+                    questionIndex,
+                    nextQuestion.QuestionText,
+                    imageUrl,
+                    nextQuestion.QuestionExplanation,
+                    answers);
+
+                Console.WriteLine($"Question sent: {nextQuestion.QuestionId} - {nextQuestion.QuestionText}");
             }
             catch (Exception ex)
             {
