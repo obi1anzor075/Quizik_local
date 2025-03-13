@@ -37,6 +37,10 @@ namespace PresentationLayer.Hubs
         private static readonly Dictionary<string, GameRoom> Rooms = new();
         private static readonly Dictionary<string, Timer> RoomTimers = new();
 
+        private static Dictionary<string, Duel> _duelCache = new Dictionary<string, Duel>();
+        private static Dictionary<string, PlayerState> _playerStateCache = new Dictionary<string, PlayerState>();
+
+
         public GameHub(IDistributedCache cache, DataStoreDbContext dbContext, IHttpContextAccessor httpContextAccessor, IUserService userService, IImageService imageService)
         {
             _cache = cache;
@@ -46,16 +50,16 @@ namespace PresentationLayer.Hubs
             _imageService = imageService;
         }
 
-        //public Task<string> GetUserName()
-        //{
-        //    var userName = _httpContextAccessor.HttpContext.Request.Cookies["userName"];
-        //    if (string.IsNullOrEmpty(userName))
-        //    {
-        //        throw new KeyNotFoundException("User name not found");
-        //    }
+        public Task<string> GetUserName()
+        {
+            var userName = _httpContextAccessor.HttpContext.Request.Cookies["userName"];
+            if (string.IsNullOrEmpty(userName))
+            {
+                throw new KeyNotFoundException("User name not found");
+            }
 
-        //    return Task.FromResult(userName);
-        //}
+            return Task.FromResult(userName);
+        }
 
 
         // Save UserName and GET
@@ -79,7 +83,7 @@ namespace PresentationLayer.Hubs
               // Save the user to the database
               await _userService.SaveUserAsync(user);
           }
-        */        
+        */
         public async Task JoinChat(UserConnection connection)
         {
             if (connection == null || string.IsNullOrEmpty(connection.UserName) || string.IsNullOrEmpty(connection.ChatRoom))
@@ -236,7 +240,8 @@ namespace PresentationLayer.Hubs
                 }
                 else
                 {
-                    await GetNextQuestion(userName, chatRoom, playerState.CurrentQuestionIndex,gameMode);
+                    string questionIndex = _httpContextAccessor.HttpContext.Request.Cookies["questionIndex"];
+                    await GetNextQuestion(userName, chatRoom, questionIndex, gameMode);
                 }
             }
             catch (Exception ex)
@@ -246,24 +251,25 @@ namespace PresentationLayer.Hubs
                 throw;
             }
         }
-
-        public async Task GetNextQuestion(string userName, string chatRoom, int questionIndex, string gameMode)
+        public async Task GetNextQuestion(string userName, string chatRoom, string questionIndex, string gameMode)
         {
             try
             {
                 Console.WriteLine($"GetNextQuestion called with UserName={userName}, ChatRoom={chatRoom}, QuestionIndex={questionIndex}, GameMode={gameMode}");
 
-                var playerState = await GetPlayerState(userName) ?? new PlayerState();
-                await SavePlayerState(userName, playerState);
-
                 string category = gameMode.Replace("Duel", "");
 
+                var cookieValue = _httpContextAccessor.HttpContext.Request.Cookies["questionIndex"];
+
+                int.TryParse(cookieValue, out int questionIndexLocal);
+
                 int questionsCount = await _dbContext.Questions
-                    .Where (q => q.Category == category)
+                    .Where(q => q.Category == category)
                     .CountAsync();
 
-                if (questionIndex >= questionsCount)
+                if (questionIndexLocal >= questionsCount)
                 {
+                    Console.WriteLine("No more questions available, ending game.");
                     await EndGame(chatRoom);
                     return;
                 }
@@ -271,20 +277,29 @@ namespace PresentationLayer.Hubs
                 var nextQuestion = _dbContext.Questions
                     .Where(q => q.Category == category)
                     .OrderBy(q => q.QuestionId)
-                    .Skip(questionIndex)
+                    .Skip(questionIndexLocal)
                     .Take(1)
                     .FirstOrDefault();
 
-                if (nextQuestion != null)
-                {
-                    var answers = new List<string> { nextQuestion.Answer1, nextQuestion.Answer2, nextQuestion.Answer3, nextQuestion.Answer4 };
+                    var answers = new List<string>
+                    {
+                        nextQuestion.Answer1,
+                        nextQuestion.Answer2,
+                        nextQuestion.Answer3,
+                        nextQuestion.Answer4
+                    };
 
-                    playerState.CurrentQuestionIndex = questionIndex + 1; // Обновляем индекс следующего вопроса
-                    await SavePlayerState(userName, playerState);
+                    // Дождаться результата декодирования изображения
+                    var imageUrl = _imageService.DecodeImageAsync(nextQuestion.ImageData);
 
-                    await Clients.Client(Context.ConnectionId).ReceiveQuestion(nextQuestion.QuestionId, nextQuestion.QuestionText, _imageService.DecodeImageAsync(nextQuestion.ImageData), nextQuestion.QuestionExplanation,answers);
+                    await Clients.Client(Context.ConnectionId).ReceiveQuestion(
+                        nextQuestion.QuestionId,
+                        nextQuestion.QuestionText,
+                        imageUrl,
+                        nextQuestion.QuestionExplanation,
+                        answers);
+
                     Console.WriteLine($"Question sent: {nextQuestion.QuestionId} - {nextQuestion.QuestionText}");
-                }
             }
             catch (Exception ex)
             {
@@ -293,6 +308,8 @@ namespace PresentationLayer.Hubs
                 throw;
             }
         }
+
+
 
         public async Task EndGame(string chatRoom)
         {
@@ -366,108 +383,45 @@ namespace PresentationLayer.Hubs
         }
     }
 
-        private async Task ClearDuel(string chatRoom)
+        private Task ClearDuel(string chatRoom)
         {
-            try
-            {
-                var cacheKey = $"{chatRoom}:duel";
-                await _cache.RemoveAsync(cacheKey);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in ClearDuel: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
+            _duelCache.Remove(chatRoom);
+            return Task.CompletedTask;
         }
 
-        private async Task ClearPlayerState(string userName)
+        private Task ClearPlayerState(string userName)
         {
-            try
-            {
-                var cacheKey = $"playerState:{userName}";
-                await _cache.RemoveAsync(cacheKey);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in ClearPlayerState: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
+            _playerStateCache.Remove(userName);
+            return Task.CompletedTask;
         }
 
-        private async Task<PlayerState> GetPlayerState(string userName)
+        private Task<PlayerState> GetPlayerState(string userName)
         {
-            try
-            {
-                var cacheKey = $"playerState:{userName}";
-                var playerStateJson = await _cache.GetStringAsync(cacheKey);
-                if (playerStateJson != null)
-                {
-                    return JsonConvert.DeserializeObject<PlayerState>(playerStateJson);
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetPlayerState: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
+            _playerStateCache.TryGetValue(userName, out var playerState);
+            return Task.FromResult(playerState);
         }
 
-        private async Task SavePlayerState(string userName, PlayerState playerState)
+        private Task SavePlayerState(string userName, PlayerState playerState)
         {
-            try
-            {
-                var cacheKey = $"playerState:{userName}";
-                var playerStateJson = JsonConvert.SerializeObject(playerState);
-                await _cache.SetStringAsync(cacheKey, playerStateJson);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in SavePlayerState: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
+            _playerStateCache[userName] = playerState;
+            return Task.CompletedTask;
         }
 
-        private async Task<Duel> GetOrCreateDuel(string chatRoom)
+        private Task<Duel> GetOrCreateDuel(string chatRoom)
         {
-            try
+            if (_duelCache.TryGetValue(chatRoom, out var duel))
             {
-                var cacheKey = $"{chatRoom}:duel";
-                var duelJson = await _cache.GetStringAsync(cacheKey);
-                if (duelJson != null)
-                {
-                    return JsonConvert.DeserializeObject<Duel>(duelJson);
-                }
-
-                return new Duel(string.Empty, string.Empty, chatRoom, new Dictionary<string, int>());
+                return Task.FromResult(duel);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetOrCreateDuel: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
+            duel = new Duel(string.Empty, string.Empty, chatRoom, new Dictionary<string, int>());
+            _duelCache[chatRoom] = duel;
+            return Task.FromResult(duel);
         }
 
-        private async Task SaveDuel(string chatRoom, Duel duel)
+        private Task SaveDuel(string chatRoom, Duel duel)
         {
-            try
-            {
-                var cacheKey = $"{chatRoom}:duel";
-                var duelJson = JsonConvert.SerializeObject(duel);
-                await _cache.SetStringAsync(cacheKey, duelJson);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in SaveDuel: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
-                throw;
-            }
+            _duelCache[chatRoom] = duel;
+            return Task.CompletedTask;
         }
 
         private class PlayerState

@@ -22,13 +22,13 @@
         <div class="question">
             <img class="question-style" src="~/img/game/question-style.svg" alt="Alternate Text" />
             <div class="question-wrapper" translate="no">
-                <div class="question-label">Вопрос @ViewBag.QuestionId</div><div class="question-text">@ViewBag.QuestionText</div>
+                <div class="question-text">@ViewBag.QuestionText</div>
             </div>
         </div>
     </header>
     <main class="main__part">
         <div class="question-img">
-            <img src="~/img/questions/@ViewBag.ImageUrl" alt="Question Photo" />
+            <img src="@ViewBag.ImageUrl" alt="Question Photo" />
         </div>
         <div class="question-answer" translate="no">
             <div class="wrapper">

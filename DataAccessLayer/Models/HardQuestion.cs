@@ -18,7 +18,7 @@ public class HardQuestion
     public string CorrectAnswer2 { get; set; }
 
     [Column("question_explanation")]
-    public string QuestionExplanation { get; set; }
+    public string? QuestionExplanation { get; set; }
 
     [Column("image_data")]
     public byte[] ImageData { get; set; }

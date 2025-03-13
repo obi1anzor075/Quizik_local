@@ -7,7 +7,6 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.18/signalr.min.js"></script>
     <link href="~/css/duel-mode.css" rel="stylesheet" />
     <link href="~/css/answer-effects.css" rel="stylesheet" />
 </head>
@@ -20,7 +19,7 @@
         <div class="relative-container">
             <img class="question-style" src="~/img/game/question-style.svg" alt="Alternate Text" />
             <div class="question-wrapper" translate="no">
-                <div id="questionId" class="question-label">Вопрос @ViewBag.QuestionId</div><div id="questionText" class="question-text">@ViewBag.QuestionText</div>
+                <div id="questionId" style="display:none;" class="question-label">Вопрос @ViewBag.QuestionId</div><div id="questionText" class="question-text">@ViewBag.QuestionText</div>
             </div>
             <div id="timeBarContainer">
                 <div id="timerBar"></div>
@@ -32,7 +31,7 @@
 <main class="main__part">
     <div id="questionSection" style="display: none;">
         <div class="question-img">
-            <img id="questionImage" src="~/img/questions/" alt="Question Image" style="display: none;">
+            <img id="questionImage" src="" alt="Question Image" style="display: none;">
         </div>
         <div class="question-answer" translate="no">
             <div class="wrapper" id="answersList"></div>
@@ -66,7 +65,7 @@
         </div>
     </div>
 
-    <div id="timer" style="display: none;">45</div> <!-- Таймер на 45 секунд -->
+    <div id="timer" style="display: none;">4500</div> <!-- Таймер на 45 секунд -->
 </main>
 <footer class="footer__part"></footer>
 
@@ -89,7 +88,6 @@
     let timerInterval;
 
 
-
     connection.on("ReceiveQuestion", function (questionId, questionText, imageUrl,questionExplanation ,answers) {
         document.getElementById('card-login').style.display = 'none';
         console.log("Received question:", questionId, questionText, imageUrl, answers);
@@ -97,7 +95,7 @@
         document.getElementById('questionText').innerText = questionText;
         document.getElementById('questionText').setAttribute('data-question-id', questionId);
         if (imageUrl) {
-            document.getElementById('questionImage').src = "/img/questions/" + imageUrl;
+            document.getElementById('questionImage').src = imageUrl;
             document.getElementById('questionImage').style.display = 'block';
         } else {
             document.getElementById('questionImage').style.display = 'none';
@@ -153,7 +151,7 @@
 
         // Запуск таймера только при получении первого вопроса
         if (!timerInterval) {
-            startTimer(45); // Specify the duration in seconds
+            startTimer(45000); // Specify the duration in seconds
         }
     });
 
@@ -181,6 +179,7 @@
     });
 
     connection.on("StartGame", function () {
+        Cookies.set("questionIndex", 0);
         console.log("Game has started!");
         document.getElementById('questionSection').style.display = 'block';
         document.getElementById('question').style.display = 'flex';
@@ -337,13 +336,24 @@
     async function getNextQuestion() {
         let gameMode = "DuelPDD";
         try {
-            const questionId = parseInt(document.getElementById('questionText').getAttribute('data-question-id')) || 0;
-            console.log(`Requesting next question: index=${questionId}`);
-            await connection.invoke("GetNextQuestion", userName, chatRoom, questionId,gameMode);
-        } catch (err) {
+            // Читаем порядковый номер вопроса из cookie
+            let questionIndex = getCookie("questionIndex");
+            console.log(`Requesting next question: index=${questionIndex}`);
+            await connection.invoke("GetNextQuestion", userName, chatRoom, questionIndex, gameMode);
+            // Увеличиваем номер вопроса и сохраняем его в cookie
+            // Читаем значение из куки и преобразуем в integer
+            let questionIndex = parseInt(Cookies.get("questionIndex")) || 0; // Если кука не существует, то по умолчанию 0
+
+            // Увеличиваем значение на 1
+            questionIndex += 1;
+
+            // Сохраняем обновленное значение обратно в куку как строку
+            Cookies.set("questionIndex", questionIndex.toString());
+            } catch (err) {
             console.error(err);
         }
     }
+
 
     async function submitAnswer(questionId, answer) {
         try {
@@ -357,6 +367,7 @@
 
     async function endGame() {
         try {
+            Cookies.remove("questionIndex");
             await connection.invoke("EndGame", chatRoom); // Ensure chatRoom is passed
         } catch (err) {
             console.error("Error invoking EndGame:", err);
@@ -401,6 +412,13 @@
                 endGame(); // Call end game function
             }
         }, 1000);
+    }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : null;
     }
 
     document.getElementById('joinDuelBtn').addEventListener('click', joinDuel);

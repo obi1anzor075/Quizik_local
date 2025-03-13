@@ -41,7 +41,7 @@
 }
 
 .question-wrapper {
-    position: absolute;
+    position: relative;
     top: 3rem;
     /* left: 50%; */
     transform: translateY(-50%);
