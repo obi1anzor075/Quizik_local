@@ -328,9 +328,16 @@ namespace PresentationLayer.Hubs
         {
             try
             {
+                // Получаем уникальный идентификатор текущего пользователя из контекста
                 var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                
-                
+                // Получаем имя текущего пользователя из контекста
+                var currentUserName = Context.User?.FindFirst("preferred_username")?.Value;
+
+                if (currentUserName == null)
+                {
+                    currentUserName = _httpContextAccessor.HttpContext.Request.Cookies["userName"];
+                }
+
                 // Проверяем, активна ли игра для данной комнаты
                 if (!Rooms.ContainsKey(chatRoom) || !Rooms[chatRoom].IsGameActive)
                 {
@@ -341,8 +348,26 @@ namespace PresentationLayer.Hubs
                 var duel = await GetOrCreateDuel(chatRoom);
                 var results = new Dictionary<string, int>();
 
+
                 if (duel != null)
                 {
+                    // Сравнение текущего пользователя с игроками дуэли:
+                    // Если duel.Player1 хранит либо id, либо имя, сравниваем с обоими параметрами текущего пользователя
+                    if (duel.Player1 == currentUserId || duel.Player1 == currentUserName)
+                    {
+                        Console.WriteLine("Current user is Player1");
+
+                    }
+                    else if (duel.Player2 == currentUserId || duel.Player2 == currentUserName)
+                    {
+                        Console.WriteLine("Current user is Player2");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Current user is not a player in this duel");
+                    }
+
+                    // Получаем состояние игрока Player1 и добавляем результат в словарь
                     if (!string.IsNullOrEmpty(duel.Player1))
                     {
                         var player1State = await GetPlayerState(duel.Player1);
@@ -352,6 +377,7 @@ namespace PresentationLayer.Hubs
                         }
                     }
 
+                    // Получаем состояние игрока Player2 и добавляем результат в словарь
                     if (!string.IsNullOrEmpty(duel.Player2))
                     {
                         var player2State = await GetPlayerState(duel.Player2);
@@ -416,6 +442,7 @@ namespace PresentationLayer.Hubs
                 throw;
             }
         }
+
 
 
         //    public async Task EndGame(string chatRoom)
