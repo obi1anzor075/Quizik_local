@@ -329,6 +329,8 @@ namespace PresentationLayer.Hubs
             try
             {
                 var currentUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                
+                
                 // Проверяем, активна ли игра для данной комнаты
                 if (!Rooms.ContainsKey(chatRoom) || !Rooms[chatRoom].IsGameActive)
                 {
@@ -359,10 +361,10 @@ namespace PresentationLayer.Hubs
                         }
                     }
 
-                    // Вычисляем места для каждого игрока
+                    // Вычисляем места для каждого игрока – формируем финальную таблицу
                     var ranking = results
                         .OrderByDescending(r => r.Value)
-                        .Select((r, index) => new { UserId = r.Key, Score = r.Value, Place = index + 1 })
+                        .Select((r, index) => new { UserId = currentUserId, Score = r.Value, Place = index + 1 })
                         .ToList();
 
                     // Логирование результатов
@@ -372,7 +374,7 @@ namespace PresentationLayer.Hubs
                         Console.WriteLine($"Player: {r.UserId}, Score: {r.Score}, Place: {r.Place}");
                     }
 
-                    // Сохраняем результаты для каждого игрока в БД
+                    // Сохраняем результаты для каждого игрока в БД с учетом места
                     foreach (var rank in ranking)
                     {
                         var quizResult = new QuizResult
@@ -387,6 +389,7 @@ namespace PresentationLayer.Hubs
                     }
                     await _dbContext.SaveChangesAsync();
 
+                    // Передаём клиенту финальную таблицу с местами
                     await Clients.Group(chatRoom).EndGame(results);
 
                     // Отключаем игру для комнаты и очищаем состояния
@@ -413,8 +416,6 @@ namespace PresentationLayer.Hubs
                 throw;
             }
         }
-
-
 
 
         //    public async Task EndGame(string chatRoom)
@@ -554,7 +555,6 @@ namespace PresentationLayer.Hubs
                 IsGameActive = true;
             }
         }
-
 
         public record Duel(string Player1, string Player2, string ChatRoom, Dictionary<string, int> Scores);
     }

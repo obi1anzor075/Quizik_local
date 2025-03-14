@@ -12,6 +12,7 @@ let timerInterval;
 // Получаем значение режима из data-атрибута тега body
 const gameMode = document.body.getAttribute('data-gamemode');
 
+// Получение вопроса с сервера
 connection.on("ReceiveQuestion", function (questionId, questionText, imageUrl,questionExplanation ,answers) {
     document.getElementById('card-login').style.display = 'none';
     console.log("Received question:", questionId, questionText, imageUrl, answers);
@@ -75,7 +76,7 @@ connection.on("ReceiveQuestion", function (questionId, questionText, imageUrl,qu
 
     // Запуск таймера только при получении первого вопроса
     if (!timerInterval) {
-        startTimer(45000); // Specify the duration in seconds
+        startTimer(45); // Specify the duration in seconds
     }
 });
 

@@ -88,9 +88,6 @@ namespace PresentationLayer.Controllers
             return Json(new { isCorrect });
         }
 
-
-
-
         [HttpGet("/Game/CheckHardAnswer/{gameMode}/{selectedAnswer}")]
         public async Task<IActionResult> CheckHardAnswer(string gameMode, string selectedAnswer)
         {
@@ -142,8 +139,6 @@ namespace PresentationLayer.Controllers
             // Возвращаем результат проверки обратно на клиент
             return Json(new { isCorrect });
         }
-
-
 
         public IActionResult ResetCounters()
         {
