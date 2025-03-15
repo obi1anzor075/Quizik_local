@@ -400,20 +400,20 @@ namespace PresentationLayer.Hubs
                         Console.WriteLine($"Player: {r.UserId}, Score: {r.Score}, Place: {r.Place}");
                     }
 
-                    // Сохраняем результаты для каждого игрока в БД с учетом места
-                    foreach (var rank in ranking)
-                    {
-                        var quizResult = new QuizResult
-                        {
-                            UserId = rank.UserId,
-                            Score = rank.Score,
-                            Type = "Дуэль",
-                            DatePlayed = DateTime.Now,
-                            Place = rank.Place
-                        };
-                        _dbContext.QuizResults.Add(quizResult);
-                    }
-                    await _dbContext.SaveChangesAsync();
+                    //// Сохраняем результаты для каждого игрока в БД с учетом места
+                    //foreach (var rank in ranking)
+                    //{
+                    //    var quizResult = new QuizResult
+                    //    {
+                    //        UserId = rank.UserId,
+                    //        Score = rank.Score,
+                    //        Type = "Дуэль",
+                    //        DatePlayed = DateTime.Now,
+                    //        Place = rank.Place
+                    //    };
+                    //    _dbContext.QuizResults.Add(quizResult);
+                    //}
+                    //await _dbContext.SaveChangesAsync();
 
                     // Передаём клиенту финальную таблицу с местами
                     await Clients.Group(chatRoom).EndGame(results);
@@ -560,7 +560,16 @@ namespace PresentationLayer.Hubs
 
         private class PlayerState
         {
+            /// <summary>
+            /// Индекс текущего вопроса, на котором находится игрок.
+            /// Начальное значение: 0.
+            /// </summary>
             public int CurrentQuestionIndex { get; set; } = 0;
+
+            /// <summary>
+            /// Количество очков игрока.
+            /// Начальное значение: 0.
+            /// </summary>
             public int Score { get; set; } = 0;
         }
 
