@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using DataAccessLayer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.Repositories.Contracts
 {
@@ -18,5 +19,6 @@ namespace DataAccessLayer.Repositories.Contracts
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task<List<T>> GetQuestion();
+        Task<Question> GetQuestionByCategoryAsync(string category);
     }
 }

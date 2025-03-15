@@ -68,5 +68,12 @@ namespace DataAccessLayer.Repositories
             }
         }
 
+        public async Task<Question> GetQuestionByCategoryAsync(string category)
+        {
+            return await _dbContext.Questions
+                .Where(q => q.Category == category)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

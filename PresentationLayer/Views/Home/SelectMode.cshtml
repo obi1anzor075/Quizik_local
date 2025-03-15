@@ -1,16 +1,13 @@
 ﻿@using PresentationLayer.ViewModels
 @using PresentationLayer.Controllers
+@using DataAccessLayer.Models
 @using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Identity
 @inject PresentationLayer.Utilities.SharedViewLocalizer SharedLocalizer
+@inject UserManager<User> UserManager
 @model RegisterVM
 
-@{
-    var Localizer = ViewData["LocalizedStrings"] as Dictionary<string, string>;
-}
 
-@{
-    ViewData["Title"] = Localizer["SelectModeTitle"];
-}
 <head>
     <link href="~/css/chat.css" rel="stylesheet" />
     <link href="~/css/SelelctMode.css" rel="stylesheet" />
@@ -18,32 +15,35 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_forward" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
-    <div class="container">
-        <header>
-            <div class="head__mode_part">
-                <div class="head__mode_left">
-                    <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector" style="display:none;">
-                        <input type="hidden" name="culture" id="selectedLanguage" value="ru-RU">
-                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+<div class="container">
+    <header>
+        <div class="head__mode_part">
+            <div class="head__mode_left">
+                <form asp-controller="Home" asp-action="SetLanguage" method="post" class="language-selector" style="display:none;">
+                    <input type="hidden" name="culture" id="selectedLanguage" value="ru-RU">
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
 
-                        <!-- Кнопка с текущим флагом -->
-                        <div class="selected-flag" id="currentFlag" onclick="toggleDropdown()"
-                             style="background-image: url(https://hatscripts.github.io/circle-flags/flags/ru.svg);">
-                        </div>
+                    <!-- Кнопка с текущим флагом -->
+                    <div class="selected-flag" id="currentFlag" onclick="toggleDropdown()"
+                    style="background-image: url(https://hatscripts.github.io/circle-flags/flags/ru.svg);">
+                    </div>
 
-                        <!-- Выпадающее меню -->
-                        <div class="flag-dropdown" id="flagDropdown">
-                            <img src="https://hatscripts.github.io/circle-flags/flags/ru.svg" alt="Русский" onclick="selectLanguage('ru-RU', this)">
-                            <img src="https://hatscripts.github.io/circle-flags/flags/us.svg" alt="English" onclick="selectLanguage('en-US', this)">
-                            <img src="https://hatscripts.github.io/circle-flags/flags/cn.svg" alt="中文" onclick="selectLanguage('zh-CN', this)">
-                        </div>
-                    </form>
-                <div id="music-circle" class="btn btn-raised">
-                    <i class="material-icons">
-                        <img class="music-icon" src="~/img/music.png" alt="Alternate Text" />
-                    </i>
-                </div>
-                </div>
+                    <!-- Выпадающее меню -->
+                    <div class="flag-dropdown" id="flagDropdown">
+                        <img src="https://hatscripts.github.io/circle-flags/flags/ru.svg" alt="Русский" onclick="selectLanguage('ru-RU', this)">
+                        <img src="https://hatscripts.github.io/circle-flags/flags/us.svg" alt="English" onclick="selectLanguage('en-US', this)">
+                        <img src="https://hatscripts.github.io/circle-flags/flags/cn.svg" alt="中文" onclick="selectLanguage('zh-CN', this)">
+                    </div>
+                </form>
+                @if (User.IsInRole("Admin"))
+                {
+                    <div id="music-circle" class="btn btn-raised">
+                        <i class="material-icons">
+                            <a asp-controller="Admin" asp-action="AddQuiz"><img class="music-icon" src="~/img/add-circle-svgrepo-com.svg" alt="Alternate Text" style="width:45px;"/></a>
+                        </i>
+                    </div>
+                }
+            </div>
                 <div class="logo__img">
                 <img src="~/img/logo.svg" class="main__logo_landing" alt="Логотип Quizik" />
                 </div>
@@ -71,7 +71,7 @@
                         
                         <div class="chat-box">
                             <div class="chat-box-header ">
-                                @Localizer["ChatTitle"]
+                                Чат
                                 <span class="chat-box-toggle">
                                     <i class="material-icons">
                                         <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -102,7 +102,7 @@
                     </div>
                 </div>
             </div>
-        </header>
+    </header>
         </div>
 <main>
     <div class="container__mode">
@@ -112,20 +112,20 @@
                 <ul class="card-list swiper-wrapper">
                     <li class="card-item swiper-slide" data-swiper-autoplay="2000">
                         <a id="cardSlider" type="button" data-toggle="modal" data-target="#pddModal" class="card-link">
-                            <h2 class="card-title">@Localizer["PDDMode"]</h2>
-                            <img src="~/img/game-modes/PDD.svg" alt="@Localizer["PDDModeAltText"]" class="card-image">
+                            <h2 class="card-title">ПДД</h2>
+                            <img src="~/img/game-modes/PDD.svg" alt="Игра по правилам дорожного движения" class="card-image">
                         </a>
                     </li>
                     <li class="card-item swiper-slide" data-swiper-autoplay="2000">
                         <a id="cardSlider" type="button" data-toggle="modal" data-target="#geographyModal" class="card-link">
-                            <h2 class="card-title">@Localizer["GeographyMode"]</h2>
-                            <img src="~/img/game-modes/Geography.png" alt="@Localizer["GeographyModeAltText"]" class="card-image">
+                            <h2 class="card-title">География</h2>
+                            <img src="~/img/game-modes/Geography.png" alt="Игра по географии" class="card-image">
                         </a>
                     </li>
                     <li class="card-item swiper-slide" data-swiper-autoplay="2000">
                         <a id="cardSlider" type="button" data-toggle="modal" data-target="#WWIImodal" class="card-link">
-                            <h2 class="card-title">@Localizer["WWIIMode"]</h2>
-                            <img src="~/img/game-modes/WWII.png" alt="@Localizer["WWIIModeAltText"]" class="card-image">
+                            <h2 class="card-title">Вторая мировая война</h2>
+                            <img src="~/img/game-modes/WWII.png" alt="Игра по Второй мировой войне" class="card-image">
                         </a>
                     </li>
                 </ul>
@@ -440,20 +440,20 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content game-modal">
             <div class="modal-header">
-                <h5 class="modal-title center" id="pddModalLabel">@Localizer["PDDModeModalTitle"]</h5>
+                <h5 class="modal-title center" id="pddModalLabel">Добро пожаловать! Вы выбрали викторину на тему: "ПДД"</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>@Localizer["PDDModeDescription"]</p>
-                <p>@Localizer["PDDModeDetails"]</p>
-                <p>@Localizer["PDDModeReadyText"]</p>
+                <p>Тест по истории Второй мировой войны позволит вам проверить свои знания о событиях, сражениях, лидерах и ключевых моментах этого важного периода в истории человечества.</p>
+                <p>Викторина охватывает такие темы, как даты и факты, крупнейшие битвы, знаковые операции, а также лидеры и страны, сыгравшие ключевую роль в конфликте. Вы узнаете интересные подробности о стратегии, тактике и влиянии войны на дальнейшую историю.</p>
+                <p>Готовы окунуться в историю Второй мировой войны и проверить, насколько хорошо вы разбираетесь в этом сложном и значимом периоде?</p>
             </div>
             <div class="modal-footer align-center">
-                <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyPDD">@Localizer["SimpleButtonText"]</a>
-                <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardPDD">@Localizer["HardButtonText"]</a>
-                <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelPDD">@Localizer["DuelButtonText"]</a>
+                <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyPDD">Просто</a>
+                <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardPDD">Сложно</a>
+                <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelPDD">Дуэль</a>
             </div>
         </div>
     </div>
@@ -464,20 +464,20 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content game-modal">
             <div class="modal-header">
-                <h5 class="modal-title center" id="geographyModalLabel">@Localizer["GeographyModeModalTitle"]</h5>
+                <h5 class="modal-title center" id="geographyModalLabel">Добро пожаловать! Вы выбрали викторину на тему: "География"</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>@Localizer["GeographyModeDescription"]</p>
-                <p>@Localizer["GeographyModeDetails"]</p>
-                <p>@Localizer["GeographyModeReadyText"]</p>
+                <p>Тест по географии поможет вам проверить и расширить знания о нашей планете, её странах, столицах, природных чудесах и культурных особенностях.</p>
+                <p>Викторина охватывает такие темы, как столицы стран, уникальные географические объекты, природные чудеса и интересные факты о городах и странах мира.</p>
+                <p>Готовы отправиться в путешествие по миру и проверить свои знания о географии?</p>
             </div>
             <div class="modal-footer align-center">
-                <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyGeography">@Localizer["SimpleButtonText"]</a>
-                <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardGeography">@Localizer["HardButtonText"]</a>
-                <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelGeography">@Localizer["DuelButtonText"]</a>
+                <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyGeography">Просто</a>
+                <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardGeography">Сложно</a>
+                <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelGeography">Дуэль</a>
             </div>
         </div>
     </div>
@@ -488,20 +488,20 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
         <div class="modal-content game-modal">
             <div class="modal-header">
-                <h5 class="modal-title center" id="WWIIModalLabel">@Localizer["WWIIModeModalTitle"]</h5>
+                <h5 class="modal-title center" id="WWIIModalLabel">Добро пожаловать! Вы выбрали викторину на тему: "Вторая мировая война"</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>@Localizer["WWIIModeDescription"]</p>
-                <p>@Localizer["WWIIModeDetails"]</p>
-                <p>@Localizer["WWIIModeReadyText"]</p>
+                <p>Тест по истории Второй мировой войны позволит вам проверить свои знания о событиях, сражениях, лидерах и ключевых моментах этого важного периода в истории человечества.</p>
+                <p>Викторина охватывает такие темы, как даты и факты, крупнейшие битвы, знаковые операции, а также лидеры и страны, сыгравшие ключевую роль в конфликте. Вы узнаете интересные подробности о стратегии, тактике и влиянии войны на дальнейшую историю.</p>
+                <p>Готовы окунуться в историю Второй мировой войны и проверить, насколько хорошо вы разбираетесь в этом сложном и значимом периоде?</p>
             </div>
             <div class="modal-footer align-center">
-                <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyWWII">@Localizer["SimpleButtonText"]</a>
-                <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardWWII">@Localizer["HardButtonText"]</a>
-                <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelWWII">@Localizer["DuelButtonText"]</a>
+                <a class="button-confirm button button__play easy" asp-controller="SelectMode" asp-action="EasyWWII">Просто</a>
+                <a class="button-confirm button button__play hard" asp-controller="SelectMode" asp-action="HardWWII">Сложно</a>
+                <a class="button-confirm button button__play duel" asp-controller="SelectMode" asp-action="DuelWWII">Дуэль</a>
             </div>
         </div>
     </div>

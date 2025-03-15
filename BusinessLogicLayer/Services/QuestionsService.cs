@@ -27,5 +27,9 @@ namespace BusinessLogicLayer.Services
             var questions = await _questionRepository.GetQuestion();
             return questions.ToList();
         }
+        public async Task<Question> GetQuestionByCategoryAsync(string category)
+        {
+            return await _questionRepository.GetQuestionByCategoryAsync(category);
+        }
     }
 }

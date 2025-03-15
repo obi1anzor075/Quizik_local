@@ -18,7 +18,7 @@
 .question-style {
     width: 450px;
     position: absolute;
-    left: 50%;
+    left: 49%;
     transform: translatex(-50%);
 }
 

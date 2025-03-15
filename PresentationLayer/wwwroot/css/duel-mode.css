@@ -62,7 +62,7 @@
     display: inline-block; /* Позволяет контейнеру подстраиваться под размер изображения */
 }
 #timeBarContainer{
-    width: 357px;
+    width: 318px;
     height: 9px;
     border-radius: 50px;
     overflow: hidden;

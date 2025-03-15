@@ -4,7 +4,6 @@
 @inject PresentationLayer.Utilities.SharedViewLocalizer SharedLocalizer
 
 @{
-    var Localizer = ViewData["LocalizedStrings"] as Dictionary<string, string>;
     ViewData["Title"] = "Легкий уровень";
     var answers = ViewBag.Answers as List<string>;
     var halfCount = answers.Count / 2;
@@ -23,7 +22,7 @@
 <body translate="no">
     <header class="head__part">
         <div class="back-button">
-            <a asp-controller="Home" asp-action="SelectMode" id="backButton" class="head__back">@Localizer["Return"]</a>
+            <a asp-controller="Home" asp-action="SelectMode" id="backButton" class="head__back">Назад</a>
         </div>
 
         <div class="question">
@@ -53,7 +52,7 @@
                 </div>
             </div>
 
-            <a class="next__question" id="next-question-btn" href="@Url.Action("EasyPDD", "SelectMode")">@Localizer["Continue"]</a>
+            <a class="next__question" id="next-question-btn" href="@Url.Action("EasyPDD", "SelectMode")">Продолжить</a>
         </div>
         <div class="explanation-question" translate="no">
 

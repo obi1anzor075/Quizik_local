@@ -13,12 +13,10 @@ namespace PresentationLayer.Controllers
     public class GameController : Controller
     {
         private readonly DataStoreDbContext _dbContext;
-        private readonly CultureHelper _cultureHelper;
 
-        public GameController(DataStoreDbContext dbContext, CultureHelper cultureHelper)
+        public GameController(DataStoreDbContext dbContext)
         {
             _dbContext = dbContext;
-            _cultureHelper = cultureHelper;
         }
 
         private int CurrentQuestionIndex
@@ -34,19 +32,19 @@ namespace PresentationLayer.Controllers
             }
         }
 
-        private string GetCurrentLanguage()
-        {
-            string currentCulture = _cultureHelper.GetCurrentCulture();
-            return currentCulture switch
-            {
-                "ru-RU" => string.Empty,
-                "en-US" => "_us",
-                "zh-CN" => "_cn",
-                _ => string.Empty
-            };
-        }
+        //private string GetCurrentLanguage()
+        //{
+        //    string currentCulture = _cultureHelper.GetCurrentCulture();
+        //    return currentCulture switch
+        //    {
+        //        "ru-RU" => string.Empty,
+        //        "en-US" => "_us",
+        //        "zh-CN" => "_cn",
+        //        _ => string.Empty
+        //    };
+        //}
 
-        [HttpGet("/Game/CheckAnswer/{gameMode}/{selectedAnswer}")]
+        [HttpGet("/Game/CheckAnswer/{gameMode}/{*selectedAnswer}")]
         public async Task<IActionResult> CheckAnswer(string gameMode, string selectedAnswer)
         {
             string category = gameMode.Replace("Easy", "").Replace("Duel", "");
@@ -88,7 +86,7 @@ namespace PresentationLayer.Controllers
             return Json(new { isCorrect });
         }
 
-        [HttpGet("/Game/CheckHardAnswer/{gameMode}/{selectedAnswer}")]
+        [HttpGet("/Game/CheckHardAnswer/{gameMode}/{*selectedAnswer}")]
         public async Task<IActionResult> CheckHardAnswer(string gameMode, string selectedAnswer)
         {
             string category = gameMode.Replace("Hard", "");

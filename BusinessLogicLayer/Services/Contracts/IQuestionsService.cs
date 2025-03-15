@@ -11,6 +11,8 @@ namespace BusinessLogicLayer.Services.Contracts
     {
         Task<List<Question>> GetAllQuestionsAsync();
         Task<List<Question>> GetQuestion();
+        Task<Question> GetQuestionByCategoryAsync(string category); // Исправленный метод
+
     }
 }
 

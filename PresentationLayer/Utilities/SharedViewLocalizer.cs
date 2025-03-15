@@ -12,13 +12,13 @@ namespace PresentationLayer.Utilities
             _factory = factory;
         }
 
-        public IStringLocalizer GetLocalizer(string resourceName)
+        public virtual IStringLocalizer GetLocalizer(string resourceName)
         {
             var assemblyName = typeof(SharedResource).GetTypeInfo().Assembly.GetName().Name;
             return _factory.Create(resourceName, assemblyName);
         }
 
-        public Dictionary<string, string> GetAllLocalizedStrings(string resourceName)
+        public virtual Dictionary<string, string> GetAllLocalizedStrings(string resourceName)
         {
             var localizer = GetLocalizer(resourceName);
             return localizer.GetAllStrings().ToDictionary(ls => ls.Name, ls => ls.Value);

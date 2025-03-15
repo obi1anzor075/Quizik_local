@@ -5,14 +5,6 @@
 @inject PresentationLayer.Utilities.SharedViewLocalizer SharedLocalizer
 @model RegisterVM;
 
-@{
-    var Localizer = ViewData["LocalizedStrings"] as Dictionary<string, string>;
-
-}
-
-@{
-    ViewData["Title"] = Localizer["RegistrationTitle"];
-}
 
 <head>
     <link href="~/css/landing.css" rel="stylesheet" />
@@ -57,23 +49,23 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="register-wrapper">
                         <div class="input__name_wrapper">
-                            <input asp-for="UserName" class="input__name" required type="text" id="userName" name="userName" placeholder="@Localizer["UserNamePlaceholder"]" />
+                            <input asp-for="UserName" class="input__name" required type="text" id="userName" name="userName" placeholder="Имя" />
                             <span class="validator_error text-danger" asp-validation-for="UserName"></span>
                         </div>
 
                         <div class="input__email_wrapper">
-                            <input asp-for="Email" class="input__email" required type="email" id="email" name="email" placeholder="@Localizer["EmailPlaceholder"]" />
+                            <input asp-for="Email" class="input__email" required type="email" id="email" name="email" placeholder="Почта" />
                             <span class="validator_error text-danger" asp-validation-for="Email"></span>
                         </div>
 
                         <div class="input__password_wrapper">
-                            <input asp-for="Password" class="input__password" required type="password" id="password" name="password" placeholder="@Localizer["PasswordPlaceholder"]" />
+                            <input asp-for="Password" class="input__password" required type="password" id="password" name="password" placeholder="Пароль" />
                             <span class="validator_error text-danger" asp-validation-for="Password"></span>
                         </div>
                         <input type="hidden" name="token" value="@Context.Request.Query["token"]" />
 
                         <div class="input__password_wrapper">
-                            <input asp-for="ConfirmPassword" class="input__password" required type="password" id="ConfirmPassword" name="ConfirmPassword" placeholder="@Localizer["ConfirmPasswordPlaceholder"]" />
+                            <input asp-for="ConfirmPassword" class="input__password" required type="password" id="ConfirmPassword" name="ConfirmPassword" placeholder="Подтверждение пароля" />
                             <span class="validator_error text-danger" asp-validation-for="ConfirmPassword"></span>
                         </div>
 
@@ -87,21 +79,21 @@
                                             <path d="M2 8.36364L6.23077 12L13 2"></path>
                                         </svg>
                                     </div>
-                                    <span class="checkbox-label">@Localizer["TermsOfServiceText"]<a class="aqua-text" href=""> @Localizer["TermsOfServiceTextLink"]</a></span>
+                                    <span class="checkbox-label">Согласен с<a class="aqua-text" href=""> Условиями использования</a></span>
                                 </div>
                             </div>
                             <span class="validator_error text-danger" asp-validation-for="TermOfService"></span>
                         </div>
 
-                        <input type="submit" value="@Localizer["SubmitButton"]" id="send" class="button button__play" />
-                        <div class="redirect-to-login">@Localizer["AlreadyHaveAccount"]<a class="aqua-text" asp-controller="Home" asp-action="Login"> @Localizer["Login"]</a></div>
+                        <input type="submit" value="Играть" id="send" class="button button__play" />
+                        <div class="redirect-to-login">Уже есть аккаунт?<a class="aqua-text" asp-controller="Home" asp-action="Login"> Войти</a></div>
                     </div>
                 </form>
             </div>
         </div>
 
         <div class="other_wrapper">
-            <span>@Localizer["OrText"]</span>
+            <span>ИЛИ</span>
             <hr />
         </div>
 

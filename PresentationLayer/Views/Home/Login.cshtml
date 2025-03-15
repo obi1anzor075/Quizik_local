@@ -4,15 +4,6 @@
 @model LoginVM;
 @inject PresentationLayer.Utilities.SharedViewLocalizer SharedLocalizer
 
-@{
-    var Localizer = ViewData["LocalizedStrings"] as Dictionary<string, string>;
-
-}
-
-@{
-    ViewData["Title"] = Localizer["LoginTitle"];
-}
-
 <head>
     <link href="~/css/landing.css" rel="stylesheet" />
 </head>
@@ -55,12 +46,12 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="register-wrapper">
                         <div class="input__name_wrapper">
-                            <input asp-for="Email" class="input__name" required type="email" id="username" name="email" placeholder="@Localizer["EnterEmail"]" />
+                            <input asp-for="Email" class="input__name" required type="email" id="username" name="email" placeholder="Почта" />
                             <span class="validator_error text-danger" asp-validation-for="Email"></span>
                         </div>
 
                         <div class="input__password_wrapper">
-                            <input asp-for="Password" class="input__password" required type="password" id="password" name="password" placeholder="@Localizer["EnterPassword"]" />
+                            <input asp-for="Password" class="input__password" required type="password" id="password" name="password" placeholder="Пароль" />
                             <span class="validator_error text-danger" asp-validation-for="Password"></span>
                         </div>
 
@@ -84,20 +75,20 @@
                                         </defs>
                                     </svg>
                                 </div>
-                                <span class="checkbox-label">@Localizer["RememberMe"]</span>
+                                <span class="checkbox-label">Запомнить меня?</span>
                             </div>
                             <span class="validator_error text-danger" asp-validation-for="RememberMe"></span>
                         </div>
 
-                        <input type="submit" value="@Localizer["Play"]" id="send" class="button button__play" />
-                        <div class="redirect-to-login">@Localizer["NoAccount"] <a class="aqua-text" asp-controller="Home" asp-action="Register">@Localizer["Register"]</a></div>
+                        <input type="submit" value="Играть" id="send" class="button button__play" />
+                        <div class="redirect-to-login">Нет аккаунта? <a class="aqua-text" asp-controller="Home" asp-action="Register">Зарегистрироваться</a></div>
                     </div>
                 </form>
             </div>
         </div>
 
         <div class="other_wrapper">
-            <span>@Localizer["Or"]</span>
+            <span>ИЛИ</span>
             <hr />
         </div>
 

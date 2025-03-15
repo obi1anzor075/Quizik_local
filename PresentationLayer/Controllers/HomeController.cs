@@ -37,10 +37,9 @@ namespace PresentationLayer.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly UrlEncoder _urlEncoder;
-        private readonly LocalizedIdentityErrorDescriber _localizedIdentityErrorDescriber;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        private readonly SharedViewLocalizer _localizer;
+        //private readonly SharedViewLocalizer _localizer;
 
         private readonly IUserService _userService;
         private readonly IAuthService _authService;
@@ -50,15 +49,14 @@ namespace PresentationLayer.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IImageService _imageService;
 
-        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, LocalizedIdentityErrorDescriber localizedIdentityErrorDescriber, IPasswordHasher<User> passwordHasher, SharedViewLocalizer localizer, IUserService userService,IAuthService authService,IQuizService quizService, IAdminTokenService adminTokenService, IUserRepository userRepository, IImageService imageService)
+        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, IPasswordHasher<User> passwordHasher, IUserService userService,IAuthService authService,IQuizService quizService, IAdminTokenService adminTokenService, IUserRepository userRepository, IImageService imageService)
         {
             _context = context;
             _signInManager = signInManager;
             _userManager = userManager;
             _urlEncoder = urlEncoder;
-            _localizedIdentityErrorDescriber = localizedIdentityErrorDescriber;
             _passwordHasher = passwordHasher;
-            _localizer = localizer;
+            //_localizer = localizer;
             _userService = userService;
             _authService = authService;
             _quizService = quizService;
@@ -69,8 +67,8 @@ namespace PresentationLayer.Controllers
 
         public IActionResult Login()
         {
-            var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
-            ViewData["LocalizedStrings"] = localizedStrings;
+            //var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
+            //ViewData["LocalizedStrings"] = localizedStrings;
 
             if (User.Identity.IsAuthenticated)
             {
@@ -95,15 +93,15 @@ namespace PresentationLayer.Controllers
         public async Task<IActionResult> LoginAsync(LoginVM model)
         {
             // Локализация
-            var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
-            ViewData["LocalizedStrings"] = localizedStrings;
+            //var localizedStrings = _localizer.GetAllLocalizedStrings("Login");
+            //ViewData["LocalizedStrings"] = localizedStrings;
 
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(model.Email!);
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, _localizedIdentityErrorDescriber.InvalidLogin().Description);
+                    ModelState.AddModelError(string.Empty, "Неверное имя пользователя или пароль.");
                     return View(model);
                 }
 
@@ -119,7 +117,7 @@ namespace PresentationLayer.Controllers
                     return RedirectToAction("Verify2FA", "Home", new { userId = ((IdentityUser)user).Id, rememberMe = model.RememberMe });
                 }
 
-                ModelState.AddModelError(string.Empty, _localizedIdentityErrorDescriber.InvalidLogin().Description);
+                ModelState.AddModelError(string.Empty, "Неверное имя пользователя или пароль.");
             }
 
             return View(model);
@@ -128,10 +126,10 @@ namespace PresentationLayer.Controllers
         public IActionResult Register()
         {
             // Локализация
-            var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
+            //var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
 
-            // Передача строк в ViewData
-            ViewData["LocalizedStrings"] = localizedStrings;
+            //// Передача строк в ViewData
+            //ViewData["LocalizedStrings"] = localizedStrings;
 
             return View();
         }
@@ -140,8 +138,8 @@ namespace PresentationLayer.Controllers
         public async Task<IActionResult> Register(RegisterVM model)
         {
             // Локализация
-            var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
-            ViewData["LocalizedStrings"] = localizedStrings;
+            //var localizedStrings = _localizer.GetAllLocalizedStrings("Register");
+            //ViewData["LocalizedStrings"] = localizedStrings;
 
             var token = model.Token;
 
@@ -259,11 +257,11 @@ namespace PresentationLayer.Controllers
         [Authorize]
         public async Task<IActionResult> SelectMode()
         {
-            // Локализация
-            var localizedStrings = _localizer.GetAllLocalizedStrings("SelectMode");
+            //// Локализация
+            //var localizedStrings = _localizer.GetAllLocalizedStrings("SelectMode");
 
-            // Передача строк в ViewData
-            ViewData["LocalizedStrings"] = localizedStrings;
+            //// Передача строк в ViewData
+            //ViewData["LocalizedStrings"] = localizedStrings;
 
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
@@ -405,11 +403,11 @@ namespace PresentationLayer.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GoogleResponse()
         {
-            // Локализация
-            var localizedStrings = _localizer.GetAllLocalizedStrings("SelectMode");
+            //// Локализация
+            //var localizedStrings = _localizer.GetAllLocalizedStrings("SelectMode");
 
-            // Передача строк в ViewData
-            ViewData["LocalizedStrings"] = localizedStrings;
+            //// Передача строк в ViewData
+            //ViewData["LocalizedStrings"] = localizedStrings;
 
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)

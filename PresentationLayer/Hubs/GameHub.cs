@@ -112,6 +112,7 @@ namespace PresentationLayer.Hubs
                     await Clients.Caller.RoomFull();
                     return;
                 }
+                await ClearPlayerState(connection.UserName);
 
                 await Groups.AddToGroupAsync(Context.ConnectionId, connection.ChatRoom);
 

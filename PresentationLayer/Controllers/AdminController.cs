@@ -32,7 +32,7 @@ namespace PresentationLayer.Controllers
 
         public async Task<IActionResult> AddQuiz()
         {
-            IEnumerable<string> tablesNames = await _quizService.GetTableNamesAsync();
+            IEnumerable<string> tablesNames = ["Легкий вопрос", "Сложный вопрос"];
             return View(tablesNames);
         }
 
