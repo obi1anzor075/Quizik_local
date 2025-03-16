@@ -33,7 +33,6 @@ namespace PresentationLayer.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly DataStoreDbContext _context;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly UrlEncoder _urlEncoder;
@@ -49,9 +48,8 @@ namespace PresentationLayer.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IImageService _imageService;
 
-        public HomeController(DataStoreDbContext context, SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, IPasswordHasher<User> passwordHasher, IUserService userService,IAuthService authService,IQuizService quizService, IAdminTokenService adminTokenService, IUserRepository userRepository, IImageService imageService)
+        public HomeController(SignInManager<User> signInManager, UserManager<User> userManager, UrlEncoder urlEncoder, IPasswordHasher<User> passwordHasher, IUserService userService,IAuthService authService,IQuizService quizService, IAdminTokenService adminTokenService, IUserRepository userRepository, IImageService imageService)
         {
-            _context = context;
             _signInManager = signInManager;
             _userManager = userManager;
             _urlEncoder = urlEncoder;
@@ -263,6 +261,8 @@ namespace PresentationLayer.Controllers
             //// Передача строк в ViewData
             //ViewData["LocalizedStrings"] = localizedStrings;
 
+            await ClearCookies();
+            
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Home");
@@ -505,6 +505,16 @@ namespace PresentationLayer.Controllers
                 return words[0];
             }
             return string.Empty;
+        }
+
+        // Удалить куки
+        private async Task ClearCookies()
+        {
+            // Удаляем куки с именем "CurrentQuestionIndex"
+            Response.Cookies.Delete("CurrentQuestionIndex");
+
+            // Если требуется асинхронная обработка, можно ожидать завершения задачи
+            await Task.CompletedTask;
         }
 
         [HttpGet]

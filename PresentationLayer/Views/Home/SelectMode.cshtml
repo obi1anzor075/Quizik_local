@@ -368,6 +368,13 @@
     });
 </script>
 
+@*Очистка куки*@
+<script>
+        document.addEventListener("DOMContentLoaded", function() {
+        // Удаляем куки, устанавливая истёкшую дату
+        document.cookie = "CurrentQuestionIndex=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    });
+</script>
 
     @*Скрипты для переключателя языков*@
 <script>
