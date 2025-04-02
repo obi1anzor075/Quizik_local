@@ -16,7 +16,7 @@
     grid-template-columns: repeat(3, 1fr);
     height: 100px;
     padding: 0 32px 10px;
-    width: 98vw;
+    width: 100vw;
 }
 
 .back-button {

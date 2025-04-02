@@ -3,7 +3,7 @@
     grid-template-columns: repeat(3, 1fr);
     height: fit-content;
     padding: 0 32px 10px;
-    width: 98vw;
+    width: 100vw;
 }
 
 .back-button {
@@ -12,13 +12,13 @@
 
 .question {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
 }
 
 .question-style {
     width: 450px;
     position: absolute;
-    left: 49%;
+    left: 50%;
     transform: translatex(-50%);
 }
 
